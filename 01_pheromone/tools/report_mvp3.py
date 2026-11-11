@@ -206,6 +206,8 @@ def results_page(stages: list[Stage]) -> None:
         ("mock/mvp1/index.html", "MVP1 page (mock end to end)"), (f"real/{CHART}", "G2 chart"),
         ("real/mvp3/demo/", "Qt demo frames"), ("README.md", "File list")]
     body = (f"<h1>Pheromone foraging under misleading trails: results</h1>\n"
+            # The final report is written by hand (M8-02). Keep its link when this page is regenerated.
+            f'<p><a href="report.html">Final report</a></p>\n'
             f'<div class="panel"><p class="label">Goals</p><p>{escape(g1)}</p><p>{escape("; ".join(g2))}.</p></div>\n'
             f'<div class="panel fig">{img(f"real/{CHART}", "G2 chart")}</div>\n'
             f'<div class="panel"><p class="label">Pages</p><ul>'
