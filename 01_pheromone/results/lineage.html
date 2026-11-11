@@ -1,0 +1,431 @@
+<!doctype html>
+<html lang="ko" data-theme="light"><head><meta charset="utf-8">
+<title>연구 계보 (lineage): Qi Lu 교수 연구 흐름과 우리 프로젝트</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/theme.css">
+<style>
+.wrap { max-width: 1040px; }
+th, td { white-space: normal; text-align: left; vertical-align: top; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground); padding: 16px; display: flex; flex-direction: column; gap: 12px; }
+.cap { font-size: 13px; }
+.abbr { font-size: 12px; color: var(--muted-foreground); }
+.sec { display: flex; flex-direction: column; gap: 12px; }
+a { color: inherit; }
+ul, ol { margin: 0; padding-left: 20px; }
+.card th { width: 150px; }
+svg { max-width: 100%; height: auto; display: block; }
+svg .node { fill: var(--card); stroke: var(--border); stroke-width: 1.2; }
+svg .proj { fill: var(--secondary); stroke: var(--foreground); stroke-width: 1.5; }
+svg .t { fill: var(--foreground); font-size: 12px; font-family: var(--font); }
+svg .tb { fill: var(--foreground); font-size: 12px; font-weight: 700; font-family: var(--font); }
+svg .lb { fill: var(--muted-foreground); font-size: 11px; font-family: var(--font); }
+svg .ln { stroke: var(--foreground); stroke-width: 1.5; fill: none; }
+svg .dash { stroke: var(--foreground); stroke-width: 1.5; fill: none; stroke-dasharray: 5 4; }
+svg .head { fill: var(--foreground); stroke: none; }
+</style></head>
+<body><div class="wrap">
+
+<h1>연구 계보(lineage): Qi Lu 교수 연구 흐름, 그리고 우리 프로젝트</h1>
+
+<div class="panel sec" id="top">
+<p class="label">결론 먼저</p>
+<p><b>Lu 교수의 채집 줄기는 정직한 로봇을 가정하고(추론), 보안 줄기(2018~2024)가 거짓 길을 다룬다. 우리 프로젝트는 식별자 없는 방어(v5)와 식별자 적응 팔을 같은 격자에서 견주고, 로봇을 20대에서 40대로 키워 시험했다.</b></p>
+<p class="abbr">출처: <code>../research/lu_lineage.md</code> §1, §3. 우리 결과: <code>report.html</code>.</p>
+<p class="label">단계 목록</p>
+<ol>
+<li><a href="#s1">PART 1 흐름도</a></li>
+<li><a href="#s2">1996 개미 시스템(Ant System)</a></li>
+<li><a href="#s3">2001 가상 페로몬(virtual pheromone)</a></li>
+<li><a href="#s4">2015 중앙 장소 채집 알고리즘</a></li>
+<li><a href="#s5">2016 다중 장소 채집 알고리즘</a></li>
+<li><a href="#s6">2018 움직이는 디포(dynamic depots)</a></li>
+<li><a href="#s7">2018 비잔틴 로봇과 블록체인</a></li>
+<li><a href="#s8">2020 가지 운송망(branching network)</a></li>
+<li><a href="#s9">2021 로봇 사슬(robot chains)</a></li>
+<li><a href="#s10">2022 로봇 사슬 망(chain networks)</a></li>
+<li><a href="#s11">2022 군락 해킹(Hacking the Colony)</a></li>
+<li><a href="#s12">2024 4월 검역 구역(quarantine)</a></li>
+<li><a href="#s13">2024 6월 방해꾼 탐지(detection)</a></li>
+<li><a href="#s14">2024 강건한 완화(robust mitigation)</a></li>
+<li><a href="#s15">PART 2 v3 기준선(baseline)</a></li>
+<li><a href="#s16">v2 잠금(lockout)</a></li>
+<li><a href="#s17">M5 v5 두 번 확인(confirm-twice)</a></li>
+<li><a href="#s18">M6 식별자 적응 팔(adapted arm)</a></li>
+<li><a href="#s19">M7 규모(scale)</a></li>
+<li><a href="#s20">다음 단계</a></li>
+<li><a href="#s21">교수님이 적은 향후 과제</a></li>
+<li><a href="#s22">읽기 순서</a></li>
+<li><a href="#terms">용어 부록(terms appendix)</a></li>
+</ol>
+<p class="abbr">관련 페이지: <a href="report.html">최종 보고서</a> · <a href="index.html">결과 목록</a></p>
+</div>
+
+<h2 id="part1">PART 1. 마일스톤 논문 흐름 (흐름도, 그다음 논문별로 시간 순)</h2>
+
+<div class="step" id="s1">
+<p class="label">Step 1 of 22</p>
+<h2>흐름도</h2>
+<p>무엇을 알려고 보나: 두 줄기(채집, 보안)가 어디서 만나 우리 프로젝트가 되는가.</p>
+<svg viewBox="0 0 1040 810" width="1040" role="img" aria-label="채집 계보와 보안 계보가 우리 프로젝트에서 만나는 흐름도">
+<defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="8" markerHeight="8" orient="auto"><polygon class="head" points="0,0 10,5 0,10"/></marker></defs>
+<text class="tb" x="22" y="22">(a) 채집 계보 (foraging line)</text>
+<text class="tb" x="542" y="22">(b) 보안 계보 (security line)</text>
+
+<!-- lane a nodes: y = 40 + 78 i, height 40 -->
+<rect class="node" x="22" y="40" width="236" height="40"/><text class="tb" x="140" y="58" text-anchor="middle">개미 시스템 (Ant System)</text><text class="lb" x="140" y="73" text-anchor="middle">1996</text>
+<rect class="node" x="22" y="118" width="236" height="40"/><text class="tb" x="140" y="136" text-anchor="middle">가상 페로몬 (virtual pheromone)</text><text class="lb" x="140" y="151" text-anchor="middle">2001</text>
+<rect class="node" x="22" y="196" width="236" height="40"/><text class="tb" x="140" y="214" text-anchor="middle">중앙 장소 채집 (CPFA)</text><text class="lb" x="140" y="229" text-anchor="middle">2015</text>
+<rect class="node" x="22" y="274" width="236" height="40"/><text class="tb" x="140" y="292" text-anchor="middle">다중 장소 채집 (MPFA)</text><text class="lb" x="140" y="307" text-anchor="middle">2016</text>
+<rect class="node" x="22" y="352" width="236" height="40"/><text class="tb" x="140" y="370" text-anchor="middle">움직이는 디포 (dynamic depots)</text><text class="lb" x="140" y="385" text-anchor="middle">2018</text>
+<rect class="node" x="22" y="430" width="236" height="40"/><text class="tb" x="140" y="448" text-anchor="middle">가지 운송망 (branching)</text><text class="lb" x="140" y="463" text-anchor="middle">2020</text>
+<rect class="node" x="22" y="508" width="236" height="40"/><text class="tb" x="140" y="526" text-anchor="middle">로봇 사슬 (robot chains)</text><text class="lb" x="140" y="541" text-anchor="middle">2021, 2022</text>
+
+<!-- lane a arrows (all inferred, dashed) -->
+<line class="dash" x1="140" y1="80" x2="140" y2="116" marker-end="url(#ah)"/><text class="lb" x="270" y="97">페로몬 = 믿는 공유 기억 (추론)</text>
+<line class="dash" x1="140" y1="158" x2="140" y2="194" marker-end="url(#ah)"/><text class="lb" x="270" y="170">중계하는 모든 로봇을 믿음</text><text class="lb" x="270" y="184">(추론)</text>
+<line class="dash" x1="140" y1="236" x2="140" y2="272" marker-end="url(#ah)"/><text class="lb" x="270" y="248">중앙 둥지 하나는</text><text class="lb" x="270" y="262">확장되지 않음</text>
+<line class="dash" x1="140" y1="314" x2="140" y2="350" marker-end="url(#ah)"/><text class="lb" x="270" y="326">고정 둥지는 미리 배치해야 함,</text><text class="lb" x="270" y="340">전역 정보 필요</text>
+<line class="dash" x1="140" y1="392" x2="140" y2="428" marker-end="url(#ah)"/><text class="lb" x="270" y="404">군집이 크면 충돌 증가,</text><text class="lb" x="270" y="418">큰 경기장은 이동 비용 증가</text>
+<line class="dash" x1="140" y1="470" x2="140" y2="506" marker-end="url(#ah)"/><text class="lb" x="270" y="482">디포가 멀리 이동,</text><text class="lb" x="270" y="496">중앙 혼잡</text>
+
+<!-- lane b nodes -->
+<rect class="node" x="542" y="40" width="236" height="40"/><text class="tb" x="660" y="58" text-anchor="middle">보안 조사 (Higgins survey)</text><text class="lb" x="660" y="73" text-anchor="middle">2009</text>
+<rect class="node" x="542" y="118" width="236" height="40"/><text class="tb" x="660" y="136" text-anchor="middle">비잔틴 로봇 + 블록체인</text><text class="lb" x="660" y="151" text-anchor="middle">(Byzantine, blockchain) 2018</text>
+<rect class="node" x="542" y="196" width="236" height="40"/><text class="tb" x="660" y="214" text-anchor="middle">군락 해킹 (Hacking the Colony)</text><text class="lb" x="660" y="229" text-anchor="middle">2022</text>
+<rect class="node" x="542" y="274" width="236" height="40"/><text class="tb" x="660" y="292" text-anchor="middle">Luna와 Lu: 검역 구역 (ICCCR)</text><text class="lb" x="660" y="307" text-anchor="middle">2024 4월</text>
+<rect class="node" x="542" y="352" width="236" height="40"/><text class="tb" x="660" y="370" text-anchor="middle">방해꾼 탐지 (UR)</text><text class="lb" x="660" y="385" text-anchor="middle">2024 6월</text>
+<rect class="node" x="542" y="430" width="236" height="40"/><text class="tb" x="660" y="448" text-anchor="middle">강건한 완화 (TAROS)</text><text class="lb" x="660" y="463" text-anchor="middle">2024 (출판 2025)</text>
+
+<!-- lane b arrows: first solid (cited), rest dashed -->
+<line class="ln" x1="660" y1="80" x2="660" y2="116" marker-end="url(#ah)"/><text class="lb" x="790" y="92">Strobel이 인용. 비잔틴 로봇</text><text class="lb" x="790" y="106">소수가 협조를 깸</text>
+<line class="dash" x1="660" y1="158" x2="660" y2="194" marker-end="url(#ah)"/><text class="lb" x="790" y="170">방어에 메시지와</text><text class="lb" x="790" y="184">장부가 필요</text>
+<line class="dash" x1="660" y1="236" x2="660" y2="272" marker-end="url(#ah)"/><text class="lb" x="790" y="248">방해꾼 50 %에서</text><text class="lb" x="790" y="262">방어가 실패</text>
+<line class="dash" x1="660" y1="314" x2="660" y2="350" marker-end="url(#ah)"/><text class="lb" x="790" y="326">미끼가 아니라 방해꾼을</text><text class="lb" x="790" y="340">일찍 격리 (추론)</text>
+<line class="dash" x1="660" y1="392" x2="660" y2="428" marker-end="url(#ah)"/><text class="lb" x="790" y="404">깔기 속도, 방해꾼 비율,</text><text class="lb" x="790" y="418">장애물 시험을 추가</text>
+
+<!-- join arrows -->
+<line class="dash" x1="140" y1="548" x2="140" y2="618" marker-end="url(#ah)"/><text class="lb" x="152" y="578">위 연구는 모두 정직한 로봇을</text><text class="lb" x="152" y="592">가정 (추론)</text>
+<line class="ln" x1="660" y1="470" x2="660" y2="618" marker-end="url(#ah)"/><text class="lb" x="672" y="522">명시: 규모와 효율, 동적 환경, 기계 학습</text><text class="lb" x="672" y="536">읽음: 방어에 작성자 식별자 필요, 오탐 남음</text>
+
+<!-- project -->
+<rect class="proj" x="22" y="620" width="996" height="136"/>
+<text class="tb" x="40" y="642">우리 프로젝트 2026: 바닥 격자 페로몬, 메시지 없음</text>
+<rect class="node" x="40" y="660" width="304" height="72"/><text class="tb" x="192" y="684" text-anchor="middle">v5 두 번 확인 (confirm-twice)</text><text class="lb" x="192" y="702" text-anchor="middle">식별자 없음 · 메시지 없음</text><text class="lb" x="192" y="718" text-anchor="middle">RQ1 · M5</text>
+<rect class="node" x="368" y="660" width="304" height="72"/><text class="tb" x="520" y="684" text-anchor="middle">식별자 적응 팔 (adapted arm)</text><text class="lb" x="520" y="702" text-anchor="middle">TAROS 방어를 격자에 맞춤</text><text class="lb" x="520" y="718" text-anchor="middle">RQ2 · M6</text>
+<rect class="node" x="696" y="660" width="304" height="72"/><text class="tb" x="848" y="684" text-anchor="middle">규모 시험 (scale test)</text><text class="lb" x="848" y="702" text-anchor="middle">정직한 로봇 20대 대 40대</text><text class="lb" x="848" y="718" text-anchor="middle">RQ3 · M7</text>
+
+<!-- legend -->
+<line class="ln" x1="22" y1="782" x2="82" y2="782"/><text class="lb" x="92" y="786">실선: 출처가 적은 관계 (참고문헌 인용, 논문의 향후 과제)</text>
+<line class="dash" x1="560" y1="782" x2="620" y2="782"/><text class="lb" x="630" y="786">점선: 추론</text>
+</svg>
+<p class="cap"><b>그림 1.</b> 채집 계보(a)와 보안 계보(b)가 우리 프로젝트의 세 단계로 합쳐진다. 왜: 화살표 라벨이 "다음 문제"이므로, 각 연구가 앞 연구의 어떤 약점에서 나왔는지 보인다. 출처: <code>research/lu_lineage.md</code> §3.</p>
+<p class="abbr">약어: 중앙 장소 채집 알고리즘(central-place foraging algorithm, CPFA) · 다중 장소 채집 알고리즘(multiple-place foraging algorithm, MPFA) · 컴퓨터 제어 로보틱스 국제 학회 2024(International Conference on Computer, Control and Robotics, ICCCR) · 편재 로봇 국제 학회 2024(International Conference on Ubiquitous Robots, UR) · 자율 로봇 시스템을 향하여 2024(Towards Autonomous Robotic Systems, TAROS) · 연구 질문(research question, RQ) · 이정표(milestone, M)</p>
+<p class="abbr">Higgins 2009 보안 조사는 <code>lu_lineage.md</code>에서 행(row)으로 만들지 않았다. Strobel 2018과 TAROS 2024가 인용해서 다리로만 쓴다. 그래서 카드가 없다.</p>
+</div>
+
+
+<div class="step" id="s2">
+<p class="label">Step 2 of 22</p>
+<h2>1996 개미 시스템 (<a href="#t-as">Ant System</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>어려운 조합 최적화 문제에서 좋은 해를 빨리 찾아야 했다. 예: <a href="#t-tsp">외판원 문제(traveling salesman problem, TSP)</a>.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>인공 개미가 경로를 만든다. 공유 <a href="#t-pheromone">페로몬(pheromone)</a>이 "양의 되먹임(positive feedback)"을 준다. 초기 걸음은 탐욕 휴리스틱(greedy heuristic)이 이끈다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>개미 집단은 중앙 통제 없이 짧은 경로를 찾는다. 이 논문은 증발(evaporation)과 강화(reinforcement)의 출발점이다. 외판원 문제, 비대칭 외판원 문제, 이차 배정 문제, 작업장 일정 문제에 적용했다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 우리 격자 감쇠는 같은 생각을 바닥으로 옮긴 것이다 (추론).<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 페로몬 = 믿는 공유 기억 (추론).</p>
+<p class="abbr">출처: [S-LL-12]. 읽은 범위: 부분(partial). 1쪽과 초록만 읽었고 갱신 규칙은 읽지 않았다.</p>
+</div>
+
+<div class="step" id="s3">
+<p class="label">Step 3 of 22</p>
+<h2>2001 가상 페로몬 (<a href="#t-vp">virtual pheromone</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>아주 많은 소형 로봇을 조율해야 했다. 고유 <a href="#t-identifier">식별자(identifier)</a>, 점대점 경로, 중앙 상태는 그 규모에서 "압도될 수 있다".</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>각 로봇의 간단한 송수신기로 기호 메시지를 보낸다. 메시지는 장소가 아니라 로봇에 묶인다. 로봇이 발견을 중계하고 방향을 기억한다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>화학물질이 없다. 로봇 메쉬가 분산 계산 격자이자 기울기 표시판이 된다. 로봇이 자원까지 "분산된 이정표 배열"을 만든다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 가상 페로몬은 로봇 안에도 바닥에도 둘 수 있다. 우리 시험대는 바닥에 둔다 (추론).<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 중계하는 모든 로봇을 믿음 (추론). 한 대가 거짓 기울기를 넣을 수 있다.</p>
+<p class="abbr">출처: [S-LL-13]. 읽은 범위: 부분(partial). 1쪽과 2쪽을 읽었다.</p>
+</div>
+
+<div class="step" id="s4">
+<p class="label">Step 4 of 22</p>
+<h2>2015 중앙 장소 채집 알고리즘 (<a href="#t-cpfa">central-place foraging algorithm, CPFA</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>로봇 군집이 실험실 밖에서 일하려면 오류 허용, 유연성, 확장성이 필요하다. 셋을 한 틀에 가진 시스템이 없었다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>씨앗 수확 개미를 본뜬 알고리즘이다. <a href="#t-ga">유전 알고리즘(genetic algorithm, GA)</a>이 매개변수 7개(기억, 통신, 이동)를 조정한다. 모의와 로봇 최대 6대로 시험했다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>저수준 제어기가 아니라 고정된 개미 행동 집합을 조정한다. 진화한 전략은 군집 자원에서 효율이 2배다. 자원이 군집하고 감지가 믿을 만하면 페로몬을 더 쓴다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 진화한 페로몬 매개변수는 일부 로봇이 거짓말하면 어떻게 되나 (추론).<br>응용: 이 알고리즘을 정직한 기준선으로 쓴다 (추론).</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 중앙 둥지 하나는 확장되지 않음.</p>
+<p class="abbr">출처: [S-LL-1]. 읽은 범위: 확인(verified). 1, 2, 23~25쪽을 읽었다. 저자 Hecker, Moses. 논문이 든 향후 과제: 더 복잡한 환경, 더 많은 로봇 오류, 더 큰 물리 군집, 실시간 규칙 적응. 적대자는 모델에 없다 (추론).</p>
+</div>
+
+<div class="step" id="s5">
+<p class="label">Step 5 of 22</p>
+<h2>2016 다중 장소 채집 알고리즘 (<a href="#t-mpfa">multiple-place foraging algorithm, MPFA</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>모든 로봇이 중앙 둥지 하나로 돌아온다. 군집과 경기장이 커지면 이동 시간과 충돌이 늘어난다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>둥지 여러 개를 경기장에 퍼뜨린다. 로봇은 목표를 가장 가까운 둥지에 가져간다. 유전 알고리즘(GA)으로 조정하고 <a href="#t-argos">ARGoS</a>에서 시험했다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>부분 군집 목표에서 CPFA보다 채집률이 높다. 충돌, 이동 시간, 탐색 시간이 적다. 이동이 짧아지고 교통이 퍼진다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 둥지당 페로몬 독자가 줄면 거짓 길의 피해자도 줄 것이다 (추론). 찾은 곳 어디에도 시험이 없다.<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 고정 둥지는 미리 배치해야 함, 전역 정보 필요.</p>
+<p class="abbr">출처: [S-LL-3], 학회 정보는 [S-PH-1] 참고문헌 23번. 읽은 범위: 초록만(abstract only). 남은 문제: 둥지당 공유 페로몬 경유점이 줄어 로봇 사이 통신이 줄었고 GA가 일부만 상쇄한다. arXiv 판이 IROS 2016 논문과 같다는 것은 추론이다.</p>
+</div>
+
+<div class="step" id="s6">
+<p class="label">Step 6 of 22</p>
+<h2>2018 움직이는 디포 (<a href="#t-depot">dynamic depots</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>고정 둥지는 미리 배치해야 한다. 좋은 배치에는 전역 정보가 필요하다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>디포(depot)가 로봇이다. 최근 찾은 지역 목표의 무게중심으로 움직인다. ARGoS와 GA를 쓴다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>정적 MPFA(최적 배치 포함)와 CPFA보다 낫다. 이득은 50 × 50 m 경기장에서 더 크다. 감지 오류가 있어도 앞선다. 디포가 먹이를 따라가므로 사전 지도가 필요 없다 (추론).</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 움직이는 수집점은 "의심 길 끝" 논리를 어렵게 한다. 길 끝이 거짓이 아니라 낡은 것일 수 있다 (추론).<br>응용: 먹이 구역을 줄이거나 옮기고 정직한 길이 의심으로 잘못 표시되는 횟수를 센다 (<code>lu_lineage.md</code> §4 6번).</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 군집이 크면 충돌 증가, 큰 경기장은 이동 비용 증가.</p>
+<p class="abbr">출처: [S-LL-4], [S-LL-8]. 읽은 범위: 부분(partial). 논문 본문의 검색 조각을 읽었고 2021 초록이 확인해 준다. 남은 문제: 큰 경기장에서 디포가 중앙까지 멀리 가야 한다 (2021 논문이 적음).</p>
+</div>
+
+<div class="step" id="s7">
+<p class="label">Step 7 of 22</p>
+<h2>2018 비잔틴 로봇과 블록체인 (<a href="#t-byz">Byzantine</a>, <a href="#t-chain">blockchain</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>군집은 "내결함성이 높다고 주장"된다. 그러나 비잔틴(고장 또는 악의) 로봇 한두 대가 조율을 깰 수 있다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>최선-2 집단 결정 과제 위에 이더리움(Ethereum) 스마트 계약을 얹는다. 의견이 계약 기록과 다른 로봇은 블랙리스트에 오른다. ARGoS, 로봇 N = 20, 비잔틴 k = 0~9.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>변조 불가능한 공유 장부로 서로 못 믿는 로봇이 중앙 권한 없이 합의한다. 기존 방식은 "항상 틀린 색으로 수렴"한다. 비용은 거래당 약 160바이트 대 2~4바이트다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 방어마다 필요한 메시지, 식별자, 메모리를 짧은 표로 비교한다 (<code>lu_lineage.md</code> §4 8번). 그들의 방어는 메시지와 장부가 필요하고 우리 것은 필요 없다 (추론).<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 방어에 메시지와 장부가 필요.</p>
+<p class="abbr">출처: [S-LL-2]. 읽은 범위: 확인(verified). 1, 2, 7, 8쪽을 읽었다. 저자 Strobel 외. 장부는 15분 실행당 약 4~10 MB. 논문이 든 향후 과제: 더 많은 비잔틴 실패 종류, 다른 과제, 실제 로봇 이식. 성긴 연결은 연구되지 않았다.</p>
+</div>
+
+<div class="step" id="s8">
+<p class="label">Step 8 of 22</p>
+<h2>2020 가지 운송망 (<a href="#t-branch">branching transport network</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>군집이 크면 충돌이 늘고, 경기장이 크면 이동 비용이 오른다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>이동 디포가 계층적 가지 운송망에 먹이를 공급한다. 프랙탈 생물 네트워크를 본떴다. 규모 법칙이 채집률을 예측한다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>생물이 가지 네트워크로 규모 불변 전달을 이미 풀었다. ARGoS에서 최대 수천 대로 규모 불변 채집을 보였다. 단순한 디포를 하드웨어로 만들었다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 가지 네트워크에는 병목이 있다. 나쁜 디포 하나가 가지 전체를 돌릴 수 있다 (추론).<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 디포가 멀리 이동, 중앙 혼잡.</p>
+<p class="abbr">출처: [S-LL-7]. 읽은 범위: 초록만(abstract only). 모든 로봇이 협조한다고 가정한다 (추론).</p>
+</div>
+
+<div class="step" id="s9">
+<p class="label">Step 9 of 22</p>
+<h2>2021 로봇 사슬 (<a href="#t-chain-r">robot chains</a>)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>움직이는 디포는 큰 경기장에서 멀리 간다. 로봇이 많을수록 혼잡하다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>로봇 사슬이 한 장소를 중앙과 잇는다. 자원이 사슬을 따라 전달된다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>ARGoS에서 움직이는 디포 MPFA보다 혼잡이 적고 성능이 낫다. 전달하면 한 로봇이 운전하는 거리가 줄어든다 (추론).</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 사슬은 로봇으로 만든 페로몬 길과 같다. 거짓말하는 사슬 구성원은 열린 공격이다 (추론).<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 사슬 하나는 한 군집만 섬기고 끝에서 막힌다 (2022 논문의 문제). 흐름도는 2021과 2022를 한 칸으로 묶었다.</p>
+<p class="abbr">출처: [S-LL-8]. 읽은 범위: 초록만(abstract only). 사슬은 한 번에 한 장소에만 닿는다.</p>
+</div>
+
+<div class="step" id="s10">
+<p class="label">Step 10 of 22</p>
+<h2>2022 로봇 사슬 망 (chain networks)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>사슬 하나는 한 군집만 섬기고 끝에서 막힌다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>가지가 있는 사슬 망을 만든다. 가장 작은 망은 유클리드 슈타이너 트리(Euclidean Steiner tree) 문제로 세운다. ARGoS에서 시험했다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>가지가 교통을 군집들에 나눈다. 장애물을 피하고 단일 사슬보다 많이 모은다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>출처가 "2주 범위 밖"이라고 적었다. 이론과 응용 모두 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 위 연구는 모두 정직한 로봇을 가정 (추론). 보안 줄기와 우리 프로젝트가 여기서 이어진다.</p>
+<p class="abbr">출처: [S-LL-9]. 읽은 범위: 초록만(abstract only). 로봇 고장에 대한 강건성은 보고되지 않았다 (추론).</p>
+</div>
+
+<div class="step" id="s11">
+<p class="label">Step 11 of 22</p>
+<h2>2022 군락 해킹 (Hacking the Colony)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td><a href="#t-stig">스티그머지(stigmergy)</a>에는 신뢰가 내장되어 있지 않다. 소수의 <a href="#t-det">방해꾼(detractor)</a>이 잘못된 먹이 페로몬을 낼 수 있다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>격자 페로몬, 개미 1024마리, 자체 시뮬레이터(ARGoS 아님)를 썼다. 방해꾼이 둥지 근처에 봉쇄선을 만든다. 방어는 탐색 개미가 참을성이 바닥날 때 까는 "경고 페로몬(cautionary pheromone)"이다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>식별자도 메시지도 필요 없고 공격과 같은 매체를 쓴다. 방해꾼 3 %가 먹이 수집을 150배 줄였다. 방어는 개미당 먹이 8개 넘게 되살렸다.</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 출처에 없음.<br>응용: 우리 격자에 경고 페로몬을 재구현해 v3와 견주는 기준선으로 쓴다 (<code>lu_lineage.md</code> §4 3번, 추론).</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 방해꾼 50 %에서 방어가 실패. 증발하지 않는 페로몬이면 실패한다.</p>
+<p class="abbr">출처: [S-PH-6]. 읽은 범위: 확인(verified). 전문을 읽었다. 저자 Aswale 외. 공격 모양이 하나(둥지 봉쇄)라는 점이 남은 문제다. TAROS 2024가 인용한다(참고문헌 5번).</p>
+</div>
+
+<div class="step" id="s12">
+<p class="label">Step 12 of 22</p>
+<h2>2024 4월 검역 구역 (<a href="#t-quar">quarantine</a>, ICCCR)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>가상 페로몬은 그것이 기대는 스티그머지를 통해 공격받는다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>ARGoS에서 가짜 자원 공격을 가짜 수와 시간을 바꿔 시험한다. 방어는 가짜 주변의 원형 검역 구역이다. 거리 기반 병합으로 저장량을 아낀다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>초록 의역에 따르면 공격이 채집을 크게 줄이고, 검역이 가짜 자원 수집을 줄인다. 로봇이 아니라 미끼를 막는다 (추론).</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 검역은 우리 "의심 끝" 표시에 가깝다. v3의 선행 연구로 인용한다 (추론).<br>응용: 의심 끝을 원형 접근 금지 구역으로 바꾸고 v3 점 표시와 견준다 (<code>lu_lineage.md</code> §4 7번).</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 미끼가 아니라 방해꾼을 일찍 격리 (추론).</p>
+<p class="abbr">출처: [S-LL-10]. 읽은 범위: 초록만(abstract only). 저자 Luna, Lu. 의역에 따르면 저자들은 알고리즘이 공격에 약하다고 말한다. 누가 검역을 놓는지는 초록에 없다. 열린 사본: UTRGV ScholarWorks (<code>taros_defense_spec.md</code> §0).</p>
+</div>
+
+<div class="step" id="s13">
+<p class="label">Step 13 of 22</p>
+<h2>2024 6월 방해꾼 탐지와 완화 (detection and mitigation, UR)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>방해꾼 로봇이 잘못된 길을 깔아 수집을 줄인다.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>길 위에 <a href="#t-dbscan">밀도 기반 군집화(density-based spatial clustering of applications with noise, DBSCAN)</a>를 돌린다. 군집별로 묶고, 길 이동 시간으로 타이밍을 조절한다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>초록에 따르면 방해꾼이 격리되고 포획률이 줄며 채집이 유지된다. 미끼만이 아니라 방해꾼을 일찍 격리한다 (추론).</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 전문을 읽고 TAROS 2024와 어떻게 다른지 확인한 뒤에야 새로움을 주장한다.<br>응용: 출처에 없음.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 깔기 속도, 방해꾼 비율, 장애물 시험을 추가.</p>
+<p class="abbr">출처: [S-LL-11]. 읽은 범위: 초록만(abstract only). 저자 Luna, Lu. 둘의 겹침은 확인하지 못했다. 열린 사본: UTRGV ScholarWorks (<code>taros_defense_spec.md</code> §0).</p>
+</div>
+
+<div class="step" id="s14">
+<p class="label">Step 14 of 22</p>
+<h2>2024 강건한 완화 (robust mitigation, TAROS)</h2>
+<table class="card">
+<tr><th>무슨 문제였나 (problem)</th><td>같은 공격에 깔기 속도, 방해꾼 비율, 장애물 시험을 더해도 방어가 버티는가.</td></tr>
+<tr><th>어떻게 풀었나 (how solved)</th><td>페로몬 경유점이 있는 중앙 장소 채집을 쓴다. 방해꾼은 포획 지점 근처 좌표를 보고한다. 방어는 DBSCAN(ε = r_search, minPts = 2), 작성자 식별자 그래프, 이동 시간 검사, 5번 경고 시 격리다. 채집 로봇 24대, ARGoS.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td>방어가 채집을 "최대 16.07 %" 올리고 포획을 "최대 65.69 %" 줄였다. 장애물은 방어를 "해치지 않았다". 늦은 귀환이라는 행동 증거는 누가 거짓말하는지 정답이 필요 없다 (추론).</td></tr>
+<tr><th>앞으로 무엇을 할 수 있나 (future)</th><td>이론: 식별자 없는 방어를 시험한다 (우리 v3).<br>응용: 오탐(false positive)을 그림 5처럼 보고한다.</td></tr>
+</table>
+<p><b>다음 논문으로 넘어간 이유:</b> 명시: 규모와 효율, 동적 환경, 기계 학습. 읽음: 방어에 작성자 식별자 필요, 오탐 남음. 이어서 우리 프로젝트(PART 2).</p>
+<p class="abbr">출처: [S-PH-1]. 읽은 범위: 확인(verified). 전문을 읽었다. 장애물 시험에서 오탐은 0이 아니다. 그림 5 상자그림의 y축은 약 5~20이다(눈으로 읽음, 표 없음). 작성자 식별자와 공유 길 저장소가 필요하다 (추론). 방어 전체: <code>../research/taros_defense_spec.md</code>.</p>
+</div>
+
+<h2 id="part2">PART 2. 우리가 한 일 (our project)</h2>
+
+<div class="step" id="s15">
+<p class="label">Step 15 of 22</p>
+<h2>v3 기준선 (baseline): 결과 없음(null)</h2>
+<table class="card">
+<tr><th>무엇을 했나 (what we did)</th><td>방해꾼 수 d = 0, 1, 2, 4에서 방어 켬과 끔을 비교했다.<br>시드(seed) 1~10, 10개. 80 runs를 기록했다 (G1).</td></tr>
+<tr><th>무엇을 위해 (for what)</th><td>목표 G2: 회복한 손실 비율 R(d) (D-004). 판정 파일은 없다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td><b>R(2) = 0.07 [−0.02, 0.15]. 이득이 해결되지 않았다 (D-026).</b><br>R(1) = −0.05 [−0.31, 0.13]. R(4) = 0.02 [−0.09, 0.14].<br>가르침: 헤드라인은 v3로 남지만 이득은 오차 안에 있다.</td></tr>
+<tr><th>어디서 개선했나 (from where we improved)</th><td>TAROS 2024의 방어가 식별자와 공유 길 저장소를 쓰는 데 비해, v3는 식별자도 메시지도 쓰지 않는 방어를 시험한 출발점이다 (<code>lu_lineage.md</code> §4 3번 기준).</td></tr>
+</table>
+<p class="abbr">출처: <code>report.html</code> 판정표, <code>real/g2_stats.csv</code>, <code>index.html</code>.</p>
+</div>
+
+<div class="step" id="s16">
+<p class="label">Step 16 of 22</p>
+<h2>v2 <a href="#t-lock">잠금(lockout)</a>: 실패(FAIL)와 그 원인</h2>
+<table class="card">
+<tr><th>무엇을 했나 (what we did)</th><td>v3에 잠금 10 s를 더했다. 시드 11~30, 20개.</td></tr>
+<tr><th>무엇을 위해 (for what)</th><td>사전 등록 판정: G(2) 하한이 0 위이고, 공격 없을 때 비용의 상한이 0 아래가 아니어야 통과 (<code>prereg/defense_v2_lockout.md</code>).</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td><b>FAIL (D-033). G(2) = 4.05 [0.85, 7.25]. 공격 없을 때 비용 −6.7 [−9.7, −3.85].</b><br>가르침: 실패는 잠금이 아니라 기본 방어에서 났다. 잠금 0 대조도 −6.15 [−8.25, −4.05]를 잃는다.<br>원인: 붐비는 진짜 먹이 근처의 잘못된 의심. run당 잘못된 의심 14.6개 중 14.45개가 진짜 먹이 근처이고, 원뿔 중단 102.6개 중 102.55개가 그 점에서 나온다.</td></tr>
+<tr><th>어디서 개선했나 (from where we improved)</th><td>v3 위에 쌓았다 (잠금 0이 v3 동작이다). 재시도하지 않았다.</td></tr>
+</table>
+<p class="abbr">출처: <code>real/v2/verdict.json</code>, <code>real/failure_analysis.md</code>, <code>research/lu_lineage.md</code> §4 표.</p>
+</div>
+
+<div class="step" id="s17">
+<p class="label">Step 17 of 22</p>
+<h2>M5 v5 <a href="#t-v5">두 번 확인(confirm-twice)</a>: 통과(PASS)</h2>
+<table class="card">
+<tr><th>무엇을 했나 (what we did)</th><td>같은 점을 두 번 실패한 뒤에만 표시한다 (k = 2). 확인 횟수 1 또는 2와 잠금 0 또는 10 s의 2 × 2, 그리고 방어 끔.<br>d = 0, 1, 2, 4. 시드 221~260, 40개. 계획 800 runs (D-043).</td></tr>
+<tr><th>무엇을 위해 (for what)</th><td>RQ1: 두 번째 독립 실패가 공격 없을 때 비용을 없애고 G(2)를 0 위에 두는가. 우리 프로젝트의 mission "신뢰를 지킨다"에 답한다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td><b>RQ1 예(yes). 공격 없을 때 비용 0.125 [−0.975, 1.15]. G(2) = 2.75 [0.40, 4.975].</b><br>가르침: 구간이 0을 포함하니 해결된 비용이 없다. 보고만 한 것: 확인 횟수의 주효과가 G(2)를 낮춘다, −2.7875 [−4.475, −1.1625].</td></tr>
+<tr><th>어디서 개선했나 (from where we improved)</th><td>v2의 실패 원인(붐비는 진짜 먹이 근처의 잘못된 의심)을 막는다.</td></tr>
+</table>
+<p class="abbr">출처: <code>real/v5/verdict.json</code>, <code>real/v5/g2_stats.csv</code>, <code>decisions/2026-11-11_fable_tracks.md</code>, <code>RQ.md</code> (D-051, D-057).</p>
+</div>
+
+<div class="step" id="s18">
+<p class="label">Step 18 of 22</p>
+<h2>M6 식별자 <a href="#t-adapt">적응 팔(adapted arm)</a>: 다르다(differs)</h2>
+<table class="card">
+<tr><th>무엇을 했나 (what we did)</th><td>TAROS 2024 방어를 격자에 맞춘 팔을 만들었다 (DBSCAN, 작성자 식별자 그래프, 이동 시간 검사, 5번 경고 격리).<br>방어 끔, v3, k1t10, v5, 식별자 팔 × d = 0, 1, 2, 4. 시드 321~360, 40개. 실제 800 runs (k1t10 추가, D-052. 근거: results/real/id_arm/check_*.txt, 팔마다 160).</td></tr>
+<tr><th>무엇을 위해 (for what)</th><td>RQ2: 같은 격자, 같은 공격, 같은 시드 블록에서 식별자 없는 방어와 식별자 방어는 먹이와 오탐이 어떻게 다른가. 비전 "두 방어를 한 그래프에 놓는다"에 답한다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td><b>RQ2: 다르다. d = 2에서 식별자 팔 − 식별자 없는 최선 방어(k1t10) = +4.375 [2.25, 6.45] 먹이/run.</b><br>값: 공격이 없을 때 정직한 로봇 9.05대/run을 격리한다.<br>가르침: 식별자가 이득을 주지만 정직한 로봇을 잘못 격리하는 값을 치른다.</td></tr>
+<tr><th>어디서 개선했나 (from where we improved)</th><td>TAROS 2024 위에 쌓았다 (D-040). "복제(replication)"가 아니라 "적응 팔"이다.</td></tr>
+</table>
+<p class="abbr">출처: <code>real/id_arm/verdict.json</code>, <code>RQ.md</code> (D-054), <code>research/taros_defense_spec.md</code>.</p>
+</div>
+
+<div class="step" id="s19">
+<p class="label">Step 19 of 22</p>
+<h2>M7 규모(scale): v5는 규모가 커지면 나빠진다</h2>
+<table class="card">
+<tr><th>무엇을 했나 (what we did)</th><td>정직한 로봇 20대 대 40대, 같은 5 × 5 m 경기장, 방해꾼 10 %. 방어 끔, v3, 최선 팔.<br>시드 401~430, 30개. 계획 360 runs.</td></tr>
+<tr><th>무엇을 위해 (for what)</th><td>RQ3와 mission의 "규모". Lu 교수의 향후 과제 "scalability"에 답한다.</td></tr>
+<tr><th>왜 중요한가 (why it matters)</th><td><b>RQ3: v5는 아니오. 정직한 로봇당 이득 0.273 (20대, d = 2)에서 0.0275 (40대, d = 4)로 떨어졌다. 차이 −0.246 [−0.411, −0.085].</b><br>v3는 −0.1458 [−0.3175, 0.0234]로 해결되지 않았다. v5 하락 − v3 하락은 −0.100 [−0.230, 0.032].<br>원인: 같은 로봇이 두 번 실패해야 확인되는 개인 메모리다. 로봇당 미끼 방문이 3.55에서 1.98로 반감하고, 보호 시간 비율이 0.244에서 0.126으로 준다.</td></tr>
+<tr><th>어디서 개선했나 (from where we improved)</th><td>M5의 v5 위에 쌓았다. TAROS의 향후 과제 "scalability"에 답하고, v5가 규모에서 나빠지는 원인을 설명한다.</td></tr>
+</table>
+<p class="abbr">출처: <code>real/scale/verdict.json</code>, <code>real/scale/root_cause.md</code> §1, §5.3, §6 (D-055, D-056).</p>
+</div>
+
+<div class="step" id="s20">
+<p class="label">Step 20 of 22</p>
+<h2>다음 단계</h2>
+<p>무엇을 알려고 보나: 규모 실패의 원인을 고치는 다음 후보와, 아직 남은 열린 문제.</p>
+<table>
+<tr><th>후보</th><th>내용</th><th>종류</th><th>출처</th></tr>
+<tr><td>옵션 A: 로컬 스티그머지로 공유 확인</td><td>실패가 짧게 사는 국소 표시를 남기고, 근처 픽업이 지운다. 어느 로봇의 표시든 k개가 되면 점이 확인된다. 식별자 없이 증거를 모은다. 효과는 추론이다. 재생(replay)도 실행도 아직 없다.</td><td>응용</td><td><code>real/scale/root_cause.md</code> §7, <code>RQ.md</code> 제안 행</td></tr>
+<tr><td>피해 곡선의 포화</td><td>d = 8을 더해 용량-반응 모양을 맞춘다.</td><td>이론 + 측정</td><td><code>lu_lineage.md</code> §4 2번</td></tr>
+<tr><td>식별자 없는 방어 (경고 페로몬)</td><td>우리 격자에 세 번째 팔로 재구현한다.</td><td>응용</td><td>§4 3번</td></tr>
+<tr><td>방어는 덜 낭비하지만 먹이는 늘지 않음</td><td>상태별 시간을 기록하고 군집한 먹이로 v3를 다시 돌린다.</td><td>측정</td><td>§4 4번</td></tr>
+<tr><td>동적 환경</td><td>먹이 구역을 줄이거나 옮겨 낡은 길과 거짓 길을 구분한다.</td><td>응용</td><td>§4 6번, <code>report.html</code> 향후 과제</td></tr>
+<tr><td>구역 검역 대 끝 표시</td><td>의심 끝을 원형 접근 금지 구역으로 바꿔 v3와 견준다. 실행하지 않았다 (D-041).</td><td>응용</td><td>§4 7번</td></tr>
+</table>
+<p class="abbr">표의 "남음"은 이 페이지가 읽은 파일 안에서 완료 표시를 찾지 못했다는 뜻이다. §4 1, 5, 8번은 각각 M5, M7, 비용 표로 다루었다. 종류 표시는 <code>lu_lineage.md</code> §4에서 옮겼고, 옵션 A의 응용 표시는 작성자 판단이다.</p>
+</div>
+
+<div class="step" id="s21">
+<p class="label">Step 21 of 22</p>
+<h2>교수님이 적은 향후 과제</h2>
+<p>무엇을 알려고 보나: Lu 교수가 쓴 다음 과제 세 단어가 우리 트랙의 어디에 닿는가.</p>
+<table>
+<tr><th>TAROS 2024 인용 (p. 317, 쪽 이미지)</th><th>우리 단어</th><th>우리 트랙</th></tr>
+<tr><td>"Future work will focus on enhancing the scalability and efficiency of our defense mechanisms"</td><td>scale (규모)</td><td>M7. 답함: v5는 규모가 커지면 나빠진다 (RQ3).</td></tr>
+<tr><td>"exploring applications in more dynamic environments"</td><td>change (변화)</td><td>향후 과제. 움직이는 먹이는 새 먹이 모델이 필요해 미뤘다 (D-042).</td></tr>
+<tr><td>"possibly integrating advanced machine learning techniques to further refine adaptability and threat detection capabilities"</td><td>learn (학습)</td><td>향후 과제. 학습된 의심 시험(a learned suspect test).</td></tr>
+</table>
+<p class="abbr">출처: [S-PH-1], <code>research/lu_lineage.md</code> §2, <code>decisions/2026-11-11_fable_tracks.md</code> (D-034, D-042), <code>report.html</code> 향후 과제. 결론 문장(p. 316): "obstacles affected foraging efficiency, they did not compromise the defense's effectiveness".</p>
+</div>
+
+<div class="step" id="s22">
+<p class="label">Step 22 of 22</p>
+<h2>읽기 순서</h2>
+<table>
+<tr><th>순서</th><th>논문</th><th>왜 읽나</th></tr>
+<tr><td>1</td><td>Hecker, Moses 2015, "Beyond pheromones" (Swarm Intelligence)</td><td>이 줄기의 정직한 기준선인 CPFA.</td></tr>
+<tr><td>2</td><td>Lu, Hecker, Moses 2016, MPFA (IROS)</td><td>Lu 교수의 첫걸음. 둥지 하나가 왜 확장되지 않는가.</td></tr>
+<tr><td>3</td><td>Aswale 외 2022, "Hacking the Colony" (AAMAS)</td><td>우리가 따라한 공격, 그리고 식별자 없는 방어.</td></tr>
+<tr><td>4</td><td>Luna, Lu 2024, 검역 (ICCCR)</td><td>그의 첫 방어. 로봇이 아니라 미끼를 막는다. 전문이 필요하다.</td></tr>
+<tr><td>5</td><td>Luna, Lu 2024, 탐지와 완화 (UR)</td><td>길 위의 DBSCAN이 처음 나온다. 전문이 필요하다.</td></tr>
+<tr><td>6</td><td>Luna, Lu 2024, 강건한 완화 (TAROS)</td><td>M6이 적응한 방법과 317쪽의 향후 과제.</td></tr>
+<tr><td>7</td><td>Strobel 외 2018, 비잔틴 로봇 + 블록체인 (AAMAS)</td><td>비용 표에서 비용이 가장 높은 끝.</td></tr>
+</table>
+<p class="abbr">출처: <code>decisions/2026-11-11_fable_tracks.md</code> "Reading guide".</p>
+</div>
+
+<div class="panel sec" id="terms">
+<h2>용어 부록 (terms appendix)</h2>
+<ul>
+<li id="t-as">개미 시스템(Ant System): 인공 개미와 페로몬으로 경로 문제를 푸는 1996년 방법.</li>
+<li id="t-tsp">외판원 문제(traveling salesman problem, TSP): 모든 도시를 한 번씩 도는 가장 짧은 경로 찾기.</li>
+<li id="t-pheromone">페로몬(pheromone): 개미가 남기는 길 신호. 로봇에서는 가상의 값이다.</li>
+<li id="t-vp">가상 페로몬(virtual pheromone): 화학물질 없이 로봇 통신이나 바닥 격자로 만든 페로몬.</li>
+<li id="t-identifier">식별자(identifier): 로봇이나 길 표시를 만든 주체를 가리키는 이름표.</li>
+<li id="t-cpfa">중앙 장소 채집 알고리즘(central-place foraging algorithm, CPFA): 모든 로봇이 둥지 하나로 돌아오는 채집 방법.</li>
+<li id="t-ga">유전 알고리즘(genetic algorithm, GA): 매개변수를 세대마다 골라 가며 맞추는 탐색 방법.</li>
+<li id="t-mpfa">다중 장소 채집 알고리즘(multiple-place foraging algorithm, MPFA): 둥지를 여러 개 두는 채집 방법.</li>
+<li id="t-argos">ARGoS(Autonomous Robots Go Swarming): 로봇 군집 시뮬레이터.</li>
+<li id="t-depot">디포(depot): 로봇이 먹이를 가져다 놓는 수집점. 움직이는 디포는 로봇이다.</li>
+<li id="t-byz">비잔틴 로봇(Byzantine robot): 고장 났거나 악의로 틀린 정보를 내는 로봇.</li>
+<li id="t-chain">블록체인(blockchain): 변조할 수 없는 공유 기록 장부.</li>
+<li id="t-branch">가지 운송망(branching transport network): 가지처럼 갈라지는 계층적 전달 경로.</li>
+<li id="t-chain-r">로봇 사슬(robot chain): 로봇이 줄지어 서서 자원을 넘기는 경로.</li>
+<li id="t-stig">스티그머지(stigmergy): 환경에 남긴 흔적으로 간접 소통하는 방식.</li>
+<li id="t-det">방해꾼(detractor): 거짓 길을 깔아 다른 로봇을 헛걸음시키는 로봇.</li>
+<li id="t-quar">검역 구역(quarantine region): 가짜 자원 주변에 쳐서 따라가지 못하게 하는 원형 구역.</li>
+<li id="t-dbscan">밀도 기반 군집화(density-based spatial clustering of applications with noise, DBSCAN): 가까운 점을 한 무리로 묶는 군집 방법.</li>
+<li id="t-lock">잠금(lockout): 거짓 길을 중단한 뒤 일정 시간 같은 길 따라가기를 막는 규칙.</li>
+<li id="t-v5">두 번 확인(confirm-twice): 같은 점에서 두 번 실패해야 의심 표시를 확정하는 방어 v5.</li>
+<li id="t-adapt">적응 팔(adapted arm): TAROS 방어를 우리 격자에 맞춘 비교 방어. 복제가 아니다.</li>
+</ul>
+<p class="abbr">시드(seed): 한 번의 실행을 정하는 난수 번호. 구간 [a, b]: 95 % 쌍 부트스트랩(bootstrap) 신뢰구간.</p>
+</div>
+
+</div></body></html>
