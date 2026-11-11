@@ -32,3 +32,4 @@
 2026-11-11 decisions: D-032 defense v2 does not block M3, end 2026-11-21 (DECISIONS.md)
 2026-11-11 M4: v4 invariance holds (8 of 8 cells equal v3 seed 1), v2 tuning 80 runs picks t_lock 10 s (results/real/tuning_v2/pick.json)
 2026-11-11 M4: v2 confirmation 320 runs, check 0 failed, verdict FAIL (d=0 cost), D-033 (results/real/v2/verdict.json)
+2026-11-11 analysis: root cause of v2/v3 failures, false suspects at crowded true sources (results/real/failure_analysis.md)
