@@ -58,32 +58,32 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 
 ### Tactic: schema first, mock fills it (kill: a column the mock cannot fill without changing DESIGN §4)
 
-- [ ] M1-01 → M1: Python project files and `.gitignore`
+- [x] M1-01 → M1: Python project files and `.gitignore`
   - Static: `01_pheromone/pyproject.toml` per `rules/development/python.md`: `[tool.uv] python-downloads = "never"`, dependencies numpy and matplotlib only.
   - Static: `.gitignore` ignores `01_pheromone/runs/` and `01_pheromone/src/experiments/generated/`. `mock/runs/`, `prereg/` and `results/` are not ignored.
   - Gate: main session runs `uv sync` once before M1 exit 1.
-- [ ] M1-02 → M1: `tools/schema.py` and `tools/check_runs.py` (U1)
+- [x] M1-02 → M1: `tools/schema.py` and `tools/check_runs.py` (U1)
   - Static: `schema.py` defines `SCHEMA_VERSION = 1` and the column lists of DESIGN Table 3 and Table 4, in that order.
   - Static: `schema.py` lists the 7 event names of Table 4 and the `manifest.json` keys of DESIGN §4.
   - Static: `check_runs.py <root>` checks per run: 4 files present, exact headers, `ticks.csv` 6000 rows when `complete` is true, `mock` column constant and equal to manifest `mock`.
   - Static: it checks `metrics` equals the last `ticks.csv` row, and runid matches `<YYYYMMDD-HHMMSS>_d<k>_def<0|1>_s<seed>` with prefix `MOCK_` exactly when `mock` is true.
   - Static: it exits nonzero on any failure and prints run, file and column. Column names live only in `schema.py` (grep: no column literal in `check_runs.py`).
   - Gate: M1 exit 2 and 4.
-- [ ] M1-03 → M1: `tools/make_mock_runs.py` (U2)
+- [x] M1-03 → M1: `tools/make_mock_runs.py` (U2)
   - Static: writes only under `mock/runs/`. A different output path makes it exit nonzero before writing.
   - Static: 80 runs = d in 0, 1, 2, 4 x defense 0, 1 x seeds 1 to 10. Runid prefix `MOCK_`. `mock` = 1 in `ticks.csv`, `"mock": true` in the manifest.
   - Static: imports columns from `schema.py`. Fixed generator seed, so two runs give identical files.
   - Static: `robots.csv` has one row per robot per second, with 20 + d robots (D-005).
   - Static: `wasted_robot_seconds` is 0 in every d = 0 run (DESIGN §4.1). Mock means show a loss at d > 0 and a partial gain with defense on, so the chart is not empty.
   - Gate: M1 exit 1 and 2.
-- [ ] M1-04 → M1: `tools/analyze.py` (U3, DESIGN §4.2)
+- [x] M1-04 → M1: `tools/analyze.py` (U3, DESIGN §4.2)
   - Static: computes `F(d, def)`, `L(d)`, `G(d)`, `R(d)` as ratio of means. Bootstrap: 10,000 resamples of the seed index, paired across cells, 95 % percentile.
   - Static: writes "loss not resolved at d" and skips `R(d)` when the `L(d)` interval contains 0. Reports `F(0, on) - F(0, off)` as defense cost.
   - Static: cell check lists missing cells and duplicates (keeps the latest complete run). Missing cells do not stop the script.
   - Static: mixing guard stops on mixed `mock` values. Mock output goes to `results/mock/`, real to `results/real/`.
   - Static: a mock chart has "MOCK DATA" in its title and a `_MOCK.png` file name. `summary.csv` has one row per run.
   - Gate: M1 exit 3 and 5.
-- [ ] M1-05 → M1: `tools/make_report.py` (stage reports and summary page)
+- [x] M1-05 → M1: `tools/make_report.py` (stage reports and summary page)
   - Static: `--phase mvp1` reads saved outputs only (manifests, CSVs, check and analyze logs). No number is typed into the script.
   - Static: one report per stage (generate, check, analyze) with the 8 fields of `.claude/CLAUDE.md` "System build phasing", one figure and one table.
   - Static: `index.html` links every report and uses `skills/html-theme/theme.css`.
@@ -108,20 +108,20 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 
 ### Tactic: copy hw5, then make two stages real (kill: build fails on hw5 tags after 2 fix cycles)
 
-- [ ] M2-01 → M2: `src/` skeleton and the controller interface (U4)
+- [x] M2-01 → M2: `src/` skeleton and the controller interface (U4)
   - Static: files of DESIGN §6 `src/` exist. Top `CMakeLists.txt` copies hw5 (C++17, `find_package(ARGoS)`).
   - Static: targets `pheromone_forager` (controller) and `pheromone_loop_functions`. Qt user functions guarded by `ARGOS_QTOPENGL_FOUND`.
   - Static: the controller header declares `SPheromoneReading { here, probe[8] }`, `SDepositRequest { active, amount }`, a food struct as hw5 `SFoodData`, and getters for state and carrying.
   - Static: both `.argos` files set `ticks_per_second` 10, `length` 600, 5 x 5 x 2 m arena, 20 `hb_` robots.
   - Static: `pheromone_headless.template.argos` has no `<visualization>`. `pheromone_qt.argos` has one.
   - Gate: M2 exit 1.
-- [ ] M2-02 → M2: pure modules `pheromone_grid` and `food_field` (U5, part 1)
+- [x] M2-02 → M2: pure modules `pheromone_grid` and `food_field` (U5, part 1)
   - Static: grid 40 x 40, cell 0.10 m, two layers (true, false). Functions `Evaporate`, `Deposit`, `Probe`.
   - Static: evaporation factor is computed from the half-life parameter (60 s start, D-007). Deposit writes 3 x 3 cells with max-merge.
   - Static: `food_field` draws 3 sources and 2 decoys, then uses the first `n_decoys` (D-009).
   - Static: sources in x 0.5 to 1.7 m, radius 0.25 m. Each decoy at least 1.5 m from every source. Pickup inside a source never empties it.
   - Static: neither module includes a simulator header (grep `argos3/core/simulator` returns nothing in both).
-- [ ] M2-03 → M2: loop functions, virtual sensor, floor paint, Qt drawing (U5, part 2)
+- [x] M2-03 → M2: loop functions, virtual sensor, floor paint, Qt drawing (U5, part 2)
   - Static: `PreStep` evaporates, handles pickup and drop, writes `SPheromoneReading` per robot. Probe ring 8 points, 0.15 m, 45° steps from the heading.
   - Static: `PostStep` applies `SDepositRequest` into the layer of the robot's role (`hb_` true, `dt_` false). No deposit inside the nest.
   - Static: nest test is `x < -1.0` by position (D-008). The ground sensor is not read for nest or pheromone.
@@ -129,7 +129,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Static: the `layout` stream uses `CRandom::CreateCategory` seeded with the run seed, passed to `food_field`.
   - Static: `pheromone_qt_user_functions` draws a black cylinder on carrying robots, as hw5 `search_deliver_qt_user_functions.cpp`.
   - Gate: M2 exit 1 and 2 (the `layout` category builds and runs).
-- [ ] M2-04 → M2: honest controller (U6, DESIGN §3.2 as corrected)
+- [x] M2-04 → M2: honest controller (U6, DESIGN §3.2 as corrected)
   - Static: states REST, SEARCH, FOLLOW, END_SEARCH, RETURN. LEDs: REST off, SEARCH green, FOLLOW yellow, RETURN blue. END_SEARCH LED: open item below.
   - Static: transitions to RETURN on pickup in SEARCH, FOLLOW or END_SEARCH, or on `t_search` over.
   - Static: valid and invalid peaks both go to END_SEARCH. Only a valid peak may add a suspect (M3). A low-reading peak goes to SEARCH.
