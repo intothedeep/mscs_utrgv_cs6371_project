@@ -1,0 +1,237 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 4 (tie) Adaptive resource distribution (precision irrigation) | Final-project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><a href="../../projects/irrigation.html" hreflang="ko">한국어</a> | <b>English</b></p>
+
+<nav class="topnav">
+  <a href="evolved-controller.html">← Previous: rank 3 evolved controller</a>
+  <a href="../index.html">Index</a>
+  <a href="risk-aware-navigation.html">Next: rank 4 risk-aware navigation →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 4 (tie) of 9 (in rank order)</div>
+  <h1>Adaptive resource distribution (precision irrigation)</h1>
+  <div class="lead">
+    <p><strong>Result: rank 4 (tie), 12 points. Research potential is 3, but it does not overlap directly with Prof. Lu's papers.</strong></p>
+    <p>Why the score is a swing score: a Fit of 3 would make it 18 points and rank 2. The Fit is now 2.</p>
+    <div class="chips">
+      <span class="chip">Research potential 3</span>
+      <span class="chip">2-week feasibility 2</span>
+      <span class="chip">Fit with the professor's research 2</span>
+      <span class="chip">Total = product = 12 (inference)</span>
+    </div>
+    <p class="muted">None of Prof. Lu's papers covers irrigation. The links are only "agriculture" on the Computing Alliance of Hispanic-Serving Institutions (CAHSI) profile and the inference that delivery is foraging in reverse <a class="s" href="../index.html#S-LQ-4">[S-LQ-4]</a>.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and timeline</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Heat map of an arena where dry cells look dark, with robot recruit arrows, and an empty frame of a chart of the fraction of cells with enough moisture over time">
+      <defs>
+        <radialGradient id="dry" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#3a3a3a" stop-opacity=".85"/><stop offset="1" stop-color="#3a3a3a" stop-opacity="0"/></radialGradient>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--s2)"/></marker>
+      </defs>
+      <text class="b" x="40" y="22">Figure 1 left: moisture heat map of the arena</text>
+      <rect x="40" y="32" width="14" height="10" fill="#3a3a3a"/><text class="m" x="60" y="41">Dry cell</text>
+      <rect x="150" y="32" width="14" height="10" fill="#f2f2f2" stroke="#999"/><text class="m" x="170" y="41">Wet cell</text>
+      <rect x="260" y="32" width="14" height="10" fill="var(--s4)"/><text class="m" x="280" y="41">Water source</text>
+      <circle cx="47" cy="58" r="5" fill="#222"/><text class="m" x="60" y="62">Robot</text>
+      <line x1="150" y1="58" x2="176" y2="58" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/><text class="m" x="188" y="62">Recruit message</text>
+      <rect x="40" y="76" width="420" height="240" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+      <ellipse cx="130" cy="150" rx="75" ry="55" fill="url(#dry)"/>
+      <ellipse cx="330" cy="260" rx="85" ry="50" fill="url(#dry)"/>
+      <ellipse cx="270" cy="120" rx="45" ry="35" fill="url(#dry)"/>
+      <g class="gr">
+        <line x1="40" y1="106" x2="460" y2="106"/><line x1="40" y1="136" x2="460" y2="136"/><line x1="40" y1="166" x2="460" y2="166"/><line x1="40" y1="196" x2="460" y2="196"/><line x1="40" y1="226" x2="460" y2="226"/><line x1="40" y1="256" x2="460" y2="256"/><line x1="40" y1="286" x2="460" y2="286"/>
+        <line x1="70" y1="76" x2="70" y2="316"/><line x1="100" y1="76" x2="100" y2="316"/><line x1="130" y1="76" x2="130" y2="316"/><line x1="160" y1="76" x2="160" y2="316"/><line x1="190" y1="76" x2="190" y2="316"/><line x1="220" y1="76" x2="220" y2="316"/><line x1="250" y1="76" x2="250" y2="316"/><line x1="280" y1="76" x2="280" y2="316"/><line x1="310" y1="76" x2="310" y2="316"/><line x1="340" y1="76" x2="340" y2="316"/><line x1="370" y1="76" x2="370" y2="316"/><line x1="400" y1="76" x2="400" y2="316"/><line x1="430" y1="76" x2="430" y2="316"/>
+      </g>
+      <rect x="444" y="186" width="16" height="60" fill="var(--s4)"/>
+      <text class="b e" x="430" y="182">Water source</text>
+      <circle cx="200" cy="200" r="5" fill="#222"/><circle cx="215" cy="130" r="5" fill="#222"/><circle cx="380" cy="210" r="5" fill="#222"/><circle cx="105" cy="260" r="5" fill="#222"/><circle cx="300" cy="170" r="5" fill="#222"/>
+      <line x1="215" y1="130" x2="155" y2="140" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/>
+      <line x1="200" y1="200" x2="140" y2="165" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/>
+      <line x1="380" y1="210" x2="350" y2="245" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/>
+      <text class="b" x="560" y="22">Figure 1 right: time and cells with enough moisture (planned)</text>
+      <line x1="580" y1="38" x2="610" y2="38" stroke="var(--base)" stroke-width="3"/><text class="m" x="616" y="42">Random</text>
+      <line x1="780" y1="38" x2="810" y2="38" stroke="var(--s4)" stroke-width="3"/><text class="m" x="816" y="42">Centralized planner</text>
+      <line x1="580" y1="56" x2="610" y2="56" stroke="var(--s1)" stroke-width="3"/><text class="m" x="616" y="60">Swarm</text>
+      <line class="gr" x1="580" y1="140" x2="960" y2="140"/><line class="gr" x1="580" y1="200" x2="960" y2="200"/><line class="gr" x1="580" y1="260" x2="960" y2="260"/>
+      <line class="ax" x1="580" y1="88" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <line x1="790" y1="88" x2="790" y2="320" stroke="#666" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text class="m" x="796" y="104">Robot failures</text>
+      <text class="b c" x="770" y="352">Time</text>
+      <text class="b c" transform="translate(528 204) rotate(-90)">Fraction of cells above threshold</text>
+      <text class="m c" x="680" y="210">Empty frame (planned)</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows dry cells and recruit messages. The right side shows the axes of the chart that will compare three methods. Why: the key questions are how close a swarm without a map comes to a central planner, and whether it holds after failures.
+      <span class="ab">Abbreviations: none. Source: original Suggested figure. The moisture pattern is an illustrative sketch, not measured values.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>A field dries unevenly. Some cells need water now, and others need it later.</li>
+    <li>There is no map of where water is needed. The robots must sense it.</li>
+    <li>Prof. Lu's foraging swarm lists agriculture among its uses <a class="s" href="../index.html#S-LQ-4">[S-LQ-4]</a>.</li>
+    <li>Water delivery is foraging in reverse. It carries from one source to many destinations (inference).</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Use neither a map nor a central planner.</li>
+    <li>Keep the largest part of the field above a moisture threshold, with the least wasted water.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: original How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>10 to 30 foot-bots (the stock wheeled robot model of ARGoS). There is one water supply zone.</td></tr>
+      <tr><td>Sensors</td><td>The ground sensor reads dryness as the gray level of the floor. The positioning sensor, the proximity sensor and the range-and-bearing sensor (it gives the distance and direction of neighbor robots and passes short messages) are also used. The range-and-bearing sensor carries the recruit messages.</td></tr>
+      <tr><td>Behavior rules</td><td>A robot looks for a dry cell. It goes to the source, fills up, comes back and pours. It broadcasts "dry here" to call nearby robots.</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every simulation step) build a hidden moisture grid. Each cell dries at its own rate. The floor color shows moisture through <code>GetFloorColor</code> and is repainted with <code>SetChanged()</code> <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>. Pouring raises moisture. Water poured on a wet cell counts as waste.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Drying</a></li>
+    <li><a href="#a2">Step 2 Search and recruit</a></li>
+    <li><a href="#a3">Step 3 Fill</a></li>
+    <li><a href="#a4">Step 4 Pour</a></li>
+    <li><a href="#a5">Step 5 Broadcast</a></li>
+    <li><a href="#a6">Step 6 Failure test</a></li>
+    <li><a href="#base">Baselines</a></li>
+    <li><a href="#var">Variant</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 6</div><p>At every step, the loop function lowers the moisture of each cell at that cell's own rate.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 6</div><p>An empty robot walks at random, or it follows a recruit message toward a reported dry place.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 6</div><p>On a dry cell, the robot records its position. Then it goes to the source and fills one unit of water.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 6</div><p>It returns to the recorded place and pours on the driest cell within reach.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 6</div><p>On the way back, it broadcasts "(x, y) is dry" with the range-and-bearing signal.</p></div>
+    <div class="step" id="a6"><div class="k">Step 6 of 6</div><p>Failure test: at time t, switch off k random robots.</p></div>
+  </div>
+  <div class="panel" id="base">
+    <p class="label">Baselines</p>
+    <ul>
+      <li>Random: when a robot has filled up, it pours where it stands.</li>
+      <li>Centralized planner (one planning program that knows the full state and commands every robot): it reads the real moisture grid. It sends each robot to the driest unassigned cell. The route uses A* path search (an algorithm that finds the lowest-cost path on a grid). This is the path planning topic of the course.</li>
+    </ul>
+  </div>
+  <div class="panel" id="var">
+    <p class="label">Variant: demand-driven delivery</p>
+    <ul>
+      <li>Supplies pile up at the source. Requests appear at unknown places and times.</li>
+      <li>Key difference: in delivery, the demand is announced when it appears. In irrigation, the demand is hidden and must be sensed.</li>
+      <li>The robots decide among themselves who takes which request. There is no central dispatcher.</li>
+      <li>A swarm wins when there is no infrastructure (disaster relief), when robots fail, or when the scale is large. Otherwise a central dispatcher wins (inference).</li>
+    </ul>
+    <table class="t">
+      <caption>Table 2. Three distributed methods</caption>
+      <thead><tr><th>Method</th><th>Rule</th><th>Verification</th></tr></thead>
+      <tbody>
+        <tr><td>Greedy nearest</td><td>The nearest idle robot takes the request.</td><td>inference</td></tr>
+        <tr><td>Response threshold (a fixed threshold per individual)</td><td>A robot takes the request when the stimulus passes its own threshold.</td><td>inference. No source was fetched</td></tr>
+        <tr><td>Consensus-based bundle algorithm (CBBA, a distributed auction method)</td><td>Robots bid and agree on bundles by consensus <a class="s" href="../index.html#S-LQ-38">[S-LQ-38]</a>.</td><td>partial. The record page hit a request limit</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure the fraction of cells above the moisture threshold, over time and as an average.</li>
+    <li>Measure the wasted water. It is the amount poured on cells already above the threshold.</li>
+    <li>Measure robustness. After k robots fail, how far does that fraction fall?</li>
+    <li>Delivery variant: measure the mean wait time per request and the number of dropped requests.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: how can a swarm share resources among hidden demands without a map (inference).</li>
+    <li>Beyond a demo: compare the recruit rule with a central planner and add a failure test (inference).</li>
+    <li>Venue candidates (inference): International Conference on Swarm Intelligence (ANTS, a swarm intelligence conference), Distributed Autonomous Robotic Systems (DARS, a distributed robotics conference), a workshop of the International Conference on Autonomous Agents and Multiagent Systems (AAMAS, an agent conference), and agricultural robotics workshops of the International Conference on Robotics and Automation (ICRA) and the International Conference on Intelligent Robots and Systems (IROS).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 3. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Key point</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Texas A&amp;M configurable, adaptive and scalable agricultural swarm, 2021 <a class="s" href="../index.html#S-LQ-28">[S-LQ-28]</a></td><td>It is the application background.</td><td>verified (university news)</td></tr>
+      <tr><td>Qi Lu. Heterogeneous foraging swarm. Agriculture is listed as an application field <a class="s" href="../index.html#S-LQ-4">[S-LQ-4]</a></td><td>It is the link to Prof. Lu.</td><td>verified</td></tr>
+      <tr><td>Choi, Brunet, How. Consensus-based decentralized auctions for robust task allocation. Institute of Electrical and Electronics Engineers (IEEE) Transactions on Robotics 2009 <a class="s" href="../index.html#S-LQ-38">[S-LQ-38]</a></td><td>It is the source of CBBA.</td><td>old [STALE]. From a search snippet</td></tr>
+      <tr><td>Swarm irrigation papers from 2022 to 2026</td><td>None was verified.</td><td>[UNVERIFIED]</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 Split among 4 people and 2-week timeline</h2>
+  <table class="t">
+    <caption>Table 4. Split among 4 people (source: original)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Moisture grid loop function, drying, waste count</td><td>Failure injection</td></tr>
+      <tr><td class="c">B</td><td>Swarm controller (search, fill, pour)</td><td>Recruit messages</td></tr>
+      <tr><td class="c">C</td><td>Random and central baselines</td><td>Delivery variant (if time allows)</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Graphs, presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>There are many parameters (drying rate, tank size). Fix them in week 1.</li>
+    <li>In a small arena, the central baseline can win easily. This is a legitimate finding, not a failure (inference).</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="evolved-controller.html">← Previous: rank 3 evolved controller</a>
+  <a href="../index.html">Index</a>
+  <a href="risk-aware-navigation.html">Next: rank 4 risk-aware navigation →</a>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,349 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Final-project candidate research results | CSCI 6371</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.className += " js";</script>
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><a href="../index.html" hreflang="ko">한국어</a> | <b>English</b></p>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">CSCI 6371 Robotics Programming / 4 people / 2 weeks / ARGoS simulator</div>
+  <h1>Final-project candidate research results</h1>
+  <div class="lead">
+    <p><strong>Result: rank 1 is pheromone foraging under misleading trails (27 points). Rank 2 is spiral search (18). Rank 3 is the evolved controller (12).</strong></p>
+    <p>Why these three: they sit closest to the paper line of Prof. Lu himself. They are the most likely to lead to follow-up research.</p>
+    <ol>
+      <li>Rank 1: <a href="projects/pheromone-misleading-trails.html">pheromone foraging under misleading trails</a>. It reproduces his 2024 defense paper and adds one new rule.</li>
+      <li>Rank 2: <a href="projects/spiral-search.html">spiral search vs random walk vs hybrid</a>. It rebuilds his 2023 ARGoS paper and adds a hybrid rule.</li>
+      <li>Rank 3: <a href="projects/evolved-controller.html">evolved foraging controller</a>. It follows a neuroevolution paper listed on Google Scholar. The risk is that the owner must run the evolution by hand.</li>
+    </ol>
+    <p>Three cautions when reading.</p>
+    <ul>
+      <li>Every score is the author's judgment (inference).</li>
+      <li>Four projects (ranks 3 to 6) tie at 12 points. The researcher broke the tie by Fit first. The owner can change this rule.</li>
+      <li>Precision irrigation would score 18 and take rank 2 if its Fit were 3. Its Fit is now 2.</li>
+    </ul>
+    <p>The territory game, the owner's current favorite, is rank 6 (12 points). It received no bonus. See the <a href="projects/territory-game.html">territory game page</a> and <a href="../DESIGN.md">DESIGN.md</a>.</p>
+  </div>
+  <ol class="toc tabs">
+    <li><a href="#rank">1 Ranking</a></li>
+    <li><a href="#prof">2 Prof. Qi (Luki) Lu</a></li>
+    <li><a href="#swarm">3 Is a swarm the right tool?</a></li>
+    <li><a href="#other">4 Other ideas</a></li>
+    <li><a href="#gaps">5 What is not verified</a></li>
+    <li><a href="#sources">Sources</a></li>
+  </ol>
+</header>
+
+<section class="tab" id="rank">
+  <h2>1 Ranking: 9 projects</h2>
+  <p class="muted">Score = research potential × 2-week feasibility × fit with the professor's research (Fit). Each factor is 1 to 3. The maximum product is 27. Every score is an inference. The territory game gets no bonus. Source: research/lu_qi.md section 2.0.</p>
+  <figure>
+    <svg viewBox="0 0 1000 350" role="img" aria-label="Bar chart of the total score of nine projects">
+      <text class="b" x="20" y="22">Figure 1. Total score per project (maximum 27)</text>
+      <rect x="20" y="34" width="14" height="10" fill="var(--s1)"/><text class="m" x="40" y="43">Top 3 (ranks 1 to 3)</text>
+      <rect x="260" y="34" width="14" height="10" fill="var(--base)"/><text class="m" x="280" y="43">Others</text>
+      <g class="gr">
+        <line x1="310" y1="58" x2="310" y2="330"/><line x1="508" y1="58" x2="508" y2="330"/><line x1="706" y1="58" x2="706" y2="330"/><line x1="904" y1="58" x2="904" y2="330"/>
+      </g>
+      <text class="m c" x="310" y="346">0</text><text class="m c" x="508" y="346">9</text><text class="m c" x="706" y="346">18</text><text class="m c" x="904" y="346">27</text>
+      <g class="m e">
+        <text x="300" y="80">1 Pheromone foraging</text>
+        <text x="300" y="110">2 Spiral search</text>
+        <text x="300" y="140">3 Evolved controller</text>
+        <text x="300" y="170">4 Precision irrigation (tie)</text>
+        <text x="300" y="200">4 Risk-aware navigation (tie)</text>
+        <text x="300" y="230">6 Territory game</text>
+        <text x="300" y="260">7 Sorting and segregation</text>
+        <text x="300" y="290">8 Collective decision</text>
+        <text x="300" y="320">9 Herding</text>
+      </g>
+      <rect x="310" y="66" width="594" height="20" fill="var(--s1)"/>
+      <rect x="310" y="96" width="396" height="20" fill="var(--s1)"/>
+      <rect x="310" y="126" width="264" height="20" fill="var(--s1)"/>
+      <rect x="310" y="156" width="264" height="20" fill="var(--base)"/>
+      <rect x="310" y="186" width="264" height="20" fill="var(--base)"/>
+      <rect x="310" y="216" width="264" height="20" fill="var(--base)"/>
+      <rect x="310" y="246" width="176" height="20" fill="var(--base)"/>
+      <rect x="310" y="276" width="132" height="20" fill="var(--base)"/>
+      <rect x="310" y="306" width="88" height="20" fill="var(--base)"/>
+      <g class="b">
+        <text x="912" y="81">27</text><text x="714" y="111">18</text><text x="582" y="141">12</text><text x="582" y="171">12</text><text x="582" y="201">12</text><text x="582" y="231">12</text><text x="494" y="261">8</text><text x="450" y="291">6</text><text x="406" y="321">4</text>
+      </g>
+    </svg>
+    <figcaption>
+      Figure 1. Total scores of nine projects, in rank order. Why: four projects tie at 12 points, so the small gaps between ranks must be easy to see.
+      <span class="ab">Abbreviations: none. Source: research/lu_qi.md section 2.0 table.</span>
+    </figcaption>
+  </figure>
+
+  <table class="t">
+    <caption>Table 1. Comparison of 9 projects. Highlighted rows are the top 3.</caption>
+    <thead><tr><th class="c">Rank</th><th>Project</th><th class="c">Score</th><th class="c">Research potential</th><th class="c">2-week feasibility</th><th class="c">Fit with Prof. Lu</th><th>One-line reason</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td class="c">1</td><td><a href="projects/pheromone-misleading-trails.html">Pheromone foraging under misleading trails</a></td><td class="c">27</td><td class="c">3</td><td class="c">3</td><td class="c">3</td><td>It extends his 2024 to 2025 pheromone security paper. Floor painting is easy in ARGoS.</td></tr>
+      <tr class="rowflag"><td class="c">2</td><td><a href="projects/spiral-search.html">Spiral search vs random walk vs hybrid</a></td><td class="c">18</td><td class="c">2</td><td class="c">3</td><td class="c">3</td><td>It rebuilds his 2023 ARGoS spiral paper and adds one hybrid rule.</td></tr>
+      <tr class="rowflag"><td class="c">3</td><td><a href="projects/evolved-controller.html">Evolved foraging controller</a></td><td class="c">12</td><td class="c">2</td><td class="c">2</td><td class="c">3</td><td>Rank 3 by Fit among the ties. It follows a neuroevolution paper on Scholar. The evolution the owner runs is the risk.</td></tr>
+      <tr><td class="c">4 (tie)</td><td><a href="projects/irrigation.html">Adaptive resource distribution (precision irrigation)</a></td><td class="c">12</td><td class="c">3</td><td class="c">2</td><td class="c">2</td><td>No direct overlap with his papers. Fit 3 would give 18 points and rank 2.</td></tr>
+      <tr><td class="c">4 (tie)</td><td><a href="projects/risk-aware-navigation.html">Risk-aware collective navigation</a></td><td class="c">12</td><td class="c">3</td><td class="c">2</td><td class="c">2</td><td>Inferred as the protective counterpart of his pheromone security work.</td></tr>
+      <tr><td class="c">6</td><td><a href="projects/territory-game.html">Territory game (owner's current choice)</a></td><td class="c">12</td><td class="c">2</td><td class="c">3</td><td class="c">2</td><td>Easy to build, but his research is foraging, not competition.</td></tr>
+      <tr><td class="c">7</td><td><a href="projects/sorting-segregation.html">Collective sorting and segregation</a></td><td class="c">8</td><td class="c">2</td><td class="c">2</td><td class="c">2</td><td>An old problem, so a novelty claim is hard.</td></tr>
+      <tr><td class="c">8</td><td><a href="projects/best-of-n.html">Collective decision (best of n)</a></td><td class="c">6</td><td class="c">2</td><td class="c">3</td><td class="c">1</td><td>Easy to build, but well studied and unrelated to his papers.</td></tr>
+      <tr><td class="c">9</td><td><a href="projects/herding.html">Herding</a></td><td class="c">4</td><td class="c">2</td><td class="c">2</td><td class="c">1</td><td>It barely overlaps with his foraging research.</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">The previous and next links on this site follow rank order. Ties after rank 3 follow the table order. The section order of the source file differs from rank order.</p>
+
+  <p><strong>Ranking by R × F only, without Fit</strong></p>
+  <p>R is research potential. F is 2-week feasibility. Ties put the higher R first, because the owner's goal is research. Ranking by R + F gives the same three groups. The groups hold 1, 5 and 3 projects.</p>
+  <table class="t">
+    <caption>Table 2. R × F rank compared with the full rank (with Fit). Why: it shows how much Fit changes the order. Source: research/lu_qi.md section 2.0 table.</caption>
+    <thead><tr><th class="c">R × F rank</th><th>Project</th><th class="c">Research potential (R)</th><th class="c">2-week feasibility (F)</th><th class="c">R × F</th><th class="c">Full rank (with Fit)</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td class="c">1</td><td><a href="projects/pheromone-misleading-trails.html">Pheromone foraging under misleading trails</a></td><td class="c">3</td><td class="c">3</td><td class="c">9</td><td class="c">1</td></tr>
+      <tr><td class="c">2 (tie)</td><td><a href="projects/irrigation.html">Adaptive resource distribution (precision irrigation)</a></td><td class="c">3</td><td class="c">2</td><td class="c">6</td><td class="c">4</td></tr>
+      <tr><td class="c">2 (tie)</td><td><a href="projects/risk-aware-navigation.html">Risk-aware collective navigation</a></td><td class="c">3</td><td class="c">2</td><td class="c">6</td><td class="c">4</td></tr>
+      <tr><td class="c">4 (tie)</td><td><a href="projects/spiral-search.html">Spiral search vs random walk vs hybrid</a></td><td class="c">2</td><td class="c">3</td><td class="c">6</td><td class="c">2</td></tr>
+      <tr><td class="c">4 (tie)</td><td><a href="projects/territory-game.html">Territory game (owner's current choice)</a></td><td class="c">2</td><td class="c">3</td><td class="c">6</td><td class="c">6</td></tr>
+      <tr><td class="c">4 (tie)</td><td><a href="projects/best-of-n.html">Collective decision (best of n)</a></td><td class="c">2</td><td class="c">3</td><td class="c">6</td><td class="c">8</td></tr>
+      <tr><td class="c">7 (tie)</td><td><a href="projects/evolved-controller.html">Evolved foraging controller</a></td><td class="c">2</td><td class="c">2</td><td class="c">4</td><td class="c">3</td></tr>
+      <tr><td class="c">7 (tie)</td><td><a href="projects/sorting-segregation.html">Collective sorting and segregation</a></td><td class="c">2</td><td class="c">2</td><td class="c">4</td><td class="c">7</td></tr>
+      <tr><td class="c">7 (tie)</td><td><a href="projects/herding.html">Herding</a></td><td class="c">2</td><td class="c">2</td><td class="c">4</td><td class="c">9</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="prof">
+  <h2>2 Prof. Qi (Luki) Lu</h2>
+  <p>Why look: the more a project overlaps with the professor's research, the easier it leads to follow-up work. Source: research/lu_qi.md part 1.</p>
+
+  <table class="t">
+    <caption>Table 3. Identity check</caption>
+    <thead><tr><th>Fact</th><th>Value</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Name as printed</td><td>"Qi (Luki) Lu" <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>verified</td></tr>
+      <tr><td>Is "Lu Qi" in the assignment this person?</td><td>It is the same name in family-name-first order, at the same school and department <a class="s" href="#S-LQ-1">[S-LQ-1]</a> <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>inference</td></tr>
+      <tr><td>Position</td><td>Assistant Professor, Department of Computer Science, University of Texas Rio Grande Valley (UTRGV) <a class="s" href="#S-LQ-1">[S-LQ-1]</a> <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>verified</td></tr>
+      <tr><td>Paper affiliation</td><td>The Towards Autonomous Robotic Systems (TAROS) paper prints Department of Computer Science, University of Texas Rio Grande Valley (UTRGV), and a utrgv.edu email <a class="s" href="#S-LQ-21">[S-LQ-21]</a></td><td>verified</td></tr>
+      <tr><td>Scholar match</td><td>Google Scholar profile "Qi Lu", computer science, University of Texas Rio Grande Valley (UTRGV), verified email at utrgv.edu <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>verified</td></tr>
+      <tr><td>Doctor of Philosophy (PhD)</td><td>Computer science, University of New Mexico, advisor Prof. Melanie Moses <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>verified</td></tr>
+      <tr><td>Name collision</td><td>A search snippet also showed a "Qi Lu" at the University of Texas at San Antonio (UTSA) with swarm work at New Mexico. It is not resolved</td><td>unverifiable</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>Table 4. Research areas and lab</caption>
+    <thead><tr><th>Item</th><th>Value</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Stated interests (lab site)</td><td>"Swarm Robotics, Heterogeneous Multi-Robot and Multi-Agent Systems" <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>verified</td></tr>
+      <tr><td>Stated interests (Scholar)</td><td>Intelligent swarm robotics (the study of many cheap robots that work together by local rules), multi-robot systems <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>verified</td></tr>
+      <tr><td>Stated interests (Computing Alliance of Hispanic-Serving Institutions (CAHSI) expert page)</td><td>Swarm robotics, multi-robot systems, autonomous mobile robots <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>verified</td></tr>
+      <tr><td>Lab</td><td>Multiple Autonomous Robot Systems (MARS) lab, established September 2022 (Fall 2022) <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>verified</td></tr>
+      <tr><td>Main project</td><td>A heterogeneous foraging swarm (robots that find food and carry it to a nest) of unmanned ground vehicles (UGV) and unmanned aerial vehicles (UAV) <a class="s" href="#S-LQ-2">[S-LQ-2]</a> <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>verified</td></tr>
+      <tr><td>Other projects</td><td>Misleading pheromone trails in foraging swarms (attack and defense). Nanoscale foraging and self-assembly. Dynamic robot chain networks. Foraging robot swarms <a class="s" href="#S-LQ-2">[S-LQ-2]</a></td><td>verified</td></tr>
+      <tr><td>Simulator</td><td>ARGoS is named on the robot-chain project and in the 2023 spiral-search abstract <a class="s" href="#S-LQ-2">[S-LQ-2]</a> <a class="s" href="#S-LQ-5">[S-LQ-5]</a></td><td>verified</td></tr>
+      <tr><td>Learning</td><td>Multi-actor-attention-critic reinforcement learning (2021) and NeuroEvolution of Augmenting Topologies (NEAT, 2025) appear on Scholar only. The research page does not mention learning <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>partial</td></tr>
+      <tr><td>Coverage and exploration</td><td>No coverage or exploration paper was found. Spiral search is a search pattern for foraging. Treating it as coverage is an inference <a class="s" href="#S-LQ-5">[S-LQ-5]</a></td><td>inference</td></tr>
+      <tr><td>Funding</td><td>National Science Foundation (NSF) programs Expand AI, CISE-MSI and CREST-MECIS. Federal Railroad Administration (FRA). Department of Homeland Security (DHS) SLA. Program names are copied as written <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>verified</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>Table 5. Thirteen representative papers (research/lu_qi.md section 1.3). Titles are kept as written.</caption>
+    <thead><tr><th class="c">No.</th><th>Title</th><th>Venue</th><th class="c">Year</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td class="c">P1</td><td><a href="https://link.springer.com/article/10.1007/s10514-017-9693-2">Multiple-place swarm foraging with dynamic depots</a></td><td>Autonomous Robots 42</td><td class="c">2018</td><td>verified</td></tr>
+      <tr><td class="c">P2</td><td><a href="https://ieeexplore.ieee.org/abstract/document/8794240">Comparing Physical and Simulated Performance of a Deterministic and a Bio-inspired Stochastic Foraging Strategy for Robot Swarms</a></td><td>Institute of Electrical and Electronics Engineers (IEEE) International Conference on Robotics and Automation (ICRA)</td><td class="c">2019</td><td>verified</td></tr>
+      <tr><td class="c">P3</td><td><a href="https://ieeexplore.ieee.org/abstract/document/9196762">A Bio-Inspired Transportation Network for Scalable Swarm Foraging</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2020</td><td>verified</td></tr>
+      <tr><td class="c">P4</td><td>Swarm Foraging Review: Closing the Gap Between Proof and Practice</td><td>Current Robotics Reports</td><td class="c">2020</td><td>partial. Only the Scholar list was read. No direct link was read</td></tr>
+      <tr><td class="c">P5</td><td>Multi-Actor-Attention-Critic Reinforcement Learning for Central Place Foraging Swarms</td><td>International Joint Conference on Neural Networks (IJCNN)</td><td class="c">2021</td><td>partial. Only the Scholar list was read</td></tr>
+      <tr><td class="c">P6</td><td><a href="https://ieeexplore.ieee.org/abstract/document/9561124">Multiple-Place Swarm Foraging with Dynamic Robot Chains</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2021</td><td>verified. Uses ARGoS</td></tr>
+      <tr><td class="c">P7</td><td><a href="https://ieeexplore.ieee.org/abstract/document/9811625">Dynamic Robot Chain Networks for Swarm Foraging</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2022</td><td>verified. Uses ARGoS</td></tr>
+      <tr><td class="c">P8</td><td><a href="https://par.nsf.gov/biblio/10591790">Adaptive Multiple Distributed Bidirectional Spiral Path Planning for Foraging Robot Swarms</a> (Qi Lu, Ryan Luna)</td><td>Scholar lists Conference on Robots and Vision (CRV). The National Science Foundation (NSF) record says only "IEEE, Montreal"</td><td class="c">2023</td><td>Title, authors, year and ARGoS are verified. The venue name is partial</td></tr>
+      <tr><td class="c">P9</td><td>Tuning PID controller for quadrotor using particle swarm optimization</td><td>21st International Conference on Ubiquitous Robots (UR)</td><td class="c">2024</td><td>partial. Only the Scholar list was read</td></tr>
+      <tr><td class="c">P10</td><td>Evolving Adaptive Foraging Robot Swarms with NEAT in Environments with Obstacles</td><td>8th International Conference on Intelligent Robotics and Control</td><td class="c">2025</td><td>partial. Only the Scholar list was read. The author list was not read</td></tr>
+      <tr><td class="c">P11</td><td><a href="https://arxiv.org/abs/2605.01461">LLM-Foraging: Large Language Models for Decentralized Swarm Robot Foraging</a> (Li, Gutierrez, Hernandez, Qi Lu, Zhou). The simulator is Gazebo, not ARGoS</td><td>arXiv preprint 2605.01461</td><td class="c">2026</td><td>partial. The page does not show the affiliation of "Qi Lu"</td></tr>
+      <tr><td class="c">P12</td><td><a href="https://doi.org/10.1007/978-3-031-72062-8_27">Robust Mitigation Strategy for Misleading Pheromone Trails in Foraging Robot Swarms</a> (Ryan Luna, Qi Lu)</td><td>Towards Autonomous Robotic Systems (TAROS) 2024, Lecture Notes in Artificial Intelligence (LNAI) 15052, pages 307 to 319</td><td class="c">2025</td><td>verified. The first two pages were read</td></tr>
+      <tr><td class="c">P13</td><td>Two pheromone-trail papers: <a href="https://ieeexplore.ieee.org/abstract/document/10597515">link 1</a>, <a href="https://ieeexplore.ieee.org/abstract/document/10585509">link 2</a>. The labels are UR2024 and ICCCR2024</td><td>International Conference on Ubiquitous Robots (UR), ICCCR (full name not read)</td><td class="c">2024</td><td>partial. Only the labels and links exist. The Institute of Electrical and Electronics Engineers (IEEE) site blocked access, so the titles were not read</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">For P1, P2, P3, P6 and P7, the research page gave year labels and links. The titles came from Scholar. The researcher paired titles and links by venue and year (inference). Sources: <a class="s" href="#S-LQ-2">[S-LQ-2]</a> <a class="s" href="#S-LQ-3">[S-LQ-3]</a>.</p>
+  <p class="muted">Only the first 20 entries of the Google Scholar profile were readable. The author search address redirected to a login page <a class="s" href="#S-LQ-3">[S-LQ-3]</a>.</p>
+
+  <table class="t">
+    <caption>Table 6. ARGoS feature checks (what the project implementation needs)</caption>
+    <thead><tr><th>Feature</th><th>Evidence</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Keyboard control</td><td>argos3-examples has <code>manualcontrol_loop_functions</code> <a class="s" href="#S-LQ-7">[S-LQ-7]</a>. I is forward, K is backward, J is left and L is right. A mouse click selects a foot-bot <a class="s" href="#S-LQ-8">[S-LQ-8]</a></td><td>verified</td></tr>
+      <tr><td>Floor coloring</td><td><code>CForagingLoopFunctions::GetFloorColor</code> returns a color for each floor point <a class="s" href="#S-LQ-9">[S-LQ-9]</a></td><td>verified</td></tr>
+      <tr><td>Floor repaint at run time</td><td>After a food pick-up or drop, <code>PreStep()</code> calls <code>m_pcFloor-&gt;SetChanged();</code> <a class="s" href="#S-LQ-9">[S-LQ-9]</a></td><td>verified</td></tr>
+      <tr><td>ARGoS reference paper</td><td>Pinciroli et al., Swarm Intelligence 6:271 to 295, 2012 <a class="s" href="#S-LQ-22">[S-LQ-22]</a></td><td>first page verified</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="swarm">
+  <h2>3 When is a swarm the right tool?</h2>
+  <p>Why look: if a problem does not need a swarm, the team cannot answer "why many robots?". Source: research/lu_qi.md section 2.1.</p>
+  <p class="muted">Şahin (2005) proposed criteria that separate swarm robotics from other multi-robot work. He also listed application domains <a class="s" href="#S-LQ-23">[S-LQ-23]</a>. This is partial, from search snippets only. The criteria below are the owner's list, not quoted from the paper. Brambilla et al. (2013) note that swarm robotics is still limited as an engineering discipline <a class="s" href="#S-LQ-24">[S-LQ-24]</a>.</p>
+
+  <table class="t">
+    <caption>Table 7. Conditions where a swarm fits (the reasons are inferences)</caption>
+    <thead><tr><th>Criterion</th><th>Why a swarm helps</th></tr></thead>
+    <tbody>
+      <tr><td>Large or spread-out area</td><td>Many cheap robots cover more ground in parallel</td></tr>
+      <tr><td>Unknown or changing environment</td><td>Local rules react without a global map</td></tr>
+      <tr><td>No central infrastructure</td><td>No server, no global positioning and no central radio are needed</td></tr>
+      <tr><td>Robust to failures</td><td>Losing a few robots does not stop the task</td></tr>
+      <tr><td>Scalable</td><td>Adding robots needs no redesign</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>Table 8. Does each idea truly need a swarm? (inference)</caption>
+    <thead><tr><th>Idea</th><th>Needs a swarm?</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr><td><a href="projects/pheromone-misleading-trails.html">Pheromone foraging</a></td><td class="c">yes</td><td>Stigmergy (indirect talk through marks left in the environment) and robustness to bad robots are swarm questions</td></tr>
+      <tr><td><a href="projects/irrigation.html">Precision irrigation</a></td><td class="c">yes</td><td>Large field, changing need and robot failures. A central planner is the baseline</td></tr>
+      <tr><td><a href="projects/spiral-search.html">Spiral search</a></td><td class="c">partly</td><td>Scalability is the question. One robot is the lower bound</td></tr>
+      <tr><td><a href="projects/evolved-controller.html">Evolved controller</a></td><td class="c">partly</td><td>Learning is the focus. The swarm is the test bed</td></tr>
+      <tr><td><a href="projects/risk-aware-navigation.html">Risk-aware navigation</a></td><td class="c">yes</td><td>Robot loss is expected. Sharing danger information is the swarm benefit</td></tr>
+      <tr><td><a href="projects/territory-game.html">Territory game</a></td><td class="c">partly</td><td>It is a team game. A central team planner could also play</td></tr>
+      <tr><td><a href="projects/sorting-segregation.html">Sorting and segregation</a></td><td class="c">yes</td><td>There is no leader. Only local rules apply</td></tr>
+      <tr><td><a href="projects/best-of-n.html">Collective decision</a></td><td class="c">yes</td><td>Collective sensing beats one noisy robot</td></tr>
+      <tr><td><a href="projects/herding.html">Herding</a></td><td class="c">partly</td><td>One shepherd can herd a flock <a class="s" href="#S-LQ-10">[S-LQ-10]</a>. Many shepherds help with large flocks <a class="s" href="#S-LQ-12">[S-LQ-12]</a></td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>Table 9. Application fields and swarm-robot examples</caption>
+    <thead><tr><th>Field</th><th>Example</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Agriculture</td><td>Texas A&amp;M "configurable, adaptive and scalable swarm" of ground and aerial farm robots. Funded by the United States Department of Agriculture (USDA), 2021 <a class="s" href="#S-LQ-28">[S-LQ-28]</a></td><td>verified (official university news)</td></tr>
+      <tr><td>Search and rescue</td><td>A review of unmanned aerial vehicle (UAV) swarm resilience. Search and rescue is one of its three application classes, 2023 <a class="s" href="#S-LQ-30">[S-LQ-30]</a></td><td>verified</td></tr>
+      <tr><td>Gas source localization</td><td>SniffySquad: multi-robot gas source localization, 2024 <a class="s" href="#S-LQ-25">[S-LQ-25]</a></td><td>verified (abstract)</td></tr>
+      <tr><td>Environmental monitoring</td><td>subCULTron: an underwater robot swarm (mussels, fish, lily pads) monitoring the Venice lagoon, 2015 to 2019 <a class="s" href="#S-LQ-27">[S-LQ-27]</a></td><td>verified</td></tr>
+      <tr><td>Oil-spill cleanup</td><td>Massachusetts Institute of Technology (MIT) Seaswarm prototype: units spread evenly over a spill. It uses wireless links and the Global Positioning System (GPS), 2010 <a class="s" href="#S-LQ-29">[S-LQ-29]</a></td><td>partial (news, prototype only). Old [STALE]</td></tr>
+      <tr><td>Planetary exploration</td><td>National Aeronautics and Space Administration (NASA) Swarmathon: student robot swarms collect resources as a Mars prototype, 2018 <a class="s" href="#S-LQ-26">[S-LQ-26]</a></td><td>verified (abstract). Old [STALE]</td></tr>
+      <tr><td>Warehouse logistics</td><td>Kiva system: hundreds of warehouse robots, AI Magazine 2008. It is a centralized contrast, not a swarm. A coordinating system directs the robots <a class="s" href="#S-LQ-31">[S-LQ-31]</a></td><td>[UNVERIFIED]. Page access blocked</td></tr>
+      <tr><td>Heterogeneous foraging, search and rescue (Qi Lu)</td><td>Foraging swarm of unmanned ground vehicles (UGV) and unmanned aerial vehicles (UAV). Uses: search and rescue, demining, agriculture, space <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>verified</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Mine exploration: no swarm example was verified <span class="mark">[UNVERIFIED]</span>.</p>
+</section>
+
+<section class="tab" id="other">
+  <h2>4 Other ideas (brief)</h2>
+  <p>Why look: to bring back an idea later, you need to know why it was left out of the full entries. Source: research/lu_qi.md "Other ideas".</p>
+  <table class="t">
+    <caption>Table 10. Short verdicts. The score column lists research potential, feasibility and Fit in that order.</caption>
+    <thead><tr><th>Idea</th><th>Verdict</th><th>Reason</th><th class="c">Score</th></tr></thead>
+    <tbody>
+      <tr><td>Multi-robot A* path planning (including a maze collector)</td><td>kept, brief</td><td>A survey paper exists <a class="s" href="#S-LQ-18">[S-LQ-18]</a>. It needs a grid map and collision handling. Its Fit with Prof. Lu is low</td><td class="c">1, 2, 1</td></tr>
+      <tr><td>Task-allocation foraging</td><td>merged into the delivery variant of precision irrigation</td><td>Deciding who takes which request is task allocation</td><td class="c">none</td></tr>
+      <tr><td>Frontier-based coverage exploration</td><td>merged into the territory game</td><td>Strategy C of the territory game is frontier search</td><td class="c">none</td></tr>
+      <tr><td>Foraging race (team vs team)</td><td>merged into pheromone and territory game</td><td>The mechanics are the same, with only a score added</td><td class="c">none</td></tr>
+      <tr><td>Formation and flocking</td><td>kept, brief</td><td>A stock <code>flocking.argos</code> example exists <a class="s" href="#S-LQ-7">[S-LQ-7]</a> (confirmed in the listing only). It is also the baseline for risk-aware navigation</td><td class="c">1, 3, 1</td></tr>
+      <tr><td>Pursuit and evasion</td><td>kept, brief</td><td>It can be built, but it does not connect to Prof. Lu's research. The watcher variant of risk-aware navigation covers evasion</td><td class="c">2, 2, 1</td></tr>
+      <tr><td>Robot soccer</td><td>kept, brief</td><td>Ball physics with the foot-bot is uncertain <span class="mark">[UNVERIFIED]</span>. The Fit is low</td><td class="c">1, 1, 1</td></tr>
+      <tr><td>Relay foraging (task partitioning)</td><td>kept, brief</td><td>Pini et al. passed objects through a cache with ARGoS and e-puck robots <a class="s" href="#S-LQ-13">[S-LQ-13]</a>. Prof. Lu's robot chains also carry resources to the nest <a class="s" href="#S-LQ-2">[S-LQ-2]</a>. The Fit is 3</td><td class="c">2, 2, 3</td></tr>
+      <tr><td>Cooking swarm (kitchen work)</td><td>kept, brief. Not recommended</td><td>The space is small and known, and the order is constrained, so central scheduling is better. A separate taxonomy covers task allocation with ordering constraints <a class="s" href="#S-LQ-37">[S-LQ-37]</a>. ARGoS cannot model cooking (inference)</td><td class="c">1, 1, 1</td></tr>
+      <tr><td>Physical throwing</td><td>dropped</td><td>The owner corrected that the idea means placing resources in place, which is now precision irrigation. Throwing with a stock foot-bot was judged impossible (inference) <a class="s" href="#S-LQ-9">[S-LQ-9]</a> <a class="s" href="#S-LQ-20">[S-LQ-20]</a> <span class="mark">[UNVERIFIED]</span></td><td class="c">none</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="gaps">
+  <h2>5 What is not verified</h2>
+  <p>Why look: the ranking stands on these gaps. Source: research/lu_qi.md open_questions. Only the main items are copied.</p>
+  <ul>
+    <li>It is not checked whether the "Qi Lu" at the University of Texas at San Antonio (UTSA) is another person or an older post of the same person.</li>
+    <li>The titles of the UR2024 and ICCCR2024 pheromone papers were not read because the Institute of Electrical and Electronics Engineers (IEEE) site blocked access. The TAROS paper is verified.</li>
+    <li>Method details of the spiral paper (region split, start from opposite ends) come from a search snippet of the abstract <a class="s" href="#S-LQ-5">[S-LQ-5]</a>.</li>
+    <li>It is not confirmed that the "Qi Lu" of arXiv 2605.01461 is the University of Texas Rio Grande Valley (UTRGV) Qi Lu. The author list of P10 was not read.</li>
+    <li>The full text of Şahin 2005 was not read. The swarm-fit criteria are the owner's list <a class="s" href="#S-LQ-23">[S-LQ-23]</a>.</li>
+    <li>The venue of Competitive Ant Coverage (International Conference on Intelligent Robots and Systems (IROS) 2023) comes from the file name only <a class="s" href="#S-LQ-19">[S-LQ-19]</a>.</li>
+    <li>Deneubourg et al. 1991 and Macharet et al. 2020 were not read. No mine-exploration example and no 2022 to 2026 swarm irrigation paper were verified.</li>
+    <li>All venue candidates are inferences. No deadlines were checked.</li>
+  </ul>
+</section>
+
+<section class="tab" id="sources">
+  <h2>Sources</h2>
+  <p class="muted">Each [S-LQ-n] mark on a page leads to an entry in this list. Titles are kept as written. Source: research/lu_qi.md Sources.</p>
+  <ul class="src">
+    <li id="S-LQ-1">[S-LQ-1] Qi (Luki) Lu: personal site. Official. <a href="https://sites.google.com/view/qilu/">https://sites.google.com/view/qilu/</a></li>
+    <li id="S-LQ-2">[S-LQ-2] Qi Lu: Research. Official. <a href="https://sites.google.com/view/qilu/research">https://sites.google.com/view/qilu/research</a></li>
+    <li id="S-LQ-3">[S-LQ-3] Qi Lu: Google Scholar profile. Aggregator. First 20 articles only. <a href="https://scholar.google.com/citations?user=5471pIYAAAAJ&amp;hl=en">https://scholar.google.com/citations?user=5471pIYAAAAJ&amp;hl=en</a></li>
+    <li id="S-LQ-4">[S-LQ-4] Computing Alliance of Hispanic-Serving Institutions (CAHSI) expert profile: Qi Lu. Official. <a href="https://cahsi.utep.edu/expert/qi-lu/">https://cahsi.utep.edu/expert/qi-lu/</a></li>
+    <li id="S-LQ-5">[S-LQ-5] Adaptive Multiple Distributed Bidirectional Spiral Path Planning for Foraging Robot Swarms. 2023. National Science Foundation (NSF) Public Access Repository (PAR) record and abstract only. <a href="https://par.nsf.gov/biblio/10591790">https://par.nsf.gov/biblio/10591790</a></li>
+    <li id="S-LQ-6">[S-LQ-6] LLM-Foraging: Large Language Models for Decentralized Swarm Robot Foraging. 2026-05-02. Abstract page only. <a href="https://arxiv.org/abs/2605.01461">https://arxiv.org/abs/2605.01461</a></li>
+    <li id="S-LQ-7">[S-LQ-7] argos3-examples: loop_functions folder. Official. <a href="https://github.com/ilpincy/argos3-examples/tree/master/loop_functions">https://github.com/ilpincy/argos3-examples/tree/master/loop_functions</a></li>
+    <li id="S-LQ-8">[S-LQ-8] argos3-examples: manualcontrol_qtuser_functions.cpp. Official. Source read. <a href="https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/manualcontrol_loop_functions/manualcontrol_qtuser_functions.cpp">https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/manualcontrol_loop_functions/manualcontrol_qtuser_functions.cpp</a></li>
+    <li id="S-LQ-9">[S-LQ-9] argos3-examples: foraging_loop_functions.cpp. Official. Source read. <a href="https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/foraging_loop_functions/foraging_loop_functions.cpp">https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/foraging_loop_functions/foraging_loop_functions.cpp</a></li>
+    <li id="S-LQ-10">[S-LQ-10] Solving the shepherding problem: heuristics for herding autonomous, interacting agents. 2014. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104">https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104</a></li>
+    <li id="S-LQ-11">[S-LQ-11] Steering herds away from dangers in dynamic environments. 2023. Record page. <a href="https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/">https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/</a></li>
+    <li id="S-LQ-12">[S-LQ-12] Shepherding control and herdability in complex multiagent systems. 2023-07-31. Abstract, preprint. <a href="https://arxiv.org/abs/2307.16797">https://arxiv.org/abs/2307.16797</a></li>
+    <li id="S-LQ-13">[S-LQ-13] Task Partitioning in a Robot Swarm: A Study on the Effect of Communication (Supplementary material). 2012-11. <a href="https://iridia.ulb.ac.be/supp/IridiaSupp2012-015/index.html">https://iridia.ulb.ac.be/supp/IridiaSupp2012-015/index.html</a></li>
+    <li id="S-LQ-14">[S-LQ-14] Towards Autonomous Task Partitioning in Swarm Robotics: Experiments with Foraging Robots (Supplementary material). 2013-04. <a href="https://iridia.ulb.ac.be/supp/IridiaSupp2013-001/index.html">https://iridia.ulb.ac.be/supp/IridiaSupp2013-001/index.html</a></li>
+    <li id="S-LQ-15">[S-LQ-15] Segregation of heterogeneous units in a swarm of robotic agents. 2010. Record page. <a href="https://scholars.duke.edu/publication/730532">https://scholars.duke.edu/publication/730532</a></li>
+    <li id="S-LQ-16">[S-LQ-16] Minimalistic Collective Perception with Imperfect Sensors. 2022-09-26. Abstract. <a href="https://arxiv.org/abs/2209.12858">https://arxiv.org/abs/2209.12858</a></li>
+    <li id="S-LQ-17">[S-LQ-17] SubCDM: Collective Decision-Making with a Swarm Subset. 2025-08-01. Preprint. <a href="https://arxiv.org/abs/2508.00467">https://arxiv.org/abs/2508.00467</a></li>
+    <li id="S-LQ-18">[S-LQ-18] Graph-Based Multi-Robot Path Finding and Planning. 2022-06-22. Abstract. <a href="https://arxiv.org/abs/2206.11319">https://arxiv.org/abs/2206.11319</a></li>
+    <li id="S-LQ-19">[S-LQ-19] Competitive Ant Coverage: The Value of Pursuit. 2023 (from the file name). First page read. <a href="https://u.cs.biu.ac.il/~agmon/ShatsIROS23.pdf">https://u.cs.biu.ac.il/~agmon/ShatsIROS23.pdf</a></li>
+    <li id="S-LQ-20">[S-LQ-20] ARGoS forum: How to change gripper position on footbot? Anecdotal. A bot check blocked access, so only a search snippet was used. [UNVERIFIED]. <a href="https://www.argos-sim.info/forum/viewtopic.php?p=428">https://www.argos-sim.info/forum/viewtopic.php?p=428</a></li>
+    <li id="S-LQ-21">[S-LQ-21] Robust Mitigation Strategy for Misleading Pheromone Trails in Foraging Robot Swarms. 2025, Towards Autonomous Robotic Systems (TAROS) 2024, Lecture Notes in Artificial Intelligence (LNAI) 15052, pages 307 to 319. First two pages read. <a href="https://par.nsf.gov/servlets/purl/10593555">https://par.nsf.gov/servlets/purl/10593555</a></li>
+    <li id="S-LQ-22">[S-LQ-22] ARGoS: a modular, parallel, multi-engine simulator for multi-robot systems. 2012. First page read. <a href="https://www.argos-sim.info/stuff/Pinciroli:SI2012.pdf">https://www.argos-sim.info/stuff/Pinciroli:SI2012.pdf</a></li>
+    <li id="S-LQ-23">[S-LQ-23] Swarm robotics: From sources of inspiration to domains of application. 2005. Record page only, no abstract. <a href="https://avesis.metu.edu.tr/yayin/cc170663-a550-46af-bead-aa0acb20e95e/swarm-robotics-from-sources-of-inspiration-to-domains-of-application">https://avesis.metu.edu.tr/yayin/cc170663-a550-46af-bead-aa0acb20e95e/swarm-robotics-from-sources-of-inspiration-to-domains-of-application</a></li>
+    <li id="S-LQ-24">[S-LQ-24] Swarm robotics: A review from the swarm engineering perspective. 2013. <a href="https://research.vu.nl/en/publications/swarm-robotics-a-review-from-the-swarm-engineering-perspective/">https://research.vu.nl/en/publications/swarm-robotics-a-review-from-the-swarm-engineering-perspective/</a></li>
+    <li id="S-LQ-25">[S-LQ-25] SniffySquad: Patchiness-Aware Gas Source Localization with Multi-Robot Collaboration. 2024-11-09. Abstract. <a href="https://arxiv.org/abs/2411.06121">https://arxiv.org/abs/2411.06121</a></li>
+    <li id="S-LQ-26">[S-LQ-26] The Swarmathon: An Autonomous Swarm Robotics Competition. 2018-05-21. Abstract. <a href="https://arxiv.org/abs/1805.08320">https://arxiv.org/abs/1805.08320</a></li>
+    <li id="S-LQ-27">[S-LQ-27] subCULTron: Submarine Cultures Perform Long-Term Robotic Exploration of Unconventional Environmental Niches. 2015-04-01 to 2019-08-31. Community Research and Development Information Service (CORDIS) project page. <a href="https://cordis.europa.eu/project/id/640967">https://cordis.europa.eu/project/id/640967</a></li>
+    <li id="S-LQ-28">[S-LQ-28] Adaptive swarm robotics could revolutionize smart agriculture. 2021-11-12. University news. <a href="https://engineering.tamu.edu/news/2021/11/ETID-MEEN-adaptive-swarm-robotics-could-revolutionize-smart-agriculture.html">https://engineering.tamu.edu/news/2021/11/ETID-MEEN-adaptive-swarm-robotics-could-revolutionize-smart-agriculture.html</a></li>
+    <li id="S-LQ-29">[S-LQ-29] MIT researchers develop autonomous oil-absorbing robot to clean up oil spills. 2010-08-27. News. <a href="https://newatlas.com/seaswarm-autonomous-oil-absorbing-robot/16153">https://newatlas.com/seaswarm-autonomous-oil-absorbing-robot/16153</a></li>
+    <li id="S-LQ-30">[S-LQ-30] Examining application-specific resiliency implementations in UAV swarm scenarios. 2023-09-25. <a href="https://www.oaepublish.com/articles/ir.2023.27">https://www.oaepublish.com/articles/ir.2023.27</a></li>
+    <li id="S-LQ-31">[S-LQ-31] Coordinating Hundreds of Cooperative, Autonomous Vehicles in Warehouses. 2008 (from a search snippet). Bot check blocked access. [UNVERIFIED]. <a href="https://ojs.aaai.org/index.php/aimagazine/article/view/2082">https://ojs.aaai.org/index.php/aimagazine/article/view/2082</a></li>
+    <li id="S-LQ-32">[S-LQ-32] Time-Dependent Surveillance-Evasion Games. 2019-03-04. Abstract. <a href="https://arxiv.org/abs/1903.01332">https://arxiv.org/abs/1903.01332</a></li>
+    <li id="S-LQ-33">[S-LQ-33] RASS: Risk-Aware Swarm Storage. 2022-01-04. Abstract. <a href="https://arxiv.org/abs/2201.01349">https://arxiv.org/abs/2201.01349</a></li>
+    <li id="S-LQ-34">[S-LQ-34] Fast Collective Evasion in Self-Localized Swarms of Unmanned Aerial Vehicles. 2021 journal, arXiv 2024-08-20. Abstract. <a href="https://arxiv.org/abs/2408.10596">https://arxiv.org/abs/2408.10596</a></li>
+    <li id="S-LQ-35">[S-LQ-35] Multi-Agent Sensor Data Collection with Attrition Risk. 2016 (from a search snippet). Bot check blocked access. [UNVERIFIED]. <a href="https://ojs.aaai.org/index.php/ICAPS/article/view/13736">https://ojs.aaai.org/index.php/ICAPS/article/view/13736</a></li>
+    <li id="S-LQ-36">[S-LQ-36]Tews, Sukhatme, Mataric: multi-robot stealthy navigation. 2004 (from a search snippet). Certificate expired. [UNVERIFIED]. <a href="https://robotics.usc.edu/resl/publications/363/">https://robotics.usc.edu/resl/publications/363/</a></li>
+    <li id="S-LQ-37">[S-LQ-37] A taxonomy for task allocation problems with temporal and ordering constraints. 2017. Record page. <a href="https://experts.umn.edu/en/publications/a-taxonomy-for-task-allocation-problems-with-temporal-and-orderin/">https://experts.umn.edu/en/publications/a-taxonomy-for-task-allocation-problems-with-temporal-and-orderin/</a></li>
+    <li id="S-LQ-38">[S-LQ-38] Consensus-Based Decentralized Auctions for Robust Task Allocation. 2009 (from a search snippet). Hypertext Transfer Protocol (HTTP) status 429. Partial. <a href="https://dspace.mit.edu/handle/1721.1/52330">https://dspace.mit.edu/handle/1721.1/52330</a></li>
+  </ul>
+</section>
+
+</div>
+<script>
+(function () {
+  var tabs = document.querySelector(".tabs");
+  var secs = document.querySelectorAll("section.tab");
+  var links = tabs.querySelectorAll("a");
+  function show(scroll) {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id ? document.getElementById(id) : null;
+    var sec = el ? el.closest("section.tab") : null;
+    if (!sec) { sec = secs[0]; el = null; }
+    for (var i = 0; i < secs.length; i++) secs[i].classList.toggle("on", secs[i] === sec);
+    for (var j = 0; j < links.length; j++) {
+      var cur = links[j].getAttribute("href") === "#" + sec.id;
+      links[j].classList.toggle("on", cur);
+      if (cur) links[j].setAttribute("aria-current", "true"); else links[j].removeAttribute("aria-current");
+    }
+    if (el && el !== sec) el.scrollIntoView();
+    else if (scroll) tabs.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", function () { show(true); });
+  show(false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,219 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 4 (tie) Risk-aware collective navigation | Final project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="lang-switch"><a href="../../projects/risk-aware-navigation.html">한국어</a> | <strong>English</strong></p>
+
+<nav class="topnav">
+  <a href="irrigation.html">← Previous: Rank 4 Precision irrigation</a>
+  <a href="../index.html">Index</a>
+  <a href="territory-game.html">Next: Rank 6 Territory game →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 4 (tie) / 9 projects (in rank order)</div>
+  <h1>Risk-aware collective navigation in an unknown hazardous field</h1>
+  <div class="lead">
+    <p><strong>Result: rank 4 (tie), score 12. Research potential is 3. The link to Prof. Lu is an inference: the protective twin of his pheromone security work.</strong></p>
+    <p>Why this rank: how much danger sharing raises survival is a new question. But A* path planning and the sentry variant make implementation feasibility only 2.</p>
+    <div class="chips">
+      <span class="chip">research potential 3</span>
+      <span class="chip">2-week feasibility 2</span>
+      <span class="chip">fit with the professor's work 2</span>
+      <span class="chip">total = product = 12 (inference)</span>
+    </div>
+    <p class="muted">Civilian use: rescue or inspection robots crossing fire, radiation or chemical zones.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and schedule</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Hidden hazard zones, danger marks where robots fell, a path that bends around the danger, and an empty frame for a scatter plot of time to goal against survival fraction">
+      <text class="b" x="40" y="22">Figure 1 left: hazard zones and paths (illustrative sketch)</text>
+      <rect x="40" y="32" width="22" height="12" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/><text class="m" x="68" y="42">hidden hazard zone</text>
+      <path d="M232 34 l12 12 M244 34 l-12 12" stroke="var(--s2)" stroke-width="3"/><text class="m" x="252" y="42">danger mark (robot fell)</text>
+      <line x1="40" y1="58" x2="68" y2="58" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4"/><text class="m" x="74" y="62">shortest path</text>
+      <line x1="232" y1="58" x2="260" y2="58" stroke="var(--s1)" stroke-width="3"/><text class="m" x="266" y="62">path with danger sharing</text>
+      <rect class="wall" x="40" y="72" width="420" height="280"/>
+      <rect x="40" y="72" width="40" height="280" fill="#eee" stroke="#333" stroke-width="2"/>
+      <rect x="420" y="72" width="40" height="280" fill="#eaf5ea" stroke="#333" stroke-width="2"/>
+      <text class="m" x="46" y="88">start</text>
+      <text class="m e" x="454" y="88">goal</text>
+      <rect x="190" y="150" width="80" height="80" fill="none" stroke="#555" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <rect x="320" y="240" width="70" height="60" fill="none" stroke="#555" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <path d="M90 190 L230 190" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4" fill="none"/>
+      <path d="M224 184 l12 12 M236 184 l-12 12" stroke="var(--s2)" stroke-width="3"/>
+      <path d="M200 164 l12 12 M212 164 l-12 12" stroke="var(--s2)" stroke-width="3"/>
+      <path d="M349 264 l12 12 M361 264 l-12 12" stroke="var(--s2)" stroke-width="3"/>
+      <path d="M90 190 C140 190 170 105 230 105 C290 105 340 190 420 190" stroke="var(--s1)" stroke-width="3" fill="none"/>
+      <circle cx="90" cy="190" r="5" fill="#222"/>
+
+      <text class="b" x="540" y="22">Figure 1 right: time and survival (planned)</text>
+      <circle cx="570" cy="38" r="5" fill="var(--base)"/><text class="m" x="582" y="42">shortest path</text>
+      <rect x="710" y="33" width="10" height="10" fill="var(--s4)"/><text class="m" x="726" y="42">flocking</text>
+      <path d="M810 32 l6 10 h-12 z" fill="var(--s1)"/><text class="m" x="822" y="42">danger sharing</text>
+      <line class="gr" x1="580" y1="140" x2="960" y2="140"/><line class="gr" x1="580" y1="200" x2="960" y2="200"/><line class="gr" x1="580" y1="260" x2="960" y2="260"/>
+      <line class="ax" x1="580" y1="88" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <text class="b c" x="770" y="352">time to goal</text>
+      <text class="b c" transform="translate(540 204) rotate(-90)">survival fraction</text>
+      <text class="m c" x="770" y="200">empty frame before measuring (planned)</text>
+      <text class="m c" x="770" y="218">one point per w value</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows a path that bends around danger. The right side shows the axes for the survival-time trade-off curve. Why: the key question is how much time danger sharing costs for each gain in survival.
+      <span class="ab">Abbreviations: none. Source: source text, Suggested figure. Zone and path positions are illustrative. w is the risk weight.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>A swarm must cross a field to reach a goal region.</li>
+    <li>Parts of the field disable robots.</li>
+    <li>Nobody knows where the danger is at the start. The swarm learns by losing robots or by sensing.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Share danger as robots find it, so the largest fraction of robots reaches the goal alive.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: source text, How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>20 to 40 foot-bots (the wheeled robot model that ARGoS provides). A start region and a goal region are painted on the floor.</td></tr>
+      <tr><td>Sensors</td><td>Positioning sensor, proximity sensor, and range-and-bearing sensor (reads neighbor distance and direction and passes short messages) for danger messages. The ground sensor is optional and reads hazard hints.</td></tr>
+      <tr><td>Variant (a) hazard zones</td><td>The zones are hidden. The loop function disables a robot inside a zone with probability p per step.</td></tr>
+      <tr><td>Variant (b) surveillance</td><td>Sentries with a view cone stand still or patrol. A robot inside a cone is detected. It is lost, or the mission fails.</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every ARGoS simulation step) handle the hazard logic, the sentry logic and the kill list. They draw a shared risk grid on the floor as a "danger pheromone" (a virtual mark that fades with time) <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 A* planning</a></li>
+    <li><a href="#a2">Step 2 Where robots fell</a></li>
+    <li><a href="#a3">Step 3 Share danger</a></li>
+    <li><a href="#a4">Step 4 Replan</a></li>
+    <li><a href="#a5">Step 5 Sweep w</a></li>
+    <li><a href="#base">Baselines</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>Each robot plans a path on a grid with A* path search (an algorithm that finds the cheapest path on a grid). Edge cost is distance plus w times the risk of the cell.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>When a robot is disabled, its last cell gets high risk. Neighbors heard its last messages.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>Surviving robots broadcast risk updates over range-and-bearing. Or the loop function paints them as a danger pheromone that decays.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>A robot replans when its path crosses a cell whose risk rose.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>Sweep w from 0 (shortest path) to a high value (most cautious).</p></div>
+  </div>
+  <div class="panel" id="base">
+    <p class="label">Baselines</p>
+    <ul>
+      <li>Individual shortest path (w = 0, no sharing).</li>
+      <li>Plain flocking toward the goal (neighbors stay close and move the same way).</li>
+      <li>Swarm with danger sharing.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure the survival fraction and the time to goal.</li>
+    <li>Draw the trade-off curve. Each w value gives one point. The x axis is time and the y axis is survival.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: how much does shared danger information raise survival, and what does it cost in time (inference).</li>
+    <li>Related lines: routing with attrition risk <span class="mark">[UNVERIFIED]</span> <a class="s" href="../index.html#S-LQ-35">[S-LQ-35]</a>, a shared risk map in a swarm <a class="s" href="../index.html#S-LQ-33">[S-LQ-33]</a>, collective evasion of an intruder <a class="s" href="../index.html#S-LQ-34">[S-LQ-34]</a>, and minimal-exposure paths against a patrolling observer <a class="s" href="../index.html#S-LQ-32">[S-LQ-32]</a>.</li>
+    <li>New beyond a demo: the survival-time trade-off curve for a swarm with stigmergic (marks left in the environment) danger marks (inference).</li>
+    <li>Venues (inference): International Conference on Swarm Intelligence (ANTS), Distributed Autonomous Robotic Systems (DARS), and safety and resilience workshops at the International Conference on Intelligent Robots and Systems (IROS) or the International Conference on Robotics and Automation (ICRA).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Key point</th><th>Check status</th></tr></thead>
+    <tbody>
+      <tr><td>Arseneault, Vielfaure, Beltrame. RASS: risk-aware swarm storage. arXiv 2022 <a class="s" href="../index.html#S-LQ-33">[S-LQ-33]</a></td><td>A shared risk map built from neighbor messages.</td><td>Abstract checked. No simulator named</td></tr>
+      <tr><td>Novák et al. Fast collective evasion in unmanned aerial vehicle (UAV) swarms with self-localization. Bioinspiration and Biomimetics 2021 (arXiv 2024) <a class="s" href="../index.html#S-LQ-34">[S-LQ-34]</a></td><td>Collective evasion.</td><td>Abstract checked</td></tr>
+      <tr><td>Cartee et al. Time-dependent surveillance-evasion games. Institute of Electrical and Electronics Engineers (IEEE) Conference on Decision and Control (CDC) 2019 <a class="s" href="../index.html#S-LQ-32">[S-LQ-32]</a></td><td>Minimal-exposure paths against a patroller.</td><td>Abstract checked</td></tr>
+      <tr><td>Hudack, Oh. Multi-agent sensor data collection with attrition risk. International Conference on Automated Planning and Scheduling (ICAPS) 2016 <a class="s" href="../index.html#S-LQ-35">[S-LQ-35]</a></td><td>Paths with attrition risk.</td><td>[UNVERIFIED]. Page access blocked</td></tr>
+      <tr><td>Tews, Sukhatme, Matarić. Multi-robot stealthy navigation. International Conference on Robotics and Automation (ICRA) 2004 <a class="s" href="../index.html#S-LQ-36">[S-LQ-36]</a></td><td>Stealthy movement.</td><td>[UNVERIFIED]. Could not read: certificate expired</td></tr>
+    </tbody>
+  </table>
+  <div class="panel">
+    <p class="label">Work related to Qi Lu</p>
+    <ul>
+      <li>No paper on hazard or sentry navigation was found on his pages <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a> <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>.</li>
+      <li>Nearest link: his pheromone security work. Detractor robots lay misleading trails that lead to forager capture and removal. So robot loss is already a measure in his paper <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>.</li>
+      <li>A danger pheromone is the protective twin of that idea (inference).</li>
+    </ul>
+  </div>
+</section>
+
+<section id="s8">
+  <h2>8 Four-person split and 2-week schedule</h2>
+  <table class="t">
+    <caption>Table 3. Four-person split (source: source text)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Hazard zones and kill logic</td><td>Sentry view cones (variant b)</td></tr>
+      <tr><td class="c">B</td><td>Grid A* with risk cost</td><td>Replanning when risk changes</td></tr>
+      <tr><td class="c">C</td><td>Danger sharing (messages or floor pheromone)</td><td>Flocking baseline</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Plots of the w sweep, presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>Sentry cones and patrols add work. Do variant (a) first.</li>
+    <li>A* for 40 robots at every step may be slow. Replan only when something changes (inference).</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="irrigation.html">← Previous: Rank 4 Precision irrigation</a>
+  <a href="../index.html">Index</a>
+  <a href="territory-game.html">Next: Rank 6 Territory game →</a>
+</div>
+
+</div>
+</body>
+</html>

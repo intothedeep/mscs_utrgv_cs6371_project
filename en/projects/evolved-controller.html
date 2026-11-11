@@ -1,0 +1,195 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 3 Evolved foraging controller | Final-project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><a href="../../projects/evolved-controller.html" hreflang="ko">한국어</a> | <b>English</b></p>
+
+<nav class="topnav">
+  <a href="spiral-search.html">← Previous: rank 2 spiral search</a>
+  <a href="../index.html">Index</a>
+  <a href="irrigation.html">Next: rank 4 precision irrigation →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 3 of 9 (in rank order)</div>
+  <h1>Evolved foraging controller</h1>
+  <div class="lead">
+    <p><strong>Result: rank 3, 12 points. Four projects tie at 12 points, and a Fit of 3 puts this one at rank 3.</strong></p>
+    <p>Why rank 3: Prof. Lu's Scholar list has a neuroevolution foraging paper. The main risk is the evolution run that the owner must start by hand.</p>
+    <div class="chips">
+      <span class="chip">Research potential 2</span>
+      <span class="chip">2-week feasibility 2</span>
+      <span class="chip">Fit with the professor's research 3</span>
+      <span class="chip">Total = product = 12 (inference)</span>
+    </div>
+    <p class="muted">The tie-break rule (Fit first, then research potential) is the researcher's choice (inference). The owner can change it.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and timeline</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Empty frame of a fitness-by-generation chart, and the paths of a hand-written and an evolved controller on an unseen obstacle map">
+      <text class="b" x="40" y="22">Figure 1 left: fitness by generation (planned)</text>
+      <line x1="40" y1="38" x2="70" y2="38" stroke="var(--s1)" stroke-width="3"/><text class="m" x="76" y="42">Best</text>
+      <line x1="220" y1="38" x2="250" y2="38" stroke="var(--s4)" stroke-width="3" stroke-dasharray="6 4"/><text class="m" x="256" y="42">Mean</text>
+      <line class="gr" x1="70" y1="140" x2="460" y2="140"/><line class="gr" x1="70" y1="210" x2="460" y2="210"/><line class="gr" x1="70" y1="280" x2="460" y2="280"/>
+      <line class="ax" x1="70" y1="92" x2="70" y2="320"/>
+      <line class="ax" x1="70" y1="320" x2="460" y2="320"/>
+      <text class="b c" x="265" y="352">Generation</text>
+      <text class="b c" transform="translate(32 206) rotate(-90)">Fitness</text>
+      <text class="m c" x="265" y="210">Empty frame before measuring (planned)</text>
+      <text class="m c" x="265" y="228">No values yet</text>
+      <text class="b" x="520" y="22">Figure 1 right: paths on an unseen obstacle map (planned)</text>
+      <line x1="520" y1="38" x2="550" y2="38" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4"/><text class="m" x="556" y="42">Hand-written controller</text>
+      <line x1="780" y1="38" x2="810" y2="38" stroke="var(--s1)" stroke-width="3"/><text class="m" x="816" y="42">Evolved controller</text>
+      <rect x="520" y="56" width="14" height="10" fill="#bbb" stroke="#777"/><text class="m" x="540" y="65">Obstacle</text>
+      <circle cx="790" cy="61" r="6" fill="none" stroke="var(--s5)" stroke-width="2"/><text class="m" x="802" y="65">Food</text>
+      <text class="m" x="520" y="88">Hand-written controller</text>
+      <rect class="wall" x="520" y="94" width="210" height="210"/>
+      <rect x="550" y="134" width="50" height="20" fill="#bbb" stroke="#777"/><rect x="640" y="204" width="20" height="60" fill="#bbb" stroke="#777"/>
+      <rect x="526" y="272" width="24" height="24" fill="#d9d9d9" stroke="#666"/>
+      <circle cx="700" cy="114" r="12" fill="none" stroke="var(--s5)" stroke-width="2"/>
+      <path d="M540 272 L540 194 L580 194 L580 164 L610 164 L610 114 L690 114" fill="none" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4"/>
+      <text class="m" x="770" y="88">Evolved controller</text>
+      <rect class="wall" x="770" y="94" width="210" height="210"/>
+      <rect x="800" y="134" width="50" height="20" fill="#bbb" stroke="#777"/><rect x="890" y="204" width="20" height="60" fill="#bbb" stroke="#777"/>
+      <rect x="776" y="272" width="24" height="24" fill="#d9d9d9" stroke="#666"/>
+      <circle cx="950" cy="114" r="12" fill="none" stroke="var(--s5)" stroke-width="2"/>
+      <path d="M790 272 C830 242 850 202 940 118" fill="none" stroke="var(--s1)" stroke-width="3"/>
+      <text class="m c" x="750" y="340">The nest is the gray square at the lower left</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows the axes of the fitness chart. The right side shows the paths of two controllers on the same map. Why: the key question is whether the evolved controller also works on an obstacle layout it has not seen.
+      <span class="ab">Abbreviations: none. Source: original Suggested figure <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>. The path shapes are illustrative sketches, not measured values.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>A hand-tuned foraging rule breaks when obstacles appear.</li>
+    <li>Prof. Lu's Scholar list has a paper that evolves a foraging swarm in an obstacle environment with NeuroEvolution of Augmenting Topologies (NEAT, a method that grows the weights and structure of a neural network by evolution) <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>.</li>
+    <li><span class="mark">partial</span> The author list was not read.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Evolve a small neural network or parametric controller for foraging with obstacles.</li>
+    <li>Compare it with a hand-written controller.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: original How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>10 foot-bots (the stock wheeled robot model of ARGoS).</td></tr>
+      <tr><td>Sensors</td><td>8 proximity sensor inputs, the ground sensor, and a light sensor that points to the nest. A light sits at the nest.</td></tr>
+      <tr><td>Behavior rules</td><td>A neural network turns the sensor values into two wheel speeds.</td></tr>
+      <tr><td>Loop functions</td><td>argos3-examples has genetic algorithm (a method that selects, mixes and mutates good solutions over generations) loop functions. <code>galib_phototaxis_loop_functions</code> and <code>mpga_loop_functions</code> are the templates <a class="s" href="../index.html#S-LQ-7">[S-LQ-7]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Take the frame</a></li>
+    <li><a href="#a2">Step 2 Genome</a></li>
+    <li><a href="#a3">Step 3 Fitness</a></li>
+    <li><a href="#a4">Step 4 Evolve</a></li>
+    <li><a href="#a5">Step 5 Test</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>Start from the structure of the <code>mpga</code> example <a class="s" href="../index.html#S-LQ-7">[S-LQ-7]</a>.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>The genome (the set of values that evolution changes) holds the weights of a small fixed neural network. It is simpler than NEAT.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>Fitness (the score of one genome) is the food delivered in one trial. Average it over 3 seeds.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>Evolve for G generations. The owner runs it.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>Test the best genome on an unseen obstacle map.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure the best fitness and the mean fitness in every generation.</li>
+    <li>On unseen maps, compare the food collected by the evolved controller and the hand-written controller.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: does an evolved swarm controller transfer to new obstacle layouts (inference).</li>
+    <li>Beyond a demo: a transfer test across map types (inference).</li>
+    <li>Venue candidates (inference): International Conference on Swarm Intelligence (ANTS, a swarm intelligence conference), a workshop of the Genetic and Evolutionary Computation Conference (GECCO, an evolutionary computation conference), Artificial Life (ALIFE, an artificial life conference).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Key point</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Qi Lu (co-author per Scholar). NEAT foraging in an obstacle environment, 2025 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a></td><td>This is the paper the project follows.</td><td>partial. Author list not verified</td></tr>
+      <tr><td>Qi Lu et al. Multi-actor-attention-critic reinforcement learning for foraging, 2021 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a></td><td>It is learning-based foraging research from the same lab.</td><td>Scholar list only</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 Split among 4 people and 2-week timeline</h2>
+  <table class="t">
+    <caption>Table 3. Split among 4 people (source: original)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Neural network controller</td><td>Hand-written baseline</td></tr>
+      <tr><td class="c">B</td><td>Genetic algorithm loop function, fitness</td><td>Test maps</td></tr>
+      <tr><td class="c">C</td><td>Obstacle maps, run script for the owner</td><td>Graphs</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>Compute: evolution needs many runs. Under the repository rule, the owner runs them by hand. If they do not finish in time, the results are blocked.</li>
+    <li>The evolved behavior may be trivial. For example, it may circle near the nest. Refine the fitness early.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="spiral-search.html">← Previous: rank 2 spiral search</a>
+  <a href="../index.html">Index</a>
+  <a href="irrigation.html">Next: rank 4 precision irrigation →</a>
+</div>
+
+</div>
+</body>
+</html>

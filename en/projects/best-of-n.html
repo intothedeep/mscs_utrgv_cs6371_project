@@ -1,0 +1,194 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 8 Collective decision | Final project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="lang-switch"><a href="../../projects/best-of-n.html">한국어</a> | <strong>English</strong></p>
+
+<nav class="topnav">
+  <a href="sorting-segregation.html">← Previous: Rank 7 Sorting and segregation</a>
+  <a href="../index.html">Index</a>
+  <a href="herding.html">Next: Rank 9 Herding →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 8 / 9 projects (in rank order)</div>
+  <h1>Collective decision (best-of-n)</h1>
+  <div class="lead">
+    <p><strong>Result: rank 8, score 6. It is easy to build, but it is well studied and does not overlap with Prof. Lu's papers.</strong></p>
+    <p>Why rank 8: 2-week feasibility is 3. The fit is only 1, so the product is low.</p>
+    <div class="chips">
+      <span class="chip">research potential 2</span>
+      <span class="chip">2-week feasibility 3</span>
+      <span class="chip">fit with the professor's work 1</span>
+      <span class="chip">total = product = 6 (inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and schedule</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Robots colored by opinion on a floor of black and white tiles, and an empty frame for a chart of the share of correct opinions over time">
+      <text class="b" x="40" y="22">Figure 1 left: floor tile map and robot opinions (illustrative sketch)</text>
+      <rect x="40" y="32" width="14" height="10" fill="#2a2a2a"/><text class="m" x="60" y="41">black tile</text>
+      <rect x="160" y="32" width="14" height="10" fill="#fff" stroke="#999"/><text class="m" x="180" y="41">white tile</text>
+      <circle cx="47" cy="58" r="6" fill="var(--s1)" stroke="#fff" stroke-width="2"/><text class="m" x="60" y="62">opinion: black is the majority</text>
+      <circle cx="287" cy="58" r="6" fill="var(--s2)" stroke="#fff" stroke-width="2"/><text class="m" x="300" y="62">opinion: white is the majority</text>
+      <rect x="40" y="72" width="416" height="280" fill="#fff"/>
+      <path fill="#2a2a2a" d="M40 72h52v56h-52z M144 72h52v56h-52z M196 72h52v56h-52z M300 72h52v56h-52z M404 72h52v56h-52z
+        M92 128h52v56h-52z M144 128h52v56h-52z M248 128h52v56h-52z M352 128h52v56h-52z M404 128h52v56h-52z
+        M40 184h52v56h-52z M92 184h52v56h-52z M196 184h52v56h-52z M248 184h52v56h-52z M300 184h52v56h-52z M404 184h52v56h-52z
+        M40 240h52v56h-52z M144 240h52v56h-52z M196 240h52v56h-52z M352 240h52v56h-52z M404 240h52v56h-52z
+        M92 296h52v56h-52z M144 296h52v56h-52z M248 296h52v56h-52z M300 296h52v56h-52z M352 296h52v56h-52z"/>
+      <g class="gr">
+        <line x1="40" y1="128" x2="456" y2="128"/><line x1="40" y1="184" x2="456" y2="184"/><line x1="40" y1="240" x2="456" y2="240"/><line x1="40" y1="296" x2="456" y2="296"/>
+        <line x1="92" y1="72" x2="92" y2="352"/><line x1="144" y1="72" x2="144" y2="352"/><line x1="196" y1="72" x2="196" y2="352"/><line x1="248" y1="72" x2="248" y2="352"/><line x1="300" y1="72" x2="300" y2="352"/><line x1="352" y1="72" x2="352" y2="352"/><line x1="404" y1="72" x2="404" y2="352"/>
+      </g>
+      <rect class="wall" x="40" y="72" width="416" height="280" style="fill:none"/>
+      <g stroke="#fff" stroke-width="2">
+        <circle cx="66" cy="100" r="9" fill="var(--s1)"/><circle cx="170" cy="156" r="9" fill="var(--s1)"/><circle cx="274" cy="100" r="9" fill="var(--s1)"/><circle cx="222" cy="212" r="9" fill="var(--s1)"/><circle cx="378" cy="268" r="9" fill="var(--s1)"/><circle cx="120" cy="268" r="9" fill="var(--s1)"/>
+        <circle cx="326" cy="156" r="9" fill="var(--s2)"/><circle cx="430" cy="214" r="9" fill="var(--s2)"/>
+      </g>
+
+      <text class="b" x="560" y="22">Figure 1 right: share of correct opinions over time (planned)</text>
+      <line class="gr" x1="620" y1="120" x2="960" y2="120"/><line class="gr" x1="620" y1="200" x2="960" y2="200"/><line class="gr" x1="620" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="620" y1="88" x2="620" y2="320"/>
+      <line class="ax" x1="620" y1="320" x2="960" y2="320"/>
+      <text class="b c" x="790" y="352">time</text>
+      <text class="b c" transform="translate(576 204) rotate(-90)">share with correct opinion</text>
+      <text class="m c" x="790" y="210">empty frame before measuring (planned)</text>
+      <text class="m c" x="790" y="228">no values yet</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows the tile color ratio and robot opinions. The right side shows the axes of the correct-opinion curve. Why: the key question is how fast the swarm settles on the right side when the sensors are noisy.
+      <span class="ab">Abbreviations: none. Source: source text, Suggested figure. Tile layout and opinion spread are an illustrative sketch, not measured values.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>A swarm must pick the better of n options with noisy local sensing.</li>
+    <li>Example: pick the color that covers more of the floor.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Foot-bots estimate the dominant floor color and reach consensus.</li>
+    <li>Measure the accuracy and the time it takes.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: source text, How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>20 to 50 foot-bots (the wheeled robot model that ARGoS provides).</td></tr>
+      <tr><td>Sensors</td><td>The ground sensor reads black and white cells. The range-and-bearing sensor (reads neighbor distance and direction and passes short messages) shares opinions.</td></tr>
+      <tr><td>Behavior rules</td><td>Explore, sample, then vote. The rule is the majority rule (follow the opinion held by more neighbors) or the voter model (copy one randomly chosen neighbor).</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every ARGoS simulation step) build a random black and white tile floor with a set ratio <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Sample</a></li>
+    <li><a href="#a2">Step 2 Opinion</a></li>
+    <li><a href="#a3">Step 3 Broadcast</a></li>
+    <li><a href="#a4">Step 4 Update</a></li>
+    <li><a href="#a5">Step 5 Stop</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>Each robot samples the floor color for a time window.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>It forms an opinion from the samples.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>It broadcasts its opinion and hears its neighbors.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>It updates its opinion by the majority of its neighbors.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>Stop when 90% of the robots agree.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure accuracy and time to consensus against the floor ratio (0.52 to 0.7) and the sensor noise.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: decisions with imperfect sensors <a class="s" href="../index.html#S-LQ-16">[S-LQ-16]</a>, and with only a subset of the swarm <a class="s" href="../index.html#S-LQ-17">[S-LQ-17]</a>.</li>
+    <li>New beyond a demo: a noise-versus-accuracy curve (inference).</li>
+    <li>Venues (inference): International Conference on Swarm Intelligence (ANTS), International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM), and workshops at the International Conference on Intelligent Robots and Systems (IROS).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Check status</th></tr></thead>
+    <tbody>
+      <tr><td>Chin, Khaluf, Pinciroli. Collective perception with imperfect sensors. International Conference on Intelligent Robots and Systems (IROS) 2023 <a class="s" href="../index.html#S-LQ-16">[S-LQ-16]</a></td><td>Abstract checked. Accepted at IROS 2023</td></tr>
+      <tr><td>Fuady, Tarapore, Soorati. SubCDM: collective decision-making with a subset of the swarm. arXiv 2025 <a class="s" href="../index.html#S-LQ-17">[S-LQ-17]</a></td><td>Abstract checked. Preprint</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 Four-person split and 2-week schedule</h2>
+  <table class="t">
+    <caption>Table 3. Four-person split (source: source text)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Floor tile loop function</td><td>Noise model</td></tr>
+      <tr><td class="c">B</td><td>Sampling and voting controller</td><td>Second decision rule</td></tr>
+      <tr><td class="c">C</td><td>Logging, consensus detector</td><td>Plots</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>The topic is well studied. It is hard to be new in 2 weeks.</li>
+    <li>No overlap with Prof. Lu's papers <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="sorting-segregation.html">← Previous: Rank 7 Sorting and segregation</a>
+  <a href="../index.html">Index</a>
+  <a href="herding.html">Next: Rank 9 Herding →</a>
+</div>
+
+</div>
+</body>
+</html>

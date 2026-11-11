@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 9 Shepherding and herding | Final project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="lang-switch"><a href="../../projects/herding.html">한국어</a> | <strong>English</strong></p>
+
+<nav class="topnav">
+  <a href="best-of-n.html">← Previous: Rank 8 Collective decision</a>
+  <a href="../index.html">Index</a>
+  <span class="off">No next (rank 9)</span>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 9 / 9 projects (in rank order)</div>
+  <h1>Shepherding and herding</h1>
+  <div class="lead">
+    <p><strong>Result: rank 9, score 4. It barely overlaps with Prof. Lu's foraging work.</strong></p>
+    <p>Why rank 9: the fit is 1. The owner asked about this topic by name, so it is listed as a full entry.</p>
+    <div class="chips">
+      <span class="chip">research potential 2</span>
+      <span class="chip">2-week feasibility 2</span>
+      <span class="chip">fit with the professor's work 1</span>
+      <span class="chip">total = product = 4 (inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and schedule</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Top view of shepherds behind a flock of sheep pushing it toward a pen, and an empty frame for a chart of time to put 90 percent of the sheep in the pen against the number of shepherds">
+      <defs><marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+      <text class="b" x="40" y="22">Figure 1 left: top view (illustrative sketch)</text>
+      <circle cx="47" cy="38" r="5" fill="#222"/><text class="m" x="60" y="42">sheep</text>
+      <rect x="140" y="33" width="10" height="10" fill="var(--s2)"/><text class="m" x="156" y="42">shepherd</text>
+      <rect x="260" y="33" width="18" height="10" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/><text class="m" x="284" y="42">pen</text>
+      <line x1="340" y1="38" x2="368" y2="38" stroke="#555" stroke-width="2.5" marker-end="url(#arr2)"/><text class="m" x="380" y="42">drive direction</text>
+      <rect class="wall" x="40" y="72" width="420" height="280"/>
+      <rect x="390" y="170" width="60" height="84" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 4"/>
+      <text class="m c" x="420" y="272">pen</text>
+      <g fill="#222"><circle cx="200" cy="190" r="5"/><circle cx="220" cy="175" r="5"/><circle cx="245" cy="185" r="5"/><circle cx="265" cy="200" r="5"/><circle cx="190" cy="215" r="5"/><circle cx="215" cy="210" r="5"/><circle cx="240" cy="215" r="5"/><circle cx="262" cy="228" r="5"/><circle cx="205" cy="240" r="5"/><circle cx="228" cy="245" r="5"/><circle cx="252" cy="245" r="5"/><circle cx="235" cy="198" r="5"/><circle cx="276" cy="182" r="5"/></g>
+      <g fill="var(--s2)"><rect x="124" y="180" width="12" height="12"/><rect x="124" y="226" width="12" height="12"/></g>
+      <text class="m" x="50" y="160">shepherds stay behind the flock</text>
+      <line x1="300" y1="212" x2="380" y2="212" stroke="#555" stroke-width="2.5" marker-end="url(#arr2)"/>
+
+      <text class="b" x="560" y="22">Figure 1 right: shepherd count and time to pen (planned)</text>
+      <line class="gr" x1="620" y1="120" x2="960" y2="120"/><line class="gr" x1="620" y1="200" x2="960" y2="200"/><line class="gr" x1="620" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="620" y1="88" x2="620" y2="320"/>
+      <line class="ax" x1="620" y1="320" x2="960" y2="320"/>
+      <line class="ax" x1="660" y1="320" x2="660" y2="326"/><line class="ax" x1="760" y1="320" x2="760" y2="326"/><line class="ax" x1="860" y1="320" x2="860" y2="326"/>
+      <text class="m c" x="660" y="342">1</text><text class="m c" x="760" y="342">2</text><text class="m c" x="860" y="342">4</text>
+      <text class="b c" x="790" y="366">number of shepherds</text>
+      <text class="b c" transform="translate(566 204) rotate(-90)">time to pen 90% of sheep</text>
+      <text class="m c" x="790" y="200">empty frame before measuring (planned)</text>
+      <text class="m c" x="790" y="218">no values yet</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows the flock, the shepherds and the pen. The right side shows the axes of the time curve against shepherd count. Why: the key question is how many shepherds drive a flock efficiently.
+      <span class="ab">Abbreviations: none. Source: source text, Suggested figure. Positions are an illustrative sketch.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>Robots must drive passive or reactive agents to a goal.</li>
+    <li>One shepherd uses two modes. "Collect" gathers stragglers. "Drive" pushes the group <a class="s" href="../index.html#S-LQ-10">[S-LQ-10]</a>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Foot-bot shepherds push a flock of foot-bot "sheep" into a goal pen.</li>
+    <li>Compare 1, 2 and 4 shepherds.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: source text, How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>20 sheep foot-bots (the wheeled robot model that ARGoS provides), and 1 to 4 shepherd foot-bots.</td></tr>
+      <tr><td>Sensors</td><td>The range-and-bearing sensor (reads neighbor distance and direction) lets sheep sense shepherds and each other. The positioning sensor is also used.</td></tr>
+      <tr><td>Behavior rules</td><td>Sheep move away from shepherds and toward the flock centroid. The shepherd uses Strömbom's collect and drive <a class="s" href="../index.html#S-LQ-10">[S-LQ-10]</a>.</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every ARGoS simulation step) make the goal pen on the floor and count the sheep inside it.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Sheep</a></li>
+    <li><a href="#a2">Step 2 Collect</a></li>
+    <li><a href="#a3">Step 3 Drive</a></li>
+    <li><a href="#a4">Step 4 Many shepherds</a></li>
+    <li><a href="#a5">Step 5 Stop</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>A sheep moves away from shepherds within radius r and toward the local centroid, and noise is added.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>If the farthest sheep is too far from the centroid, the shepherd goes behind that sheep (collect).</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>Otherwise the shepherd goes behind the centroid, on the side opposite the pen (drive) <a class="s" href="../index.html#S-LQ-10">[S-LQ-10]</a>.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5 (variant)</div><p>Split the sheep by angle and give each sector one shepherd.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>Stop when 90% of the sheep are inside the pen.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure the time to put 90% of the sheep in the pen against the number of shepherds and sheep.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: how many herders are needed per target, especially when the target density is low <a class="s" href="../index.html#S-LQ-12">[S-LQ-12]</a>.</li>
+    <li>New beyond a demo: a scaling curve on dynamics close to real robots, in ARGoS (inference).</li>
+    <li>Venues (inference): International Conference on Swarm Intelligence (ANTS), International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM), and Distributed Autonomous Robotic Systems (DARS).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Check status</th></tr></thead>
+    <tbody>
+      <tr><td>Strömbom et al. Shepherding heuristics. Journal of the Royal Society Interface 2014 <a class="s" href="../index.html#S-LQ-10">[S-LQ-10]</a></td><td>Old [STALE]. Full-text page checked</td></tr>
+      <tr><td>Van Havermaet et al. Multi-robot caging to steer herds away from danger. Royal Society Open Science 2023 <a class="s" href="../index.html#S-LQ-11">[S-LQ-11]</a></td><td>Record page checked</td></tr>
+      <tr><td>Lama, di Bernardo. Shepherding control and herdability in complex multi-agent systems. arXiv 2023 <a class="s" href="../index.html#S-LQ-12">[S-LQ-12]</a></td><td>Abstract checked. Preprint</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 Four-person split and 2-week schedule</h2>
+  <table class="t">
+    <caption>Table 3. Four-person split (source: source text)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Sheep controller</td><td>Tune flock cohesion</td></tr>
+      <tr><td class="c">B</td><td>Shepherd collect and drive</td><td>Multi-shepherd sectors</td></tr>
+      <tr><td class="c">C</td><td>Pen loop function, timer</td><td>Experiment grid, plots</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>Foot-bot sheep may not flock well. Tuning may use all of week 1.</li>
+    <li>It barely overlaps with Prof. Lu's foraging work <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="best-of-n.html">← Previous: Rank 8 Collective decision</a>
+  <a href="../index.html">Index</a>
+  <span class="off">No next</span>
+</div>
+
+</div>
+</body>
+</html>

@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 1 Pheromone foraging under misleading trails | Final-project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><a href="../../projects/pheromone-misleading-trails.html" hreflang="ko">한국어</a> | <b>English</b></p>
+
+<nav class="topnav">
+  <span class="off">No previous (rank 1)</span>
+  <a href="../index.html">Index</a>
+  <a href="spiral-search.html">Next: rank 2 spiral search →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 1 of 9 (in rank order)</div>
+  <h1>Pheromone foraging under misleading trails</h1>
+  <div class="lead">
+    <p><strong>Result: rank 1, 27 points. It attaches directly to the misleading pheromone trail attack and defense papers of Prof. Lu's lab.</strong></p>
+    <p>Why rank 1: research potential, 2-week feasibility and Fit all score 3. Floor painting alone makes it easy to build.</p>
+    <div class="chips">
+      <span class="chip">Research potential 3</span>
+      <span class="chip">2-week feasibility 3</span>
+      <span class="chip">Fit with the professor's research 3</span>
+      <span class="chip">Total = product = 27 (inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and timeline</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Top view of an arena with a true trail and a false trail, and an empty frame of a chart of food collected against the number of detractor robots">
+      <text class="b" x="40" y="22">Figure 1 left: top view of the arena</text>
+      <g>
+        <line x1="40" y1="38" x2="70" y2="38" stroke="var(--s5)" stroke-width="4"/><text class="m" x="76" y="42">True trail</text>
+        <line x1="230" y1="38" x2="260" y2="38" stroke="var(--s2)" stroke-width="4" stroke-dasharray="6 4"/><text class="m" x="266" y="42">False trail</text>
+        <circle cx="48" cy="56" r="5" fill="#222"/><text class="m" x="76" y="60">Honest robot</text>
+        <circle cx="238" cy="56" r="5" fill="var(--s2)"/><text class="m" x="266" y="60">Detractor robot</text>
+      </g>
+      <rect class="wall" x="40" y="72" width="420" height="280"/>
+      <rect x="50" y="300" width="84" height="42" fill="#d9d9d9" stroke="#666"/>
+      <text class="b c" x="92" y="326">Nest</text>
+      <circle cx="400" cy="117" r="22" fill="none" stroke="var(--s5)" stroke-width="2" stroke-dasharray="4 3"/>
+      <text class="m c" x="400" y="160">Food</text>
+      <path d="M134 322 C190 262 300 212 390 127" stroke="var(--s5)" stroke-width="4" fill="none"/>
+      <path d="M85 300 C60 236 100 172 135 122" stroke="var(--s2)" stroke-width="4" fill="none" stroke-dasharray="6 4"/>
+      <path d="M128 115 L142 129 M142 115 L128 129" stroke="var(--s2)" stroke-width="3"/>
+      <text class="m c" x="150" y="104">Empty area</text>
+      <circle cx="243" cy="233" r="5" fill="#222"/><circle cx="318" cy="184" r="5" fill="#222"/>
+      <circle cx="200" cy="336" r="5" fill="#222"/><circle cx="300" cy="322" r="5" fill="#222"/>
+      <circle cx="380" cy="282" r="5" fill="#222"/><circle cx="250" cy="150" r="5" fill="#222"/>
+      <circle cx="88" cy="202" r="5" fill="var(--s2)"/><circle cx="114" cy="152" r="5" fill="var(--s2)"/>
+
+      <text class="b" x="560" y="22">Figure 1 right: detractors and food collected (planned)</text>
+      <line x1="580" y1="38" x2="610" y2="38" stroke="var(--base)" stroke-width="3"/><text class="m" x="616" y="42">No defense</text>
+      <line x1="800" y1="38" x2="830" y2="38" stroke="var(--s1)" stroke-width="3"/><text class="m" x="836" y="42">With defense</text>
+      <line class="gr" x1="580" y1="110" x2="960" y2="110"/><line class="gr" x1="580" y1="190" x2="960" y2="190"/><line class="gr" x1="580" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="580" y1="72" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <line class="ax" x1="600" y1="320" x2="600" y2="326"/><line class="ax" x1="685" y1="320" x2="685" y2="326"/>
+      <line class="ax" x1="770" y1="320" x2="770" y2="326"/><line class="ax" x1="940" y1="320" x2="940" y2="326"/>
+      <text class="m c" x="600" y="342">0</text><text class="m c" x="685" y="342">1</text>
+      <text class="m c" x="770" y="342">2</text><text class="m c" x="940" y="342">4</text>
+      <text class="b c" x="770" y="366">Number of detractors</text>
+      <text class="b c" transform="translate(540 196) rotate(-90)">Food collected</text>
+      <text class="m c" x="770" y="200">Empty frame before measuring (planned)</text>
+      <text class="m c" x="770" y="218">No values yet</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows the true and false trails in the arena. The right side shows the axes of the planned chart. Why: a false trail pulls robots to an empty place, and the defense gain over that loss is the core of this project.
+      <span class="ab">Abbreviations: none. Source: original Suggested figure <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>. Error bars use 10 seeds.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>Foraging with pheromone (a scent signal that ants leave on a path) is fast. Foraging means finding food and carrying it to a nest.</li>
+    <li>But one bad robot can lay a false trail.</li>
+    <li>Prof. Lu's lab studies this attack and its defense <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a> <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Show how much a few detractor robots (robots that lay false trails to fool the swarm) cut the food collected by the swarm.</li>
+    <li>Show how much of that loss a simple defense wins back.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: original How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>20 to 40 foot-bots (the stock wheeled robot model of ARGoS). A few are detractors. Their light-emitting diode (LED) color is red.</td></tr>
+      <tr><td>Sensors</td><td>The ground sensor reads the floor. The proximity sensor avoids obstacles. The range-and-bearing sensor (it gives the distance and direction of neighbor robots and passes short messages) is optional and shares trail ends. The positioning sensor is also used.</td></tr>
+      <tr><td>Behavior rules</td><td>Robots search by random walk. On finding food, a robot returns to the nest and leaves pheromone. When it senses pheromone, it follows the strongest side.</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every simulation step) build the virtual pheromone on a floor grid. <code>GetFloorColor</code> paints the grid color. <code>SetChanged()</code> repaints it at every step. The grid evaporates over time <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>Food</td><td>Food is a set of floor points. It works like the foraging demo of argos3-examples <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Decay</a></li>
+    <li><a href="#a2">Step 2 Honest robots</a></li>
+    <li><a href="#a3">Step 3 Detractors</a></li>
+    <li><a href="#a4">Step 4 Following a trail</a></li>
+    <li><a href="#a5">Step 5 Defense</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>At every step, the loop function lowers all pheromone cells by a fixed ratio.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>An honest robot returns carrying food. It adds pheromone along the path from the food to the nest.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>A detractor adds pheromone along a path to an empty area.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>A searching robot reads the pheromone in the cell under it. It follows the gradient (the direction of steepest increase).</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5 (defense)</div><p>If a robot follows a trail and finds no food, it marks the trail end as "suspect". Suspect ends are grouped by distance and ignored.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure food collected per 10 minutes of simulation, against the number of detractors (0, 1, 2, 4).</li>
+    <li>Draw the same curve with and without the defense. Run each with 10 seeds (starting values of the random number generator).</li>
+    <li>Measure the time spent on false trails in robot-seconds.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: how robust is stigmergy (indirect talk through marks left in the environment) against hostile robots <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+    <li>Beyond a demo: a cheap defense that needs no communication, or a scaling curve of detractor share against loss.</li>
+    <li>Prof. Lu's defense applies density-based spatial clustering of applications with noise (DBSCAN, a method that groups dense points and treats sparse points as noise) to pheromone trails. It also adds swarm grouping and adaptive timing <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>.</li>
+    <li>The contribution would be a simpler new rule compared against the reimplementation (inference).</li>
+    <li>Venue candidates (inference): Towards Autonomous Robotic Systems (TAROS, an autonomous robotics conference where Prof. Lu published this line of work <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>), International Conference on Swarm Intelligence (ANTS, a swarm intelligence conference), International Conference on Ubiquitous Robots (UR, a robotics conference where Prof. Lu published in 2024 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Key point</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Luna, Qi Lu. Robust mitigation of misleading pheromone trails. Towards Autonomous Robotic Systems (TAROS) 2024 proceedings, 2025 <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a></td><td>Food collection falls as the share of detractors grows. The defense was tested with obstacles.</td><td>first two pages read</td></tr>
+      <tr><td>Qi Lu's pheromone trail papers. Labels UR 2024 and ICCCR 2024 (full name of ICCCR not read) <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a></td><td>Only links and labels exist. The titles were not read.</td><td>partial</td></tr>
+      <tr><td>Qi Lu. Dynamic robot chains and ARGoS. International Conference on Robotics and Automation (ICRA) 2021, 2022 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a></td><td>It is evidence that the same lab used ARGoS.</td><td>verified</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Note: the Institute of Electrical and Electronics Engineers (IEEE) site blocked access. So the full name of ICCCR and the titles of the two papers were not read.</p>
+</section>
+
+<section id="s8">
+  <h2>8 Split among 4 people and 2-week timeline</h2>
+  <table class="t">
+    <caption>Table 3. Split among 4 people (source: original)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Pheromone grid loop function, evaporation, floor painting</td><td>Detractor placement, data logging</td></tr>
+      <tr><td class="c">B</td><td>Honest foraging controller</td><td>Defense rule</td></tr>
+      <tr><td class="c">C</td><td>Experiment files, seeds, batch run script for the owner</td><td>Graph: food against number of detractors</td></tr>
+      <tr><td class="c">D</td><td>Literature survey, related-work slides</td><td>Presentation, demo video</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>With a fine grid, repainting the floor at every step can slow the simulation. Use a coarse grid (inference).</li>
+    <li>It overlaps with the defense Prof. Lu already published. Present it as one reproduction plus one new rule.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <span class="off">No previous</span>
+  <a href="../index.html">Index</a>
+  <a href="spiral-search.html">Next: rank 2 spiral search →</a>
+</div>
+
+</div>
+</body>
+</html>

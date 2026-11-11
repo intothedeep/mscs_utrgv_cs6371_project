@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 7 Collective sorting and segregation | Final project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="lang-switch"><a href="../../projects/sorting-segregation.html">한국어</a> | <strong>English</strong></p>
+
+<nav class="topnav">
+  <a href="territory-game.html">← Previous: Rank 6 Territory game</a>
+  <a href="../index.html">Index</a>
+  <a href="best-of-n.html">Next: Rank 8 Collective decision →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 7 / 9 projects (in rank order)</div>
+  <h1>Collective sorting and segregation</h1>
+  <div class="lead">
+    <p><strong>Result: rank 7, score 8. The problem is old, so a novelty claim is hard.</strong></p>
+    <p>Why rank 7: all three criteria score 2. It fits a swarm well, because it uses only local rules and no leader.</p>
+    <div class="chips">
+      <span class="chip">research potential 2</span>
+      <span class="chip">2-week feasibility 2</span>
+      <span class="chip">fit with the professor's work 2</span>
+      <span class="chip">total = product = 8 (inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and schedule</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Three scenes, start, middle and end, in which two colors of items form clusters, and an empty frame for a purity-over-time chart">
+      <text class="b" x="40" y="22">Figure 1 left: three scenes (illustrative sketch)</text>
+      <circle cx="48" cy="38" r="5" fill="var(--s2)"/><text class="m" x="60" y="42">color 1 item</text>
+      <circle cx="220" cy="38" r="5" fill="var(--s4)"/><text class="m" x="232" y="42">color 2 item</text>
+
+      <g transform="translate(40 80)">
+        <rect class="wall" x="0" y="0" width="130" height="130"/>
+        <g fill="var(--s2)"><circle cx="15" cy="20" r="5"/><circle cx="60" cy="35" r="5"/><circle cx="105" cy="15" r="5"/><circle cx="30" cy="75" r="5"/><circle cx="85" cy="90" r="5"/><circle cx="110" cy="60" r="5"/><circle cx="50" cy="110" r="5"/></g>
+        <g fill="var(--s4)"><circle cx="40" cy="12" r="5"/><circle cx="90" cy="48" r="5"/><circle cx="18" cy="48" r="5"/><circle cx="70" cy="72" r="5"/><circle cx="108" cy="108" r="5"/><circle cx="32" cy="95" r="5"/><circle cx="68" cy="110" r="5"/></g>
+        <text class="m c" x="65" y="152">start</text>
+      </g>
+      <g transform="translate(185 80)">
+        <rect class="wall" x="0" y="0" width="130" height="130"/>
+        <g fill="var(--s2)"><circle cx="20" cy="25" r="5"/><circle cx="38" cy="38" r="5"/><circle cx="30" cy="62" r="5"/><circle cx="72" cy="30" r="5"/><circle cx="92" cy="82" r="5"/><circle cx="108" cy="100" r="5"/><circle cx="80" cy="108" r="5"/></g>
+        <g fill="var(--s4)"><circle cx="90" cy="22" r="5"/><circle cx="108" cy="38" r="5"/><circle cx="62" cy="62" r="5"/><circle cx="45" cy="88" r="5"/><circle cx="25" cy="104" r="5"/><circle cx="75" cy="52" r="5"/><circle cx="15" cy="75" r="5"/></g>
+        <text class="m c" x="65" y="152">middle</text>
+      </g>
+      <g transform="translate(330 80)">
+        <rect class="wall" x="0" y="0" width="130" height="130"/>
+        <g fill="var(--s2)"><circle cx="22" cy="24" r="5"/><circle cx="36" cy="22" r="5"/><circle cx="28" cy="38" r="5"/><circle cx="44" cy="34" r="5"/><circle cx="24" cy="52" r="5"/><circle cx="40" cy="50" r="5"/><circle cx="32" cy="64" r="5"/></g>
+        <g fill="var(--s4)"><circle cx="86" cy="84" r="5"/><circle cx="100" cy="82" r="5"/><circle cx="92" cy="98" r="5"/><circle cx="106" cy="96" r="5"/><circle cx="82" cy="104" r="5"/><circle cx="98" cy="112" r="5"/><circle cx="88" cy="70" r="5"/></g>
+        <text class="m c" x="65" y="152">end</text>
+      </g>
+      <text class="m" x="40" y="260">Over time, items of the same color gather in one place.</text>
+
+      <text class="b" x="560" y="22">Figure 1 right: purity over time (planned)</text>
+      <line class="gr" x1="620" y1="120" x2="960" y2="120"/><line class="gr" x1="620" y1="200" x2="960" y2="200"/><line class="gr" x1="620" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="620" y1="88" x2="620" y2="320"/>
+      <line class="ax" x1="620" y1="320" x2="960" y2="320"/>
+      <line x1="620" y1="120" x2="960" y2="120" stroke="#666" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text class="m e" x="612" y="124">90%</text>
+      <text class="b c" x="790" y="352">time</text>
+      <text class="b c" transform="translate(576 204) rotate(-90)">purity</text>
+      <text class="m c" x="790" y="210">empty frame before measuring (planned)</text>
+      <text class="m c" x="790" y="228">dashed line = 90% purity target</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows the start, middle and end scenes. The right side shows the axes of the purity curve. Why: the key metric is how the time to reach 90% purity changes with swarm size.
+      <span class="ab">Abbreviations: none. Source: source text, Suggested figure. Dot positions are an illustrative sketch, not measured values.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>A swarm must split mixed items or robots into groups without a leader. Each group gathers in its own place.</li>
+    <li>Ant brood sorting inspired a simple rule: pick up lonely items and drop them next to similar ones (Deneubourg et al., 1991) <span class="mark">[UNVERIFIED]</span>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Sort two item colors into two clusters, or separate two robot types.</li>
+    <li>Measure cluster purity (the share of the main color inside a cluster, where 100% means one color only) over time.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: source text, How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>10 to 20 foot-bots (the wheeled robot model that ARGoS provides).</td></tr>
+      <tr><td>Sensors</td><td>The ground sensor reads the item color, which is placed as a floor spot. The positioning sensor is also used.</td></tr>
+      <tr><td>Behavior rules</td><td>The pick-up probability falls when many similar items are nearby. The drop probability rises when many are nearby.</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every ARGoS simulation step) place items as colored floor spots. They count the local density around each item <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>Robot segregation variant</td><td>Give different attraction to the same type and to the other type (differential potentials, which attract or repel by type so types separate) <a class="s" href="../index.html#S-LQ-15">[S-LQ-15]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Scatter</a></li>
+    <li><a href="#a2">Step 2 Fraction f</a></li>
+    <li><a href="#a3">Step 3 Pick up</a></li>
+    <li><a href="#a4">Step 4 Drop</a></li>
+    <li><a href="#a5">Step 5 Variant</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>Scatter items of two colors. The source text uses red and blue.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>A robot walks at random and stops on an item. It computes the fraction f of nearby items with the same color. The loop function supplies this value.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>It picks up the item with the probability below. The form of the formula is attributed to Deneubourg et al. 1991, and the source was not read <span class="mark">[UNVERIFIED]</span>.</p><p><code>p_pick = (k1 / (k1 + f))^2</code></p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>It carries the item. It drops it where the same-color fraction is high, with the probability below <span class="mark">[UNVERIFIED]</span>.</p><p><code>p_drop = (f / (k2 + f))^2</code></p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5 (variant)</div><p>Put a nest for each color. The structure is like Prof. Lu's multiple-place foraging <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure the number of clusters and the purity for each color over time.</li>
+    <li>Measure the time to reach 90% purity against swarm size.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: how fast and how pure is sorting with minimal sensing (inference).</li>
+    <li>New beyond a demo: sorting into fixed depots that the swarm chooses (inference).</li>
+    <li>Venues (inference): International Conference on Swarm Intelligence (ANTS) and International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Check status</th></tr></thead>
+    <tbody>
+      <tr><td>Kumar, Garg, Kumar. Segregation of heterogeneous robots by differential potentials. Institute of Electrical and Electronics Engineers (IEEE) Transactions on Automatic Control 2010 <a class="s" href="../index.html#S-LQ-15">[S-LQ-15]</a></td><td>Old [STALE]</td></tr>
+      <tr><td>Macharet et al. Spatial segregation in robot swarms. Swarm Intelligence 2020</td><td>[UNVERIFIED]. Not read</td></tr>
+      <tr><td>Deneubourg et al. 1991, "The dynamics of collective sorting"</td><td>[UNVERIFIED]. Not read. The year is 1990 or 1991 depending on the citation</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">No paper on this topic from 2022 to 2026 was verified.</p>
+</section>
+
+<section id="s8">
+  <h2>8 Four-person split and 2-week schedule</h2>
+  <table class="t">
+    <caption>Table 3. Four-person split (source: source text)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Item loop function, density lookup</td><td>Depot variant</td></tr>
+      <tr><td class="c">B</td><td>Pick-up and drop controller</td><td>Parameter sweep files</td></tr>
+      <tr><td class="c">C</td><td>Purity metric, logging</td><td>Plots</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>Clustering can be slow. It may need a long simulated time.</li>
+    <li>The problem is old. A novelty claim is hard.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="territory-game.html">← Previous: Rank 6 Territory game</a>
+  <a href="../index.html">Index</a>
+  <a href="best-of-n.html">Next: Rank 8 Collective decision →</a>
+</div>
+
+</div>
+</body>
+</html>

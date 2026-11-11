@@ -1,0 +1,221 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 6 Territory capture game | Final project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<p class="lang-switch"><a href="../../projects/territory-game.html">한국어</a> | <strong>English</strong></p>
+
+<nav class="topnav">
+  <a href="risk-aware-navigation.html">← Previous: Rank 4 Risk-aware navigation</a>
+  <a href="../index.html">Index</a>
+  <a href="sorting-segregation.html">Next: Rank 7 Sorting and segregation →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 6 / 9 projects (in rank order)</div>
+  <h1>Territory capture game<br><span class="muted" style="font-size:15px;font-weight:400">ttangttameokgi</span></h1>
+  <div class="lead">
+    <p><strong>Result: rank 6, score 12. This is the owner's current favorite. It was scored the same way as the other ideas, with no bonus.</strong></p>
+    <p>Why rank 6: it is one of four ideas tied at 12. Its research potential is 2 and its fit is 2. Prof. Lu's work is foraging, not competition <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</p>
+    <div class="chips">
+      <span class="chip">research potential 2</span>
+      <span class="chip">2-week feasibility 3</span>
+      <span class="chip">fit with the professor's work 2</span>
+      <span class="chip">total = product = 12 (inference)</span>
+    </div>
+    <p class="muted">Bridge: adding disruptor robots or danger marks to this game links it to rank 1 or to the rank 4 (tie) idea (inference).</p>
+    <p>Design document: <a href="../../DESIGN.md">DESIGN.md</a> (grid, capture rules, log files, options A, B, C). Table 4 before section 9 summarizes it.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and schedule</a></li>
+    <li><a href="#design">Design options A, B, C</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="An arena scene with cells painted by two teams and robots, and an empty frame for a win-rate matrix of four strategies">
+      <text class="b" x="40" y="22">Figure 1 left: arena scene (illustrative sketch)</text>
+      <rect x="40" y="32" width="14" height="10" fill="var(--s4)" fill-opacity=".45"/><text class="m" x="60" y="41">team 0 cell (blue)</text>
+      <rect x="200" y="32" width="14" height="10" fill="var(--s2)" fill-opacity=".45"/><text class="m" x="220" y="41">team 1 cell (orange)</text>
+      <rect x="380" y="32" width="14" height="10" fill="#fff" stroke="#999"/><text class="m" x="400" y="41">free cell</text>
+      <circle cx="47" cy="58" r="5" fill="var(--s4)"/><circle cx="68" cy="58" r="5" fill="var(--s2)"/><text class="m" x="80" y="62">robot (team color)</text>
+      <rect x="40" y="72" width="420" height="280" fill="#fff"/>
+      <polygon points="40,72 220,72 220,128 250,128 250,212 190,212 190,268 160,268 160,352 40,352" fill="var(--s4)" fill-opacity=".45"/>
+      <polygon points="460,72 310,72 310,100 280,100 280,184 340,184 340,240 370,240 370,352 460,352" fill="var(--s2)" fill-opacity=".45"/>
+      <g class="gr">
+        <line x1="40" y1="100" x2="460" y2="100"/><line x1="40" y1="128" x2="460" y2="128"/><line x1="40" y1="156" x2="460" y2="156"/><line x1="40" y1="184" x2="460" y2="184"/><line x1="40" y1="212" x2="460" y2="212"/><line x1="40" y1="240" x2="460" y2="240"/><line x1="40" y1="268" x2="460" y2="268"/><line x1="40" y1="296" x2="460" y2="296"/><line x1="40" y1="324" x2="460" y2="324"/>
+        <line x1="70" y1="72" x2="70" y2="352"/><line x1="100" y1="72" x2="100" y2="352"/><line x1="130" y1="72" x2="130" y2="352"/><line x1="160" y1="72" x2="160" y2="352"/><line x1="190" y1="72" x2="190" y2="352"/><line x1="220" y1="72" x2="220" y2="352"/><line x1="250" y1="72" x2="250" y2="352"/><line x1="280" y1="72" x2="280" y2="352"/><line x1="310" y1="72" x2="310" y2="352"/><line x1="340" y1="72" x2="340" y2="352"/><line x1="370" y1="72" x2="370" y2="352"/><line x1="400" y1="72" x2="400" y2="352"/><line x1="430" y1="72" x2="430" y2="352"/>
+      </g>
+      <rect class="wall" x="40" y="72" width="420" height="280" style="fill:none"/>
+      <circle cx="100" cy="150" r="6" fill="var(--s4)"/><circle cx="145" cy="300" r="6" fill="var(--s4)"/><circle cx="205" cy="100" r="6" fill="var(--s4)"/><circle cx="235" cy="190" r="6" fill="var(--s4)"/>
+      <circle cx="400" cy="120" r="6" fill="var(--s2)"/><circle cx="325" cy="210" r="6" fill="var(--s2)"/><circle cx="415" cy="300" r="6" fill="var(--s2)"/><circle cx="295" cy="140" r="6" fill="var(--s2)"/>
+
+      <text class="b" x="540" y="22">Figure 1 right: win-rate matrix by strategy (planned)</text>
+      <text class="m" x="540" y="42">row = team 0 strategy, column = team 1 strategy</text>
+      <rect x="540" y="50" width="100" height="10" fill="url(#g)" stroke="#999"/>
+      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#333"/></linearGradient></defs>
+      <text class="m" x="648" y="59">win rate: low at left, high at right</text>
+      <g>
+        <text class="b c" x="740" y="96">A</text><text class="b c" x="800" y="96">B</text><text class="b c" x="860" y="96">C</text><text class="b c" x="920" y="96">D</text>
+        <text class="m e" x="702" y="130">A random walk</text><text class="m e" x="702" y="190">B sector sweep</text><text class="m e" x="702" y="250">C frontier seeking</text><text class="m e" x="702" y="310">D Q-learning (stretch)</text>
+        <rect x="710" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+        <rect x="710" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+        <rect x="710" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+        <rect x="710" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+      </g>
+      <text class="m c" x="830" y="368">empty frame (planned), no values yet</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows cells painted by two teams. The right side shows an empty matrix for strategy-against-strategy win rates. Why: the key question is which search method wins when an opponent repaints cells.
+      <span class="ab">Abbreviations: none. Source: source text, Suggested figure, and DESIGN.md Table 3. Color mismatch: the source text says red and blue, and DESIGN.md fixes blue and orange. This figure follows DESIGN.md.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>Coverage studies usually assume that robots cooperate.</li>
+    <li>In competitive coverage (teams race to cover the same area), robots compete to cover cells first or last <a class="s" href="../index.html#S-LQ-19">[S-LQ-19]</a>.</li>
+    <li>Shats, Amir and Agmon found that pursuing the opponent is the key strategy. Q-learning and deep Q-learning did not close the knowledge gap <a class="s" href="../index.html#S-LQ-19">[S-LQ-19]</a>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Two foot-bot teams paint floor cells in their color.</li>
+    <li>The team with more cells at time T wins. Compare strategies.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: source text, How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>2 teams of 4 to 10 foot-bots (the wheeled robot model that ARGoS provides). The light-emitting diode (LED) color is the team color.</td></tr>
+      <tr><td>Sensors</td><td>Positioning sensor (which cell am I on), ground sensor (color of the cell under me), proximity sensor, and range-and-bearing sensor (reads neighbor distance and direction and passes team messages).</td></tr>
+      <tr><td>Behavior rules</td><td>They differ for each strategy below.</td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every ARGoS simulation step) hold a cell grid. At each step, the cell under a robot takes that robot's team color. <code>GetFloorColor</code> returns the cell color and <code>SetChanged()</code> repaints <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>Human player (optional)</td><td>Drive one robot with the keyboard keys I, J, K, L. Use the <code>manualcontrol</code> example <a class="s" href="../index.html#S-LQ-8">[S-LQ-8]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Random walk</a></li>
+    <li><a href="#a2">Step 2 Sector sweep</a></li>
+    <li><a href="#a3">Step 3 Frontier seeking</a></li>
+    <li><a href="#a4">Step 4 Q-learning (stretch)</a></li>
+    <li><a href="#a5">Step 5 Matches</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5 (strategy A)</div><p>Random walk (the robot changes direction at random as it moves).</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5 (strategy B)</div><p>Each robot takes a sector and sweeps it. Use boustrophedon (back-and-forth rows, like plowing a field) or a spiral <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a>.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5 (strategy C)</div><p>Frontier seeking (go to the border between covered and uncovered cells). Go to the nearest cell not owned by my team.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5 (strategy D, stretch)</div><p>Tabular Q-learning (reinforcement learning with a value table for each state and action) on a coarse grid, trained by self-play. The state is the local 3x3 cell colors (inference).</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>Play round-robin matches between strategies, 10 seeds for each pair.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>The final cell share for each team, and the win-rate matrix between strategies.</li>
+    <li>The share-over-time curve.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: what search pattern wins when an opponent repaints your cells (inference).</li>
+    <li>New beyond a demo: a win-rate matrix that shows non-transitive strategies (a rock-paper-scissors pattern), if one appears (inference).</li>
+    <li>Venues (inference): workshops at the International Conference on Autonomous Agents and Multiagent Systems (AAMAS), the International Conference on Swarm Intelligence (ANTS), and Towards Autonomous Robotic Systems (TAROS).</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Key point</th><th>Check status</th></tr></thead>
+    <tbody>
+      <tr><td>Shats, Amir, Agmon. Competitive Ant Coverage: The Value of Pursuit. International Conference on Intelligent Robots and Systems (IROS) 2023 <a class="s" href="../index.html#S-LQ-19">[S-LQ-19]</a></td><td>Pursuit is the key strategy.</td><td>First page read. IROS 2023 comes only from the file name</td></tr>
+      <tr><td>Qi Lu, Ryan Luna. Spiral search with ARGoS, 2023. Source of the sweep strategy <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a></td><td>The basis for strategy B.</td><td>Partial</td></tr>
+      <tr><td>Qi Lu et al. Multi-agent reinforcement learning for foraging, 2021 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a></td><td>Neighboring work on learned strategies.</td><td>Only the Google Scholar listing was checked</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 Four-person split and 2-week schedule</h2>
+  <table class="t">
+    <caption>Table 3. Four-person split (source: research source text). The module-owner slot split is in section 7 of <a href="../../DESIGN.md">DESIGN.md</a>.</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Cell grid loop function, painting, score</td><td>Keyboard player robot</td></tr>
+      <tr><td class="c">B</td><td>Strategies A and B</td><td>Strategy D (stretch)</td></tr>
+      <tr><td class="c">C</td><td>Strategy C</td><td>Tournament script for the owner</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Win-matrix plots, presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="design">
+  <h2>Summary of design options A, B, C (<a href="../../DESIGN.md">DESIGN.md</a> Table 7)</h2>
+  <p class="muted">DESIGN.md is a draft that waits for the owner's pick (2026-11-10). Effort is an estimate in person-days (about 4 hours each), not a measurement. Minimum viable product stage 1 (MVP1, which proves the flow with fake strategies) takes about 6 person-days. About 18 person-days remain after it.</p>
+  <table class="t">
+    <caption>Table 4. Options A, B, C (source: DESIGN.md section 5, Table 7)</caption>
+    <thead><tr><th></th><th>A Rule-based swarm team</th><th>B Tabular Q-learning self-play</th><th>C Learned behavior selector</th></tr></thead>
+    <tbody>
+      <tr><td>Content</td><td>Four rules: random, dispersal, color trail, frontier seeking</td><td>One Q table for each team. About 120 states and 4 actions</td><td>A learner picks one of A0, A1, A2 every 2 seconds. About 24 states</td></tr>
+      <tr><td>Effort after MVP1 (person-days, estimate)</td><td>About 10</td><td>About 15 to 17</td><td>About 14 to 16</td></tr>
+      <tr><td>Slack left (against about 18)</td><td>8</td><td>1 to 3</td><td>2 to 4</td></tr>
+      <tr><td>Main risk</td><td>Weak learning story</td><td>It may not learn in time. The cluster build may fail</td><td>Cluster build</td></tr>
+      <tr><td>Training</td><td>None</td><td>Cradle cluster</td><td>Cradle cluster</td></tr>
+      <tr><td>Presentation result</td><td>Strategy ranking, share over time</td><td>Learning curve, learned team against A0</td><td>Swarm against learned share</td></tr>
+      <tr><td>Fit with the professor's interest</td><td>Strong: swarm robots and stigmergy are his core. Spiral sweep can cite his 2023 paper</td><td>Medium: his reinforcement learning paper (2021) is only on Google Scholar and is deep multi-agent learning</td><td>Medium to strong: swarm rules are the center and learning is a small add-on</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Note on DESIGN.md section 8, Q13: that document lists this game as "rank 5 of 8, score 12". The research source text (research/lu_qi.md) lists it as rank 6 of 9. This site follows the research source text.</p>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>The fit with Prof. Lu is weak. His work is foraging, not competition <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+    <li>Tabular reinforcement learning in 2 weeks is risky. Training runs only when the owner orders it. Keep it a stretch goal.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="risk-aware-navigation.html">← Previous: Rank 4 Risk-aware navigation</a>
+  <a href="../index.html">Index</a>
+  <a href="sorting-segregation.html">Next: Rank 7 Sorting and segregation →</a>
+</div>
+
+</div>
+</body>
+</html>

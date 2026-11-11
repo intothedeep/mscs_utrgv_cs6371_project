@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 2 Spiral search vs random walk vs hybrid | Final-project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><a href="../../projects/spiral-search.html" hreflang="ko">한국어</a> | <b>English</b></p>
+
+<nav class="topnav">
+  <a href="pheromone-misleading-trails.html">← Previous: rank 1 pheromone</a>
+  <a href="../index.html">Index</a>
+  <a href="evolved-controller.html">Next: rank 3 evolved controller →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 2 of 9 (in rank order)</div>
+  <h1>Search-pattern foraging: spiral vs random walk vs hybrid</h1>
+  <div class="lead">
+    <p><strong>Result: rank 2, 18 points. It rebuilds Prof. Lu's 2023 ARGoS spiral search paper and adds one new hybrid rule.</strong></p>
+    <p>Why rank 2: feasibility and Fit score 3. Research potential is 2, so it is below rank 1. The hybrid rule is the research part.</p>
+    <div class="chips">
+      <span class="chip">Research potential 2</span>
+      <span class="chip">2-week feasibility 3</span>
+      <span class="chip">Fit with the professor's research 3</span>
+      <span class="chip">Total = product = 18 (inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 Problem</a></li>
+    <li><a href="#s2">2 Goal</a></li>
+    <li><a href="#s3">3 How it works in ARGoS</a></li>
+    <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#s5">5 What to measure</a></li>
+    <li><a href="#s6">6 Research potential</a></li>
+    <li><a href="#s7">7 Related papers</a></li>
+    <li><a href="#s8">8 Split and timeline</a></li>
+    <li><a href="#s9">9 Risks</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="Two spiral paths turning in opposite directions inside one region, and an empty frame of a chart of food collected against swarm size">
+      <text class="b" x="40" y="22">Figure 1 left: two spiral paths in one region</text>
+      <line x1="40" y1="38" x2="70" y2="38" stroke="var(--s1)" stroke-width="4"/><text class="m" x="76" y="42">Robot 1: from the center outward</text>
+      <line x1="40" y1="56" x2="70" y2="56" stroke="var(--s4)" stroke-width="4"/><text class="m" x="76" y="60">Robot 2: from the edge inward</text>
+      <rect class="wall" x="40" y="72" width="420" height="280"/>
+      <polyline fill="none" stroke="var(--s1)" stroke-width="3" points="250,212 274,212 274,188 226,188 226,236 298,236 298,164 202,164 202,260 322,260 322,140 178,140 178,284"/>
+      <polyline fill="none" stroke="var(--s4)" stroke-width="3" points="178,284 346,284 346,116 154,116 154,308 370,308 370,92 130,92"/>
+      <circle cx="250" cy="212" r="9" fill="var(--s1)"/><text class="c" x="250" y="216" style="fill:#fff">1</text>
+      <circle cx="130" cy="92" r="9" fill="var(--s4)"/><text class="c" x="130" y="96" style="fill:#fff">2</text>
+      <text class="m e" x="452" y="342">Region</text>
+      <text class="b" x="560" y="22">Figure 1 right: swarm size and food collected (planned)</text>
+      <line x1="580" y1="38" x2="610" y2="38" stroke="var(--base)" stroke-width="3"/><text class="m" x="616" y="42">Random walk</text>
+      <line x1="580" y1="56" x2="610" y2="56" stroke="var(--s1)" stroke-width="3"/><text class="m" x="616" y="60">Spiral</text>
+      <line x1="780" y1="56" x2="810" y2="56" stroke="var(--s2)" stroke-width="3"/><text class="m" x="816" y="60">Hybrid</text>
+      <line class="gr" x1="580" y1="120" x2="960" y2="120"/><line class="gr" x1="580" y1="195" x2="960" y2="195"/><line class="gr" x1="580" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="580" y1="80" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <line class="ax" x1="620" y1="320" x2="620" y2="326"/><line class="ax" x1="720" y1="320" x2="720" y2="326"/>
+      <line class="ax" x1="820" y1="320" x2="820" y2="326"/><line class="ax" x1="920" y1="320" x2="920" y2="326"/>
+      <text class="m c" x="620" y="342">4</text><text class="m c" x="720" y="342">8</text>
+      <text class="m c" x="820" y="342">16</text><text class="m c" x="920" y="342">32</text>
+      <text class="b c" x="770" y="366">Swarm size (log scale)</text>
+      <text class="b c" transform="translate(540 200) rotate(-90)">Food collected</text>
+      <text class="m c" x="770" y="200">Empty frame before measuring (planned)</text>
+      <text class="m c" x="770" y="218">No values yet</text>
+    </svg>
+    <figcaption>
+      Figure 1. The left side shows two spiral paths in one region. The right side shows the axes of the chart that will compare three methods. Why: the key question is how long a fixed plan beats a random walk as the robot count grows.
+      <span class="ab">Abbreviations: none. Source: original Suggested figure <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a>.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 Problem</h2>
+  <ul>
+    <li>A fixed spiral search (a path that winds outward from one point to sweep a region) finds nearby food first. But it scales poorly when the swarm grows.</li>
+    <li>A random walk (movement with random direction changes) scales well with a big swarm, but it wastes time.</li>
+    <li><span class="mark">partial</span> The two sentences above come from a search snippet of the paper abstract <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 Goal</h2>
+  <ul>
+    <li>Rebuild a search that covers many regions with bidirectional spirals.</li>
+    <li>Compare it with the random walk search as the swarm size grows.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 How it works in ARGoS</h2>
+  <table class="t">
+    <caption>Table 1. ARGoS setup (source: original How it works in ARGoS)</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Robots</td><td>4 to 32 foot-bots (the stock wheeled robot model of ARGoS). One nest sits in the center.</td></tr>
+      <tr><td>Sensors</td><td>The positioning sensor serves the spiral waypoints. The ground sensor reads food points. The proximity sensor is also used.</td></tr>
+      <tr><td>Behavior rules</td><td>Each region has spiral waypoints to follow. The two robots of one region start from opposite ends of the spiral. <span class="mark">partial</span> From a search snippet <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a></td></tr>
+      <tr><td>Loop functions</td><td>Loop functions (user code that runs at every simulation step) place the food. There are three layouts: uniform, clustered and power-law. They also count floor points and delivered food <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 Algorithm steps</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 Split regions</a></li>
+    <li><a href="#a2">Step 2 Assign regions</a></li>
+    <li><a href="#a3">Step 3 Bidirectional spiral</a></li>
+    <li><a href="#a4">Step 4 Deliver food</a></li>
+    <li><a href="#a5">Step 5 Baseline</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>Divide the arena into k square regions of equal size.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>Assign each robot to an empty region or to a region with only one robot. <span class="mark">partial</span> <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a></p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>Robot 1 walks the spiral of its region outward. Robot 2 walks it inward.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>On finding food, the robot goes to the nest and drops it. Then it returns to the last spiral point.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5 (baseline)</div><p>The baseline is a correlated random walk (a random walk with persistent heading) that returns to the nest.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 What to measure</h2>
+  <ul>
+    <li>Measure food collected in a fixed time, against swarm size (4, 8, 16, 32) and food layout.</li>
+    <li>Find the crossover swarm size where the random walk starts to beat the spiral.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 Research potential and venues</h2>
+  <ul>
+    <li>Open question: when does a fixed plan beat a stochastic plan, as swarm size and food distribution change <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a>.</li>
+    <li>Beyond a demo: a hybrid rule that switches from spiral to random walk when a crowding signal arrives (inference).</li>
+    <li>Venue candidates (inference): Conference on Robots and Vision (CRV, a robotics and vision conference), International Conference on Swarm Intelligence (ANTS, a swarm intelligence conference), Distributed Autonomous Robotic Systems (DARS, a distributed robotics conference).</li>
+    <li>Google Scholar lists CRV as the venue of Prof. Lu's spiral paper <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 Related papers</h2>
+  <table class="t">
+    <caption>Table 2. Related papers</caption>
+    <thead><tr><th>Paper</th><th>Key point</th></tr></thead>
+    <tbody>
+      <tr><td>Qi Lu, Ryan Luna. Multiple-region bidirectional spiral search, 2023, ARGoS <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a></td><td>This is what the project will rebuild. The venue name is partial. The National Science Foundation (NSF) record says only "IEEE, Montreal".</td></tr>
+      <tr><td>Qi Lu et al. Physical and simulated comparison of deterministic and stochastic foraging. International Conference on Robotics and Automation (ICRA) 2019 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a></td><td>It is prior work that compares a fixed method with a stochastic method.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 Split among 4 people and 2-week timeline</h2>
+  <table class="t">
+    <caption>Table 3. Split among 4 people (source: original)</caption>
+    <thead><tr><th>Person</th><th>Week 1</th><th>Week 2</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>Spiral waypoint generator, region assignment</td><td>Bidirectional pairing</td></tr>
+      <tr><td class="c">B</td><td>Random walk baseline</td><td>Hybrid switch rule</td></tr>
+      <tr><td class="c">C</td><td>Food layout in the loop function, logging</td><td>Experiment grid, graphs</td></tr>
+      <tr><td class="c">D</td><td>Related work, slides</td><td>Demo video, presentation</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 Risks</h2>
+  <ul>
+    <li>Following a spiral needs an exact position. In simulation, the positioning sensor gives it directly (inference).</li>
+    <li>A pure reproduction is weak as research. The hybrid rule is the research part.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="pheromone-misleading-trails.html">← Previous: rank 1 pheromone</a>
+  <a href="../index.html">Index</a>
+  <a href="evolved-controller.html">Next: rank 3 evolved controller →</a>
+</div>
+
+</div>
+</body>
+</html>
