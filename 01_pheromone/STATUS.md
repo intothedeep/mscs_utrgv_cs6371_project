@@ -14,3 +14,4 @@
 2026-11-11 M2: tuning 3 rounds x 3 seeds ran, D-016 freezes round 1 (results/real/tuning/tuning_pick.json)
 2026-11-11 M2: keep-A judgement PASS, D-017 (results/real/judgement/verdict.json)
 2026-11-11 M2: Qt frames captured headless (autoplay + frame_grabbing), MVP2 report 8 of 8 stages ran (results/real/mvp2/index.html)
+2026-11-11 M3: build v2 clean, invariance holds (seed 101 food equal to v1), defense tuning 3 rounds, D-018 freeze (results/real/defense_tuning/defense_pick.json)
