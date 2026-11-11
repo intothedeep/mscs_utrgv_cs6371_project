@@ -11,10 +11,11 @@
 
 ## Summary counts
 
-- Table rows: 8 (literature 4, ours 4). Rows verified 4, partial 3, inference 1
-- Sources: 12 new (S-CT), 7 reused (S-LL, S-PH, S-TB)
+- Table 1 rows: 8 (literature 4, ours 4). Rows verified 4, partial 3, inference 1 (ID arm design cells. Its measured cells are verified)
+- Table 2 rows: 5 (M6 block, seeds 321 to 360), all verified. G cells "not in file"
+- Sources: 15 new (S-CT), 7 reused (S-LL, S-PH, S-TB)
 - Unverified cells: 0. Cells "not stated" by the source: 9 (TAROS 4, ICCCR 5)
-- Open questions: 6
+- Open questions: 7
 
 ## 1. Terms
 
@@ -46,18 +47,35 @@ Table 1. Information each defense needs, and the measured food cost on our testb
 | Our v3 (suspect mark, mask and cone, k = 1, t = 0) | 0. The controller reads the pheromone sensor only, `DESIGN.md` §2.1, §3.4 (verified) | No. The controller never receives a deposit's creator, `DESIGN.md` §2.1 (verified) | No. Private suspect list, `DESIGN.md` Fig. 1 (verified) | Up to `n_mem` 16 suspect points (centroid, count), oldest dropped, `DESIGN.md` §3.4, Table 2 (verified) | None for the defense. Loop functions only play the floor sensor, `DESIGN.md` §2.1 (verified) | −1.9 [−5.0, 1.5], seeds 1 to 10, `results/real/g2_stats.csv` row d = 0 (partial: "v3" label from the dispatch, level from [S-CT-5]). Same rule, other blocks: k1t0 −2.7 [−4.5, −0.85], seeds 221 to 260, `results/real/v5/g2_stats.csv` (verified). `t_lock` 0 control −6.15 [−8.25, −4.05], seeds 11 to 30, `results/real/v2/verdict.json` `lock0_control_G.d0` (verified) | 2.3 [−0.7, 5.2], `results/real/g2_stats.csv` row d = 2 (partial). k1t0 4.575 [2.325, 6.825], `results/real/v5/g2_stats.csv` (verified). `t_lock` 0 control 2.35 [−1.9, 6.35], `results/real/v2/verdict.json` `lock0_control_G.d2` (verified) | [S-CT-1], [S-CT-2], [S-CT-4], [S-CT-5], [S-CT-6] |
 | Our v5 primary arm k2t10 (confirm twice, 10 s lockout) | 0. Same controller path as v3, `DESIGN_M5.md` §1 (verified) | No (verified, `DESIGN_M5.md` §1 rule 8: memory is private) | No (verified) | Same 16-slot queue. Each point adds a `Count`. Pending below k = 2, `DESIGN_M5.md` §1 (verified). Plus a FOLLOW-entry lockout of 10 s after a cone abort, `CHANGELOG.md` v4 (verified) | None (verified) | 0.125 [−0.975, 1.15], seeds 221 to 260, `results/real/v5/g2_stats.csv` row k2t10 d = 0, same in `results/real/v5/verdict.json` `failure.d0_cost` (verified) | 2.75 [0.40, 4.975], `results/real/v5/g2_stats.csv` row k2t10 d = 2, same in `results/real/v5/verdict.json` `metric_G2` (verified) | [S-CT-2], [S-CT-3], [S-CT-7] |
 | Our k1t10 (v2 lockout, k = 1, 10 s) | 0 (verified, `DESIGN_M5.md` §4 "v2 lockout") | No (verified) | No (verified) | 16-slot queue, every point active at count 1, plus 10 s lockout, `DESIGN_M5.md` §1.1 (verified) | None (verified) | −3.55 [−5.4, −1.725], seeds 221 to 260, `results/real/v5/g2_stats.csv` row k1t10 d = 0 (verified). Same rule, seeds 11 to 30: −6.7 [−9.7, −3.85], `results/real/v2/verdict.json` `item_11_failure.d0_cost` (verified) | 5.05 [2.025, 7.975], `results/real/v5/g2_stats.csv` row k1t10 d = 2 (verified). Seeds 11 to 30: 4.05 [0.85, 7.25], `results/real/v2/verdict.json` `item_8_metric_G2` (verified) | [S-CT-2], [S-CT-4], [S-CT-7] |
-| Our ID adapted arm (M6, draft design) | In sim 0. A real swarm "would need a nest server or broadcast", `DESIGN_M6.md` §1 (inference). Store inputs per check: deposit-run start, follow start, peak, pickup, `DESIGN_M6.md` §2 (inference) | Yes. Per-cell owner ID `owner[2][1600]`, `DESIGN_M6.md` §2 (inference, draft) | Yes. Trail store and owner grid in the loop functions, `DESIGN_M6.md` §1 row 13 (inference, draft) | None. The controller is unchanged and its suspect rule is off, `DESIGN_M6.md` §1, §6 (inference, draft) | Yes. The loop functions as a central trail store, `DESIGN_M6.md` §1 row 13 (inference, draft) | pending M6 verdict (results/real/id_arm/verdict.json) | pending M6 verdict (results/real/id_arm/verdict.json) | [S-CT-8], [S-CT-9] |
+| Our ID adapted arm (M6, draft design) | In sim 0. A real swarm "would need a nest server or broadcast", `DESIGN_M6.md` §1 (inference). Store inputs per check: deposit-run start, follow start, peak, pickup, `DESIGN_M6.md` §2 (inference) | Yes. Per-cell owner ID `owner[2][1600]`, `DESIGN_M6.md` §2 (inference, draft) | Yes. Trail store and owner grid in the loop functions, `DESIGN_M6.md` §1 row 13 (inference, draft) | None. The controller is unchanged and its suspect rule is off, `DESIGN_M6.md` §1, §6 (inference, draft) | Yes. The loop functions as a central trail store, `DESIGN_M6.md` §1 row 13 (inference, draft) | id vs off G(0) and its interval: not in file (`results/real/id_arm/verdict.json`, `contrast.csv`). Means only, seeds 321 to 360: F(0, id) 77.775, F(0, off) 81.4, `results/real/id_arm/contrast.csv` (verified). Honest robots isolated per run at d = 0: 9.05, `results/real/id_arm/verdict.json` `isolation_mean_per_run.d0.honest_isolated` (verified) | id vs off G(2) and its interval: not in file. Means only: F(2, id) 52.7, F(2, off) 43.85, `results/real/id_arm/contrast.csv` (verified). Judged Δ = F(2, id) − F(2, k1t10): 4.375 [2.25, 6.45], verdict "differs", `results/real/id_arm/verdict.json` `metric_delta2` (verified). Honest isolated per run at d = 2: 15.925, `isolation_mean_per_run.d2.honest_isolated` (verified) | [S-CT-8], [S-CT-9], [S-CT-13], [S-CT-14], [S-CT-15] |
 
-What Table 1 shows (the information-vs-cost trade-off):
+Table 2. Second measured block: M6 arms on one shared seed block, seeds 321 to 360 (40 seeds)
+
+- All values copied from `results/real/id_arm/contrast.csv` and `results/real/id_arm/verdict.json` [S-CT-13], [S-CT-14].
+- These files hold mean food F per arm, not G against off. So G and its interval are "not in file".
+- Do not compare Table 2 rows with Table 1 rows. Seed blocks and off baselines differ.
+
+| Arm (M6 name) | F(0) mean | F(2) mean | d = 0 cost G(0) [95 % interval] | d = 2 gain G(2) [95 % interval] | Honest isolated per run, d = 0 / d = 2 | Verification |
+| --- | --- | --- | --- | --- | --- | --- |
+| off | 81.4 | 43.85 | reference | reference | not in file (no ID defense) | verified |
+| v3 | 75.15 | 45.875 | not in file | not in file | not in file (no ID defense) | verified |
+| k1t10 (best no-ID arm, `best_no_id_arm`) | 75.175 | 48.325 | not in file | not in file | not in file (no ID defense) | verified |
+| v5 (k2, t10) | 80.375 | 46.575 | not in file | not in file | not in file (no ID defense) | verified |
+| id (adapted arm) | 77.775 | 52.7 | not in file | not in file. Δ vs k1t10 at d = 2: 4.375 [2.25, 6.45], "differs" | 9.05 / 15.925 | verified |
+
+- Detractors isolated per run (id): 0.0 at d = 0, 2.0 at d = 2. Seeds with no detractor isolated at d = 2: 0. Failure not triggered (`verdict.json` `failure`).
+- Frozen values judged: margin 5.4, eps 0.3 m, minPts 2 (`verdict.json` `frozen`, `prereg/defense_id_arm.md`) [S-CT-15].
+
+What Tables 1 and 2 show (the information-vs-cost trade-off):
 
 1. More information buys detection. Strobel needs keys and a ledger. TAROS needs creator IDs and one trail store.
 2. Low information was not free on our testbed. The v3 rule lost food at d = 0 on 20 and 40 seeds.
 3. Confirm-twice removed that cost: k2t10 d = 0 is 0.125 [−0.975, 1.15]. Its d = 2 gain stayed above 0.
-4. The price of k = 2 is decoy gain: E_k at d = 2 is −2.7875 [−4.475, −1.1625] (`results/real/v5/verdict.json`).
-5. Every measured point is low information. Cost against information level waits for the M6 verdict.
+4. On seeds 321 to 360 the ID arm beat k1t10 at d = 2: Δ 4.375 [2.25, 6.45].
+5. Its price is trust in honest robots. It isolated 9.05 per run at d = 0 and 15.925 at d = 2.
 
 ```
-Figure 1. Information needed (x) against measured d = 0 cost (y), ours only
+Figure 1, panel A. Information needed (x) against measured d = 0 cost (y), ours only
 
  y = G(0), food per run (negative = food lost, rounded to the nearest row)
  x = information needed, ordinal (inference): LOW < MID < HIGH
@@ -75,16 +93,38 @@ Figure 1. Information needed (x) against measured d = 0 cost (y), ours only
    -6   | lock0 -6.15 (v3 rule)   |                         |
    -7   | v2 -6.7 (k1t10 rule)    |                         |
  -------+-------------------------+-------------------------+--------------------
- pending|                         | ID arm (M6 verdict)     |
+ G(0)   |                         | ID arm: not in file     |
+ n/a    |                         | (see panel B)           |
  -------+-------------------------+-------------------------+--------------------
  not on | cautionary pheromone    | TAROS 2024              | blockchain 2018
  our    | (Aswale 2022)           | ICCCR 2024 (x unclear,  | (Strobel)
  testbed|                         |  abstract only)         |
 ```
 
-- Caption: Figure 1 places each defense by information needed and by its measured d = 0 cost on our testbed. Why: it asks whether more information is needed to remove the no-attack cost, and only the low column has data until M6.
-- Intervals for each point: Table 1. Seeds: v3 1 to 10, k1t0 k1t10 k2t10 221 to 260, lock0 and v2 11 to 30.
-- Source folder: `results/real/` (`g2_stats.csv`, `v5/g2_stats.csv`, `v5/verdict.json`, `v2/verdict.json`).
+```
+Figure 1, panel B. M6 block, seeds 321 to 360: mean food at d = 0 (y) by information needed (x)
+
+ y = F(0) mean, food per run, rounded to the nearest row. Off reference = 81.4
+ x = information needed, ordinal (inference)
+
+        | LOW                     | MID                     |
+        | 0 messages, no IDs      | IDs + central store     |
+ -------+-------------------------+-------------------------+
+   81 --|-------------------------|-------------------------|-- off 81.4 reference
+   80   | v5 80.375               |                         |
+   79   |                         |                         |
+   78   |                         | id 77.775               |
+   77   |                         | (honest isolated 9.05)  |
+   76   |                         |                         |
+   75   | v3 75.15, k1t10 75.175  |                         |
+ -------+-------------------------+-------------------------+
+ d = 2  | v3 45.875, v5 46.575,   | id 52.7, honest         |  off 43.85
+ F mean | k1t10 48.325            | isolated 15.925         |
+```
+
+- Caption: Figure 1 places each defense by information needed and by its measured d = 0 cost (panel A) or mean d = 0 food on one shared seed block (panel B). Why: it asks whether more information removes the no-attack cost, and panel B shows the ID arm pays in honest isolations instead.
+- Intervals for panel A points: Table 1. Seeds: v3 1 to 10, k1t0 k1t10 k2t10 221 to 260, lock0 and v2 11 to 30. Panel B: Table 2, means only, no intervals in file.
+- Source folder: `results/real/` (`g2_stats.csv`, `v5/g2_stats.csv`, `v5/verdict.json`, `v2/verdict.json`, `id_arm/contrast.csv`, `id_arm/verdict.json`).
 
 ## Selection log
 
@@ -97,7 +137,8 @@ Figure 1. Information needed (x) against measured d = 0 cost (y), ours only
 | Our v3 | kept | named in dispatch. Three saved measurements of the same rule, all listed |
 | Our v5 k2t10 | kept | named in dispatch. Primary M5 arm (D-051) |
 | Our k1t10 | kept | named in dispatch. Same rule as v2, both measurements listed |
-| Our ID adapted arm | kept, pending | named in dispatch. M6 results do not exist yet |
+| Our ID adapted arm | kept, measured | named in dispatch. M6 verdict "differs" read 2026-11-11 |
+| M6 no-ID arms v3, k1t10, v5 (seeds 321 to 360) | kept, Table 2 | coordinator message: same seeds as the ID arm |
 | Our k2t0 | not rowed | not in the dispatch row list. Values stay in `results/real/v5/g2_stats.csv` |
 | Luna, Lu UR 2024 | not rowed | not in the dispatch row list. Abstract only |
 
@@ -107,7 +148,8 @@ Figure 1. Information needed (x) against measured d = 0 cost (y), ours only
 - `results/real/g2_stats.csv` does not state its interval level or its defense version. The 95 % level and the "v3" label are taken from `tools/g2_stats.py` and the dispatch.
 - ICCCR 2024 full text unread. IDs, messages and the central component of quarantine are unknown.
 - TAROS 2024 does not say who runs the defense or how trails are shared.
-- ID arm cells come from a draft design (`DESIGN_M6.md`, status draft). They may change before the M6 prereg.
+- ID arm design cells (messages, IDs, store, memory, central) come from `DESIGN_M6.md`, status draft. Not checked against the v6 code.
+- M6 files hold no G against off and no interval for any arm except Δ(2) vs k1t10. G(0) and G(2) for the M6 block are "not in file". A judge run that writes them would fill Table 2.
 - Strobel per-decision transaction count depends on dissemination time. No single number per decision is printed.
 
 ## Sources
@@ -136,3 +178,6 @@ New sources (local saved files and designs):
 [S-CT-10] Code change log | CHANGELOG.md | published: repo log | accessed: 2026-11-11 | type: design | note: v4 row (FOLLOW-entry lockout `t_lock`) and v5 row read via search
 [S-CT-11] Pre-registration: defense v2 lockout | prereg/defense_v2_lockout.md | published: repo prereg | accessed: 2026-11-11 | type: design | note: seeds 11 to 30, 95 % bootstrap line read via search
 [S-CT-12] Decision log | DECISIONS.md | published: repo log | accessed: 2026-11-11 | type: design | note: D-028 and D-051 rows read via search
+[S-CT-13] M6 verdict, ID adapted arm | results/real/id_arm/verdict.json | published: saved run output | accessed: 2026-11-11 | type: dataset | note: read in full
+[S-CT-14] M6 contrast, mean food per arm and d | results/real/id_arm/contrast.csv | published: saved run output | accessed: 2026-11-11 | type: dataset | note: read in full
+[S-CT-15] Pre-registration: ID adapted arm | prereg/defense_id_arm.md | published: repo prereg | accessed: 2026-11-11 | type: design | note: read in full
