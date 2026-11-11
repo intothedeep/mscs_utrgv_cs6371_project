@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>MVP1 summary: mock end to end</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<h1>MVP1 summary: mock end to end</h1>
+<p>Milestone M1 (minimum viable product 1) runs every stage on mock data. 3 of 3 stages ran. All numbers come from saved outputs.</p>
+<svg viewBox="0 0 900 90" width="100%" role="img" aria-label="stage flow"><defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs><rect x="15" y="15" width="250" height="60" fill="var(--card)" stroke="var(--border)"/><text x="27" y="40" style="fill:var(--foreground);font-size:14px">1. generate</text><text x="27" y="60">status: ran</text><line x1="265" y1="45" x2="321" y2="45" stroke="currentColor" marker-end="url(#arr)"/><rect x="325" y="15" width="250" height="60" fill="var(--card)" stroke="var(--border)"/><text x="337" y="40" style="fill:var(--foreground);font-size:14px">2. check</text><text x="337" y="60">status: ran</text><line x1="575" y1="45" x2="631" y2="45" stroke="currentColor" marker-end="url(#arr)"/><rect x="635" y="15" width="250" height="60" fill="var(--card)" stroke="var(--border)"/><text x="647" y="40" style="fill:var(--foreground);font-size:14px">3. analyze</text><text x="647" y="60">status: ran</text></svg>
+<ol><li><a href="#step-1">Step 1 of 3: Stage 1: generate mock runs</a></li><li><a href="#step-2">Step 2 of 3: Stage 2: check the runs</a></li><li><a href="#step-3">Step 3 of 3: Stage 3: analyze and draw the G2 chart</a></li></ol>
+<section class="step" id="step-1"><p class="label">Step 1 of 3</p><h2><a href="generate.html">Stage 1: generate mock runs</a></h2><p>Status: ran (80 runs found)</p><p>Mean food_collected per cell runs from 31.3 to 59.0. Largest wasted_robot_seconds at d = 0: 0.0.</p><p class="muted">Good: loss grows with d and defense wins part back. Wasted time is 0 at d = 0.</p></section><section class="step" id="step-2"><p class="label">Step 2 of 3</p><h2><a href="check.html">Stage 2: check the runs</a></h2><p>Status: ran</p><p>runs 80, failed 0, problems 0.</p><p class="muted">Good: every run passes the check.</p></section><section class="step" id="step-3"><p class="label">Step 3 of 3</p><h2><a href="analyze.html">Stage 3: analyze and draw the G2 chart</a></h2><p>Status: ran</p><p>defense cost F(0, on) - F(0, off) = -0.60; R(1) = 0.65 [0.45, 0.84]; R(2) = 0.48 [0.34, 0.59]; R(4) = 0.43 [0.36, 0.48].</p><p class="muted">Good: the loss is resolved at every d &gt; 0, so R(d) has intervals.</p></section>
+<div class="panel"><p class="label">Other files</p><ul><li><a href="../g2_recovered_share_MOCK.png">g2_recovered_share_MOCK.png</a></li><li><a href="../summary.csv">summary.csv</a></li><li><a href="../g2_stats.csv">g2_stats.csv</a></li></ul></div>
+</div></body></html>

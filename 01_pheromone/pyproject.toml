@@ -1,0 +1,12 @@
+[project]
+name = "pheromone"
+version = "0.1.0"
+description = "Pheromone foraging under misleading trails: log tools (schema, mock, check, analysis, reports)"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.0",
+    "matplotlib>=3.9",
+]
+
+[tool.uv]
+python-downloads = "never"   # Python comes from pyenv (.python-version)

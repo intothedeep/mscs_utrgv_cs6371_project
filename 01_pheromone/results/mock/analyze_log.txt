@@ -1,0 +1,7 @@
+ANALYZE root=mock/runs runs=80 mock=1
+CELLS expected=80 present=80 missing=0 duplicates=0 incomplete=0 ignored=0
+DEFENSE_COST d=0 n_seeds=10 F_off=59.00 F_on=58.40 F_on_minus_F_off=-0.60 [-2.20, 1.20]
+G2 d=1 n_seeds=10 L=8.40 [6.00, 10.50] G=5.50 [3.10, 7.90] R=0.65 [0.45, 0.84]
+G2 d=2 n_seeds=10 L=18.10 [16.70, 19.50] G=8.60 [5.80, 11.30] R=0.48 [0.34, 0.59]
+G2 d=4 n_seeds=10 L=27.70 [26.30, 29.10] G=11.80 [9.60, 13.80] R=0.43 [0.36, 0.48]
+OUTPUT chart=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/01_pheromone/results/mock/g2_recovered_share_MOCK.png summary=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/01_pheromone/results/mock/summary.csv stats=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/01_pheromone/results/mock/g2_stats.csv

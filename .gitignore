@@ -1,0 +1,8 @@
+# 01_pheromone: real run output and generated .argos files (PLAN "Fixed paths")
+01_pheromone/runs/
+01_pheromone/src/experiments/generated/
+# uv environment and bytecode created by `uv sync` and tool runs
+01_pheromone/.venv/
+__pycache__/
+01_pheromone/src/build/
+01_pheromone/mock/runs/

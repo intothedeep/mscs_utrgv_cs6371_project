@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 1: generate mock runs</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 1 of 3. <a href="index.html">Back to summary</a></p>
+<h1>Stage 1: generate mock runs</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>Write 80 MOCK runs (fake data) that follow the log schema.</td></tr><tr><th>Why</th><td>Milestone M1 shows the shape and the flow on mock data first. That serves goals G1 and G2 before any real pipeline exists.</td></tr><tr><th>Input data</th><td>No input data. Every value is generated (fake) by tools/make_mock_runs.py.</td></tr><tr><th>Output data</th><td>80 run folders under mock/runs/. 320 files, 71.7 MB.</td></tr><tr><th>Result (numbers)</th><td>Mean food_collected per cell runs from 31.3 to 59.0. Largest wasted_robot_seconds at d = 0: 0.0.</td></tr><tr><th>Result (good or bad)</th><td>Good: loss grows with d and defense wins part back. Wasted time is 0 at d = 0.</td></tr><tr><th>Status</th><td>ran (80 runs found)</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="generate_fig.png" alt="Mean food per cell, MOCK DATA"><div class="scroll-x"><table><thead><tr><th>d</th><th>defense</th><th>runs</th><th>mean food_collected</th><th>mean wasted_robot_seconds</th></tr></thead><tbody><tr><td>0</td><td>off</td><td>10</td><td>59.0</td><td>0.0</td></tr><tr><td>0</td><td>on</td><td>10</td><td>58.4</td><td>0.0</td></tr><tr><td>1</td><td>off</td><td>10</td><td>50.6</td><td>78.3</td></tr><tr><td>1</td><td>on</td><td>10</td><td>56.1</td><td>38.8</td></tr><tr><td>2</td><td>off</td><td>10</td><td>40.9</td><td>159.6</td></tr><tr><td>2</td><td>on</td><td>10</td><td>49.5</td><td>84.9</td></tr><tr><td>4</td><td>off</td><td>10</td><td>31.3</td><td>281.1</td></tr><tr><td>4</td><td>on</td><td>10</td><td>43.1</td><td>153.0</td></tr></tbody></table></div></div>
+</div></body></html>
