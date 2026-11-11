@@ -1,0 +1,58 @@
+{
+  "rule": "D-007: highest mean food_collected, d = 0, defense off, seeds 101 to 103; tie to the earlier round",
+  "picked_round": 1,
+  "half_life_s": 60.0,
+  "lambda_dep": 0.077,
+  "rounds": [
+    {
+      "round": 1,
+      "half_life_s": 60.0,
+      "lambda_dep": 0.077,
+      "food_by_seed": {
+        "101": 86,
+        "102": 98,
+        "103": 80
+      },
+      "mean_food": 88.0,
+      "runids": [
+        "20261111-111416_d0_def0_s101",
+        "20261111-111416_d0_def0_s102",
+        "20261111-111416_d0_def0_s103"
+      ]
+    },
+    {
+      "round": 2,
+      "half_life_s": 120.0,
+      "lambda_dep": 0.077,
+      "food_by_seed": {
+        "101": 75,
+        "102": 95,
+        "103": 75
+      },
+      "mean_food": 81.66666666666667,
+      "runids": [
+        "20261111-111429_d0_def0_s101",
+        "20261111-111429_d0_def0_s102",
+        "20261111-111429_d0_def0_s103"
+      ]
+    },
+    {
+      "round": 3,
+      "half_life_s": 60.0,
+      "lambda_dep": 0.05,
+      "food_by_seed": {
+        "101": 80,
+        "102": 87,
+        "103": 78
+      },
+      "mean_food": 81.66666666666667,
+      "runids": [
+        "20261111-111436_d0_def0_s101",
+        "20261111-111436_d0_def0_s102",
+        "20261111-111436_d0_def0_s103"
+      ]
+    }
+  ],
+  "criterion_file": "prereg/pheromone_tuning.md",
+  "pick_code_sha256": "5983e66e0710dc588c0f3c7c265e22b43847ae336862d889332dce045a739acb"
+}
