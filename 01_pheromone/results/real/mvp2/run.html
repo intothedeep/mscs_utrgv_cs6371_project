@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 3: headless run</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 3 of 8. <a href="index.html">Back to summary</a></p>
+<h1>Stage 3: headless run</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>Run argos3 headless on the generated file. One run writes one folder under runs/smoke/.</td></tr><tr><th>Why</th><td>The real forager and the real grid must collect food and write the log schema.</td></tr><tr><th>Input data</th><td>Generated .argos file(s). Real simulation, no recorded data.</td></tr><tr><th>Output data</th><td>1 run folder(s) under runs/smoke/.</td></tr><tr><th>Result (numbers)</th><td>food_collected 85, ticks 6000, pickup 92, drop 85.</td></tr><tr><th>Result (good or bad)</th><td>Good: food was collected and pickup and drop were logged.</td></tr><tr><th>Status</th><td>ran</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="run_fig.png" alt="Food over time"><div class="scroll-x"><table><thead><tr><th>runid</th><th>food</th><th>wasted s</th><th>ticks</th><th>complete</th><th>pickups</th><th>drops</th></tr></thead><tbody><tr><td>20261111-111329_d0_def0_s1</td><td>85</td><td>0.0</td><td>6000</td><td>True</td><td>92</td><td>85</td></tr></tbody></table></div></div>
+</div></body></html>

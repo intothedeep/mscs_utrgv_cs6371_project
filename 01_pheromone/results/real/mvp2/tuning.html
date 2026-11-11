@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 7: pheromone tuning (D-007)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 7 of 8. <a href="index.html">Back to summary</a></p>
+<h1>Stage 7: pheromone tuning (D-007)</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>Up to 3 rounds on seeds 101 to 103. Pick the round with the highest mean food_collected.</td></tr><tr><th>Why</th><td>The pheromone values freeze before the keep-A judgement and before any detractor run.</td></tr><tr><th>Input data</th><td>Real runs, d = 0, defense off, seeds 101 to 103 (runs/tuning/).</td></tr><tr><th>Output data</th><td>results/real/tuning/tuning_pick.json.</td></tr><tr><th>Result (numbers)</th><td>picked round 1: half_life_s 60, lambda_dep 0.077.</td></tr><tr><th>Result (good or bad)</th><td>Bad: no round beat round 1 (D-007 failure condition).</td></tr><tr><th>Status</th><td>ran</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="tuning_fig.png" alt="Mean food per round"><div class="scroll-x"><table><thead><tr><th>round</th><th>half-life (s)</th><th>lambda_dep</th><th>food by seed</th><th>mean food</th></tr></thead><tbody><tr><td>1</td><td>60</td><td>0.077</td><td>101: 86, 102: 98, 103: 80</td><td>88.00</td></tr><tr><td>2</td><td>120</td><td>0.077</td><td>101: 75, 102: 95, 103: 75</td><td>81.67</td></tr><tr><td>3</td><td>60</td><td>0.05</td><td>101: 80, 102: 87, 103: 78</td><td>81.67</td></tr></tbody></table></div></div>
+</div></body></html>

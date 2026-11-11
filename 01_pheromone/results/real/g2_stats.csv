@@ -1,0 +1,5 @@
+d,n_seeds,f_off,f_on,loss,loss_lo,loss_hi,gain,gain_lo,gain_hi,share,share_lo,share_hi,resolved,note
+0,0,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,False,cells missing at 0
+1,0,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,False,cells missing at 1
+2,0,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,False,cells missing at 2
+4,0,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,nan,False,cells missing at 4

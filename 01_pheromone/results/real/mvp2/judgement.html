@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 8: keep-A judgement (D-010)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 8 of 8. <a href="index.html">Back to summary</a></p>
+<h1>Stage 8: keep-A judgement (D-010)</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>Compare pheromone on (arm 1) with no following (arm 2) on seeds 104 to 106.</td></tr><tr><th>Why</th><td>Strategy A stays only if following the trails brings food (D-010).</td></tr><tr><th>Input data</th><td>Real runs, d = 0, defense off, seeds 104 to 106 (runs/judgement/).</td></tr><tr><th>Output data</th><td>results/real/judgement/verdict.json.</td></tr><tr><th>Result (numbers)</th><td>arm 1 mean 85.33, arm 2 mean 32.33, threshold 1.2.</td></tr><tr><th>Result (good or bad)</th><td>Good: pass, keep strategy A.</td></tr><tr><th>Status</th><td>ran</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="judgement_fig.png" alt="Food per seed and arm"><div class="scroll-x"><table><thead><tr><th>seed</th><th>arm 1 food</th><th>arm 2 food</th><th>arm 1 above arm 2</th></tr></thead><tbody><tr><td>104</td><td>94</td><td>41</td><td>True</td></tr><tr><td>105</td><td>79</td><td>27</td><td>True</td></tr><tr><td>106</td><td>83</td><td>29</td><td>True</td></tr></tbody></table></div></div>
+</div></body></html>

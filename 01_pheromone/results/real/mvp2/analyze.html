@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 5: analyze</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 5 of 8. <a href="index.html">Back to summary</a></p>
+<h1>Stage 5: analyze</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>analyze.py reads the smoke root and lists the cells it still lacks.</td></tr><tr><th>Why</th><td>A partial root must not crash the analysis. It must say what is missing.</td></tr><tr><th>Input data</th><td>1 manifest(s) from runs/smoke/.</td></tr><tr><th>Output data</th><td>summary.csv, g2_stats.csv, g2_recovered_share.png, analyze_log.txt in results/real/.</td></tr><tr><th>Result (numbers)</th><td>cells expected 80, present 1, missing 79.</td></tr><tr><th>Result (good or bad)</th><td>Good: missing = expected - present, no crash.</td></tr><tr><th>Status</th><td>ran</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="../g2_recovered_share.png" alt="G2 chart, partial data"><div class="scroll-x"><table><thead><tr><th>d</th><th>seeds</th><th>F(d, off)</th><th>F(d, on)</th><th>share R(d) [95 %]</th><th>note</th></tr></thead><tbody><tr><td>0</td><td>0</td><td>n/a</td><td>n/a</td><td>n/a [n/a, n/a]</td><td>cells missing at 0</td></tr><tr><td>1</td><td>0</td><td>n/a</td><td>n/a</td><td>n/a [n/a, n/a]</td><td>cells missing at 1</td></tr><tr><td>2</td><td>0</td><td>n/a</td><td>n/a</td><td>n/a [n/a, n/a]</td><td>cells missing at 2</td></tr><tr><td>4</td><td>0</td><td>n/a</td><td>n/a</td><td>n/a [n/a, n/a]</td><td>cells missing at 4</td></tr></tbody></table></div></div>
+</div></body></html>

@@ -12,3 +12,5 @@
 2026-11-11 M1: gate issues I-1..I-13 closed, gates re-run PASS (results/reviews/M1_gate.md, results/reviews/M1_evidence/)
 2026-11-11 M2: build clean, smoke run logs 4 files, check 0 failed, analyze lists 79 missing (runs/smoke, results/real/check_log.txt)
 2026-11-11 M2: tuning 3 rounds x 3 seeds ran, D-016 freezes round 1 (results/real/tuning/tuning_pick.json)
+2026-11-11 M2: keep-A judgement PASS, D-017 (results/real/judgement/verdict.json)
+2026-11-11 M2: Qt frames captured headless (autoplay + frame_grabbing), MVP2 report 8 of 8 stages ran (results/real/mvp2/index.html)
