@@ -49,7 +49,7 @@ OMP_NUM_THREADS=1 timeout 300 uv run python tools/analyze.py runs/smoke
 ```
 
 - `make_sweep.py` needs the built libraries. It stamps the git commit and library hashes into the `.argos` file.
-- Only d = 0 works until M3 (detractor controller).
+- d = 2, defense on: `--cell 2,1,1`. `make_sweep.py --cell` uses the template values (no frozen values).
 
 ## 4. Tools (in `tools/`)
 
@@ -59,7 +59,8 @@ OMP_NUM_THREADS=1 timeout 300 uv run python tools/analyze.py runs/smoke
 | `check_runs.py` | `uv run python tools/check_runs.py <runs root> [--log FILE]` | reads a runs root, exit 0 when all pass |
 | `analyze.py` | `uv run python tools/analyze.py <runs root>` | writes `results/mock/` or `results/real/` |
 | `make_report.py` | `uv run python tools/make_report.py --phase mvp1` or `--phase mvp2` | reads saved outputs, writes `results/<mock\|real>/<phase>/` |
-| `make_sweep.py` | see section 3 | writes `src/experiments/generated/` |
+| `make_sweep.py` | section 3 (`--cell`), section 8 (`--sweep`) | writes `src/experiments/generated/` |
+| `make_demo.py` | section 9 | writes two Qt demo `.argos`, frames under `results/real/mvp3/demo/` |
 
 ## 5. Pheromone tuning (D-007, runs root `runs/tuning/`)
 
@@ -77,3 +78,39 @@ OMP_NUM_THREADS=1 timeout 300 uv run python tools/analyze.py runs/smoke
 3. Verdict: `uv run python tools/judge_keep_a.py` writes `results/real/judgement/verdict.json`.
 
 - Arm 1 is pheromone on. Arm 2 sets the controller attribute `follow_enabled="false"` in `<params><pheromone .../>`, which makes `theta_on` infinite (no following).
+
+## 7. Defense tuning (D-011, runs root `runs/defense_tuning/`)
+
+1. Commit `prereg/defense_tuning.md` and `prereg/defense_candidates.json`. The scripts refuse to run before.
+2. Round 1, start values (`r_suspect` 0.4 m, `alpha_cone` 15 degrees, `d_cone` 1.0 m, `t_end` 15 s): `uv run python tools/make_tuning.py --defense --round 1 --run`
+3. Rounds 2 and 3 change one value from the best round, for example: `uv run python tools/make_tuning.py --defense --round 2 --d-cone 1.5 --run`
+4. Pick: `uv run python tools/tuning_pick.py --defense` writes `results/real/defense_tuning/defense_pick.json`.
+
+- Each round is d = 2, defense on, seeds 101 to 103, with the frozen pheromone values from `tuning_pick.json`.
+- The defense is on when the controller attribute `<defense enabled="true">` is set. `make_sweep.py` sets it from the cell.
+
+## 8. The 80-run sweep (G1, runs root `runs/sweep/`)
+
+```bash
+OMP_NUM_THREADS=1 uv run python tools/make_sweep.py --sweep --run
+OMP_NUM_THREADS=1 timeout 300 uv run python tools/check_runs.py runs/sweep --log results/real/check_sweep_log.txt
+OMP_NUM_THREADS=1 timeout 300 uv run python tools/analyze.py runs/sweep
+```
+
+- Needs `tuning_pick.json` and `defense_pick.json`. All 80 files carry the same frozen values.
+- Cells: d 0, 1, 2, 4 x defense off, on x seeds 1 to 10. Runs go one at a time, 300 s each.
+- It resumes. A cell with a complete run, the same params and no `src/` change since is skipped.
+- A stopped run leaves a folder without a complete manifest. The next call moves it to `runs/x_sweep_incomplete/`.
+- `analyze.py` writes `g2_recovered_share.png`, `food_by_cell.png`, `wasted_by_cell.png`, `events_by_cell.csv` and `summary.csv` into `results/real/`.
+
+## 9. Qt demo at d = 2 and frame capture
+
+```bash
+uv run python tools/make_demo.py --capture
+```
+
+- It writes `src/experiments/pheromone_qt_d2_def0.argos` and `pheromone_qt_d2_def1.argos` (frozen values, seed 1).
+- `--capture` runs each one with `<qt-opengl autoplay="true"><frame_grabbing headless_grabbing="true" .../>` under `timeout`, then downscales the frames with `sips -Z 900`.
+- Frames: `results/real/mvp3/demo/d2_def<0|1>_<NN>.png`. Raw frames: `runs/demo/`.
+- To watch the demo live: `cd src && argos3 -c experiments/pheromone_qt_d2_def1.argos`.
+- Pages: `uv run python tools/make_report.py --phase mvp3` writes `results/index.html`, `results/README.md` and `results/real/mvp3/`.

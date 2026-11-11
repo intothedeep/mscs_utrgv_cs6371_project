@@ -1,7 +1,7 @@
 #include "pheromone_forager.h"
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
-#include <limits>
+
 
 /****************************************/
 /****************************************/
@@ -23,61 +23,6 @@ void CPheromoneForager::SFoodData::Reset()
     TotalFoodItems = 0;
 }
 
-CPheromoneForager::SParams::SParams() : GoStraightAngleRange(CRadians(-1.0f), CRadians(1.0f)) {}
-
-/* Seconds in the XML become ticks here, so the controller never hard-codes
-   10 ticks per second. The clock tick is set by <experiment> before any
-   controller is initialised (core/simulator/physics_engine/physics_engine.h). */
-static UInt32 ToTicks(TConfigurationNode &t_node, const char *pch_name, Real f_tps)
-{
-    Real fSeconds;
-    GetNodeAttribute(t_node, pch_name, fSeconds);
-    return static_cast<UInt32>(fSeconds * f_tps + 0.5f);
-}
-
-void CPheromoneForager::SParams::Init(TConfigurationNode &t_params, Real f_tps)
-{
-    TConfigurationNode &tDiff = GetNode(t_params, "diffusion");
-    CRange<CDegrees> cStraight(CDegrees(-10.0f), CDegrees(10.0f));
-    GetNodeAttribute(tDiff, "go_straight_angle_range", cStraight);
-    GoStraightAngleRange.Set(ToRadians(cStraight.GetMin()), ToRadians(cStraight.GetMax()));
-    GetNodeAttribute(tDiff, "delta", Delta);
-
-    TConfigurationNode &tTurn = GetNode(t_params, "wheel_turning");
-    CDegrees cAngle;
-    GetNodeAttribute(tTurn, "hard_turn_angle_threshold", cAngle);
-    HardTurnOnAngleThreshold = ToRadians(cAngle);
-    GetNodeAttribute(tTurn, "soft_turn_angle_threshold", cAngle);
-    SoftTurnOnAngleThreshold = ToRadians(cAngle);
-    GetNodeAttribute(tTurn, "no_turn_angle_threshold", cAngle);
-    NoTurnAngleThreshold = ToRadians(cAngle);
-    GetNodeAttribute(tTurn, "max_speed", MaxSpeed);
-
-    TConfigurationNode &tPh = GetNode(t_params, "pheromone");
-    GetNodeAttribute(tPh, "a_max", AMax);
-    GetNodeAttribute(tPh, "lambda_dep", LambdaDep);
-    GetNodeAttribute(tPh, "theta_on", ThetaOn);
-    GetNodeAttribute(tPh, "theta_off", ThetaOff);
-    GetNodeAttribute(tPh, "delta_up", DeltaUp);
-    GetNodeAttribute(tPh, "end_radius", EndRadius);
-    PeakTicks = ToTicks(tPh, "t_peak", f_tps);
-    FollowMinTicks = ToTicks(tPh, "t_follow_min", f_tps);
-    RestTicks = ToTicks(tPh, "t_rest", f_tps);
-    SearchTicks = ToTicks(tPh, "t_search", f_tps);
-    EndTicks = ToTicks(tPh, "t_end", f_tps);
-    /* D-010 arm 2: follow_enabled="false" makes theta_on infinite. */
-    GetNodeAttribute(tPh, "follow_enabled", FollowEnabled);
-    if (!FollowEnabled)
-        ThetaOn = std::numeric_limits<Real>::infinity();
-
-    TConfigurationNode &tNest = GetNode(t_params, "nest");
-    Real fX, fY;
-    GetNodeAttribute(tNest, "edge_x", NestEdgeX);
-    GetNodeAttribute(tNest, "centre_x", fX);
-    GetNodeAttribute(tNest, "centre_y", fY);
-    NestCentre.Set(fX, fY);
-}
-
 /****************************************/
 /****************************************/
 
@@ -96,11 +41,12 @@ void CPheromoneForager::Init(TConfigurationNode &t_node)
         /* The ground sensor is not requested: nest and pheromone use position (D-008). */
         m_pcPositioning = GetSensor<CCI_PositioningSensor>("positioning");
         m_pcProximity = GetSensor<CCI_FootBotProximitySensor>("footbot_proximity");
-        /* M3-01 hook: role="detractor" will select the detractor machine here. */
+        /* Role picks the state machine. The detractor shares sensors, motion and params. */
         std::string strRole = "honest";
         GetNodeAttributeOrDefault(t_node, "role", strRole, strRole);
-        if (strRole != "honest")
-            THROW_ARGOSEXCEPTION("role \"" << strRole << "\" is not implemented before M3-01");
+        if (strRole != "honest" && strRole != "detractor")
+            THROW_ARGOSEXCEPTION("unknown role \"" << strRole << "\"");
+        m_bDetractor = (strRole == "detractor");
         m_sParams.Init(t_node, CPhysicsEngine::GetInverseSimulationClockTick());
     }
     catch (CARGoSException &ex)
@@ -111,17 +57,21 @@ void CPheromoneForager::Init(TConfigurationNode &t_node)
     Reset();
 }
 
+/* The decoy target is not reset: the loop functions set it once (D-009). */
 void CPheromoneForager::Reset()
 {
     m_sReading = SPheromoneReading();
+    m_sSeen = SPheromoneReading();
     m_sDeposit = SDepositRequest();
     m_sFoodData.Reset();
     m_ePeakEvent = PEAK_NONE;
-    m_bFollowStart = false;
+    m_bFollowStart = m_bDecoyReach = m_bSuspectAdd = m_bConeAbort = false;
+    m_bPeakValid = false;
+    m_vecSuspects.clear();
     m_eTurning = NO_TURN;
     m_unTripTicks = 0;
-    m_unCarryTicks = 0;
-    m_bWasCarrying = false;
+    m_unTauTicks = 0;
+    m_bWasLaying = false;
     m_fHereEntry = 0.0f;
     Enter(STATE_REST);
 }
@@ -133,25 +83,33 @@ void CPheromoneForager::ControlStep()
 {
     m_ePeakEvent = PEAK_NONE;
     m_bFollowStart = false;
+    m_bDecoyReach = false;
+    m_bSuspectAdd = false;
+    m_bConeAbort = false;
     m_sDeposit.active = false;
     UpdatePose();
+    MaskSuspects();
 
-    bool bCarrying = m_sFoodData.HasFoodItem;
-    if (bCarrying && !m_bWasCarrying)
-        m_unCarryTicks = 0;
-    if (bCarrying)
-        ++m_unCarryTicks;
-    m_bWasCarrying = bCarrying;
+    /* tau counts from pickup (honest) or from leaving the decoy (detractor). */
+    const bool bLaying = m_sFoodData.HasFoodItem || m_eState == STATE_RETURN_LAY;
+    if (bLaying && !m_bWasLaying)
+        m_unTauTicks = 0;
+    if (bLaying)
+        ++m_unTauTicks;
+    m_bWasLaying = bLaying;
 
-    /* Pickup in SEARCH, FOLLOW or END_SEARCH ends the search. */
-    if (bCarrying && m_eState != STATE_RETURN)
-        Enter(STATE_RETURN);
     ++m_unStateTicks;
-    if (m_eState == STATE_SEARCH || m_eState == STATE_FOLLOW || m_eState == STATE_END_SEARCH)
+    if (!m_bDetractor)
     {
-        ++m_unTripTicks;
-        if (m_unTripTicks > m_sParams.SearchTicks)
+        /* Pickup in SEARCH, FOLLOW or END_SEARCH ends the search. */
+        if (m_sFoodData.HasFoodItem && m_eState != STATE_RETURN)
             Enter(STATE_RETURN);
+        if (m_eState == STATE_SEARCH || m_eState == STATE_FOLLOW || m_eState == STATE_END_SEARCH)
+        {
+            ++m_unTripTicks;
+            if (m_unTripTicks > m_sParams.SearchTicks)
+                Enter(STATE_RETURN);
+        }
     }
 
     switch (m_eState)
@@ -161,6 +119,9 @@ void CPheromoneForager::ControlStep()
     case STATE_FOLLOW: Follow(); break;
     case STATE_END_SEARCH: EndSearch(); break;
     case STATE_RETURN: Return(); break;
+    case STATE_GO_DECOY: GoDecoy(); break;
+    case STATE_WAIT_DECOY: WaitDecoy(); break;
+    case STATE_RETURN_LAY: ReturnLay(); break;
     }
     RequestDeposit();
 }
@@ -192,7 +153,7 @@ size_t CPheromoneForager::BestProbe() const
 {
     size_t unBest = 0;
     for (size_t i = 1; i < NUM_PROBES; ++i)
-        if (m_sReading.probe[i] > m_sReading.probe[unBest])
+        if (m_sSeen.probe[i] > m_sSeen.probe[unBest])
             unBest = i;
     return unBest;
 }

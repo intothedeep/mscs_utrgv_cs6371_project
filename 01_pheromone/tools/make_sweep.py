@@ -1,25 +1,30 @@
-"""Write one .argos file for one cell from the headless template (U8, single-cell mode).
+"""Write .argos files for one cell or the whole sweep from the headless template (U8, U11).
 
-Usage: make_sweep.py --cell d,defense,seed --root <runs root>
-The file goes to src/experiments/generated/<runid>.argos. Run it from src/:
+Usage:
+  make_sweep.py --cell d,defense,seed --root <runs root>     one file, template values
+  make_sweep.py --sweep [--run]                              80 runs into runs/sweep/, frozen values
+Files go to src/experiments/generated/<runid>.argos. Run one from src/:
     argos3 -c experiments/generated/<runid>.argos
 It sets the seed, the cell, the run folder and the stamps (git commit, library hashes).
 Why stamps here: C++ has no git access and no hash (DESIGN section 4).
-The 80-run mode (--sweep) comes with M3-04.
+--sweep needs tuning_pick.json and defense_pick.json. It skips cells already complete.
+--run runs the new files one at a time, one core, 300 s each (D-013).
 """
 from __future__ import annotations
 
 import argparse
+import copy
 import subprocess
 import sys
 import xml.etree.ElementTree as ET
 from datetime import datetime, timedelta
 from pathlib import Path
 
-from run_results import PROJECT, sha256_hex
 import schema as S
+from run_results import PROJECT, sha256_hex
+from sweep_params import Override
 
-__all__ = ["Override", "build_argos", "GENERATED"]
+__all__ = ["build_argos", "add_detractors", "GENERATED", "SRC", "git_stamp", "load_template", "set_attr"]
 
 SRC = PROJECT / "src"
 TEMPLATE = SRC / "experiments" / "pheromone_headless.template.argos"
@@ -28,7 +33,7 @@ LIBRARIES = {"code_sha_loop_functions": ("build/loop_functions/pheromone_loop_fu
                                          "libpheromone_loop_functions.*"),
              "code_sha_controller": ("build/controllers/pheromone_forager", "libpheromone_forager.*")}
 PHEROMONE_LF = "loop_functions/pheromone"
-Override = tuple[str, str, str]  # (element path from <argos-configuration>, attribute, value)
+DEFENSE_NODE = "controllers/pheromone_forager_controller/params/defense"
 
 
 def library_sha12(folder: str, pattern: str) -> str:
@@ -64,22 +69,50 @@ def set_attr(tree: ET.ElementTree, path: str, name: str, value: str) -> None:
     node.set(name, value)
 
 
+def load_template(path: Path = TEMPLATE) -> ET.ElementTree:
+    return ET.parse(path)
+
+
+def add_detractors(tree: ET.ElementTree, d: int) -> None:
+    """D-005: d detractors (dt_) are added after the 20 honest robots. Copy of the honest
+    controller with role=detractor, and a second <distribute> in the nest.
+    Added after the honest block, so honest start poses do not depend on d."""
+    if d == 0:
+        return
+    root = tree.getroot()
+    controllers = root.find("controllers")
+    honest = controllers.find("pheromone_forager_controller")  # type: ignore[union-attr]
+    detractor = copy.deepcopy(honest)
+    detractor.set("id", "detractor")  # type: ignore[union-attr]
+    detractor.find("params").set("role", "detractor")  # type: ignore[union-attr]
+    controllers.append(detractor)  # type: ignore[union-attr]
+    arena = root.find("arena")
+    block = copy.deepcopy(arena.find("distribute"))  # type: ignore[union-attr]
+    block.find("entity").set("quantity", str(d))  # type: ignore[union-attr]
+    robot = block.find("entity/foot-bot")  # type: ignore[union-attr]
+    robot.set("id", "dt_")  # type: ignore[union-attr]
+    robot.find("controller").set("config", "detractor")  # type: ignore[union-attr]
+    arena.append(block)  # type: ignore[union-attr]
+
+
 def build_argos(d: int, defense: int, seed: int, root: Path,
                 overrides: tuple[Override, ...] = (), tags: dict[str, str] | None = None
                 ) -> tuple[str, Path]:
     """Return (runid, path of the generated .argos). Tags land in manifest params."""
-    if d != 0:
-        raise SystemExit("stop: d > 0 needs the detractor controller (M3-01)")
+    if d not in S.DETRACTOR_COUNTS or defense not in S.DEFENSES:
+        raise SystemExit(f"stop: d in {S.DETRACTOR_COUNTS} and defense in {S.DEFENSES}")
     root = root.resolve()
-    tree = ET.parse(TEMPLATE)
+    tree = load_template()
     runid = fresh_runid(d, defense, seed, root)
     set_attr(tree, "framework/experiment", "random_seed", str(seed))
     set_attr(tree, PHEROMONE_LF, "n_det", str(d))
     set_attr(tree, PHEROMONE_LF, "defense", str(defense))
+    set_attr(tree, DEFENSE_NODE, "enabled", "true" if defense else "false")  # the controller reads this
     for key, value in (tags or {}).items():
         set_attr(tree, PHEROMONE_LF, key, value)
     for path, name, value in overrides:
         set_attr(tree, path, name, value)
+    add_detractors(tree, d)
     commit, dirty = git_stamp()
     logger = {"root": str(root), "runid": runid, "git_commit": commit,
               "git_dirty": "true" if dirty else "false",
@@ -104,9 +137,17 @@ def parse_cell(text: str) -> tuple[int, int, int]:
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--cell", required=True, type=parse_cell, help="d,defense,seed")
-    ap.add_argument("--root", required=True, type=Path, help="runs root, for example runs/smoke")
+    mode = ap.add_mutually_exclusive_group(required=True)
+    mode.add_argument("--cell", type=parse_cell, help="d,defense,seed")
+    mode.add_argument("--sweep", action="store_true", help="the 80 runs of G1 into runs/sweep/")
+    ap.add_argument("--root", type=Path, help="runs root for --cell, for example runs/smoke")
+    ap.add_argument("--run", action="store_true", help="with --sweep: also run the new files")
     args = ap.parse_args(argv)
+    if args.sweep:
+        from sweep_plan import run_sweep  # late import: sweep_plan uses build_argos from here
+        return run_sweep(args.run)
+    if args.root is None:
+        ap.error("--cell needs --root")
     runid, out = build_argos(*args.cell, args.root)
     print(f"runid={runid}\nargos_file={out}\nrun_folder={args.root.resolve() / runid}")
     print(f"command: cd {SRC} && argos3 -c experiments/generated/{out.name}")

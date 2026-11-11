@@ -1,0 +1,7 @@
+{
+  "_source": "DESIGN.md section 3.5 defense tuning table, D-011. Start value first. alpha_cone_deg is in degrees.",
+  "r_suspect": {"start": 0.4, "alternates": [0.25, 0.6]},
+  "alpha_cone_deg": {"start": 15, "alternates": [10, 25]},
+  "d_cone": {"start": 1.0, "alternates": [0.5, 1.5]},
+  "t_end": {"start": 15, "alternates": [10, 25]}
+}

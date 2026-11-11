@@ -13,7 +13,8 @@ import json
 import sys
 from pathlib import Path
 
-from make_sweep import Override, build_argos
+from make_sweep import build_argos
+from sweep_params import Override
 from run_argos import run_argos_files
 from run_results import PROJECT, load_manifests, require_committed
 

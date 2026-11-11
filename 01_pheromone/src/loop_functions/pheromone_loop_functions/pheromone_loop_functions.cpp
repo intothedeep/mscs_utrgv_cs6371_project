@@ -32,7 +32,8 @@ CPheromoneLoopFunctions::CPheromoneLoopFunctions() : m_pcFloor(NULL),
                                                      m_fProbeRadius(0.15f),
                                                      m_unRepaintEvery(0),
                                                      m_unCollectedFood(0),
-                                                     m_unWastedRobotTicks(0) {}
+                                                     m_unWastedRobotTicks(0),
+                                                     m_bDecoysAssigned(false) {}
 
 void CPheromoneLoopFunctions::Init(TConfigurationNode &t_node)
 {
@@ -155,8 +156,27 @@ void CPheromoneLoopFunctions::UpdateRobotPreStep(CFootBotEntity &c_robot, CPhero
     }
 }
 
+/* D-009: detractor j lures to active decoy j mod n_decoys (d = 1, 2, 4 -> decoys 1, 2, 2).
+   Done in the first PreStep, not in Init: that the controller objects already exist when
+   the loop functions Init runs is not verified on beta59. */
+void CPheromoneLoopFunctions::AssignDecoys()
+{
+    size_t unDetractor = 0;
+    ForEachFootBot([&](CFootBotEntity &c_robot, CPheromoneForager &c_controller)
+                   {
+        if (IsHonest(c_robot.GetId()))
+            return;
+        if (m_vecActiveDecoys.empty())
+            THROW_ARGOSEXCEPTION("detractor " << c_robot.GetId() << " has no decoy: n_det is 0");
+        const pheromone::SPoint &sDecoy = m_vecActiveDecoys[unDetractor++ % m_vecActiveDecoys.size()];
+        c_controller.SetDecoy(CVector2(sDecoy.x, sDecoy.y)); });
+    m_bDecoysAssigned = true;
+}
+
 void CPheromoneLoopFunctions::PreStep()
 {
+    if (!m_bDecoysAssigned)
+        AssignDecoys();
     m_pcGrid->Evaporate();
     ForEachFootBot([this](CFootBotEntity &c_robot, CPheromoneForager &c_controller)
                    { UpdateRobotPreStep(c_robot, c_controller); });

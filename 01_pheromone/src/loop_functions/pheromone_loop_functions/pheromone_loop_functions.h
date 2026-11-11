@@ -39,6 +39,7 @@ private:
     /* One tick of the run log (pheromone_loop_functions_log.cpp). No-op without <logger>. */
     void LogStep();
     void OpenLogger(TConfigurationNode &t_node);
+    void AssignDecoys();
 
     CFloorEntity *m_pcFloor;
     std::unique_ptr<pheromone::CPheromoneGrid> m_pcGrid;
@@ -52,6 +53,7 @@ private:
     UInt32 m_unCollectedFood;
 
     pheromone::CRunLogger m_cLogger;
+    bool m_bDecoysAssigned;
     UInt64 m_unWastedRobotTicks; /* integers, divided once: no float drift in the cumulative sum */
 };
 

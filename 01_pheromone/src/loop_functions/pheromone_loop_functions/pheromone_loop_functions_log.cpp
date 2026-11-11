@@ -13,8 +13,10 @@
 namespace
 {
     /* Bumped by hand with a CHANGELOG.md row (rules/measurement.md 2.1). */
-    const char *CODE_VERSION = "v1";
-    const char *STATE_NAMES[] = {"REST", "SEARCH", "FOLLOW", "END_SEARCH", "RETURN"};
+    const char *CODE_VERSION = "v2";
+    /* EState order. The last three are detractor states (tools/schema.py STATES_DETRACTOR). */
+    const char *STATE_NAMES[] = {"REST", "SEARCH", "FOLLOW", "END_SEARCH", "RETURN",
+                                 "GO_DECOY", "WAIT_DECOY", "RETURN_LAY"};
     /* DESIGN 4.1: decoy radius 0.25 m + 0.25 m. */
     const Real WASTE_DECOY_RADIUS = 0.5f;
     const Real WASTE_FALSE_SHARE = 0.5f;
@@ -77,13 +79,20 @@ void CPheromoneLoopFunctions::LogStep()
         if (c_controller.GetFollowStart())
             m_cLogger.LogEvent(unTick, strId, "follow_start", fX, fY);
         if (c_controller.GetPeakEvent() != CPheromoneForager::PEAK_NONE)
-            m_cLogger.LogEvent(unTick, strId, "peak", fX, fY); });
+            m_cLogger.LogEvent(unTick, strId, "peak", fX, fY);
+        if (c_controller.GetDecoyReach())
+            m_cLogger.LogEvent(unTick, strId, "decoy_reach", fX, fY);
+        /* suspect_add: the robot is within end_radius of the point it records. */
+        if (c_controller.GetSuspectAdd())
+            m_cLogger.LogEvent(unTick, strId, "suspect_add", fX, fY);
+        if (c_controller.GetConeAbort())
+            m_cLogger.LogEvent(unTick, strId, "cone_abort", fX, fY);
+        sTick.suspects += static_cast<unsigned>(c_controller.GetSuspectCount()); });
 
     sTick.tick = unTick;
     sTick.food = m_unCollectedFood;
     sTick.wastedSeconds = static_cast<double>(m_unWastedRobotTicks) / unTicksPerSecond;
     sTick.pherTrue = m_pcGrid->LayerSum(pheromone::LAYER_TRUE);
     sTick.pherFalse = m_pcGrid->LayerSum(pheromone::LAYER_FALSE);
-    sTick.suspects = 0; /* M3-02 fills this when the defense holds suspect points */
     m_cLogger.LogTick(sTick);
 }

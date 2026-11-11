@@ -1,6 +1,6 @@
 """Stage reports and the summary page from saved outputs only.
 
-Usage: make_report.py --phase mvp1 | mvp2   (mvp2 stages live in report_mvp2.py)
+Usage: make_report.py --phase mvp1 | mvp2 | mvp3   (stages of mvp2, mvp3: report_mvp2.py, report_mvp3.py)
 Reads manifests, check_log.txt, analyze_log.txt, summary.csv and g2_stats.csv.
 No number is typed here. A stage with no saved output is reported as skipped and
 the script goes on.
@@ -229,11 +229,14 @@ def analyze_stage() -> Stage:
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--phase", required=True, choices=["mvp1", "mvp2"])
+    ap.add_argument("--phase", required=True, choices=["mvp1", "mvp2", "mvp3"])
     args = ap.parse_args(argv)
     if args.phase == "mvp2":
         from report_mvp2 import run_phase  # late import: report_mvp2 uses helpers from this file
         return run_phase()
+    if args.phase == "mvp3":
+        from report_mvp3 import run_phase as run_mvp3
+        return run_mvp3()
     OUT.mkdir(parents=True, exist_ok=True)
     stages = [generate_stage(), check_stage(), analyze_stage()]
     for i, s in enumerate(stages, 1):

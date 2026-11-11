@@ -1,6 +1,7 @@
 #ifndef PHEROMONE_FORAGER_H
 #define PHEROMONE_FORAGER_H
 
+#include <vector>
 #include <argos3/core/control_interface/ci_controller.h>
 #include <argos3/core/utility/math/rng.h>
 #include <argos3/core/utility/math/vector2.h>
@@ -55,7 +56,11 @@ public:
         STATE_SEARCH,
         STATE_FOLLOW,
         STATE_END_SEARCH,
-        STATE_RETURN
+        STATE_RETURN,
+        /* Detractor only (DESIGN section 3.3). REST is shared. */
+        STATE_GO_DECOY,
+        STATE_WAIT_DECOY,
+        STATE_RETURN_LAY
     };
 
     /* Peak flag of this tick. Valid peaks may become suspects in M3. */
@@ -79,6 +84,14 @@ public:
     /* Both flags describe the last ControlStep only (cleared at its start). */
     inline EPeak GetPeakEvent() const { return m_ePeakEvent; }
     inline bool GetFollowStart() const { return m_bFollowStart; }
+    inline bool GetDecoyReach() const { return m_bDecoyReach; }
+    inline bool GetSuspectAdd() const { return m_bSuspectAdd; }
+    inline bool GetConeAbort() const { return m_bConeAbort; }
+    /* Suspect points this robot holds (0 when the defense is off). */
+    inline size_t GetSuspectCount() const { return m_vecSuspects.size(); }
+    /* The loop functions give each detractor its lure point (D-009). */
+    inline void SetDecoy(const CVector2 &c_decoy) { m_cDecoy = c_decoy; }
+    inline bool IsDetractor() const { return m_bDetractor; }
 
     inline SFoodData &GetFoodData() { return m_sFoodData; }
     inline SPheromoneReading &GetPheromoneReading() { return m_sReading; }
@@ -94,9 +107,14 @@ private:
         /* Wheel turning (hw5) */
         CRadians HardTurnOnAngleThreshold, SoftTurnOnAngleThreshold, NoTurnAngleThreshold;
         /* Pheromone (DESIGN Table 2) */
-        Real AMax, LambdaDep, ThetaOn, ThetaOff, DeltaUp, EndRadius;
+        Real AMax, LambdaDep, ThetaOn, ThetaOff, DeltaUp, EndRadius, ProbeRadius, DecoyReach;
         bool FollowEnabled;
-        UInt32 PeakTicks, FollowMinTicks, RestTicks, SearchTicks, EndTicks;
+        UInt32 PeakTicks, FollowMinTicks, RestTicks, SearchTicks, EndTicks, WaitTicks;
+        /* Defense (DESIGN section 3.4) */
+        bool DefenseEnabled;
+        Real RMerge, RSuspect, DCone;
+        UInt32 NMem;
+        CRadians AlphaCone;
         /* Nest by position (D-008) */
         Real NestEdgeX;
         CVector2 NestCentre;
@@ -114,6 +132,14 @@ private:
     void EndSearch();
     void Return();
     bool TryEnterFollow();
+    /* Detractor states (pheromone_forager_detractor.cpp) */
+    void GoDecoy();
+    void WaitDecoy();
+    void ReturnLay();
+    /* Defense rule (pheromone_forager_defense.cpp) */
+    void AddSuspect(const CVector2 &c_point);
+    void MaskSuspects();
+    bool IsConeHit() const;
     void RequestDeposit();
     /* Motion (pheromone_forager.cpp) */
     void UpdatePose();
@@ -133,7 +159,8 @@ private:
     CRandom::CRNG *m_pcRNG;
 
     SParams m_sParams;
-    SPheromoneReading m_sReading;
+    SPheromoneReading m_sReading; /* raw, as the loop functions wrote it */
+    SPheromoneReading m_sSeen;    /* m_sReading with suspect areas read as 0 (rule 4) */
     SDepositRequest m_sDeposit;
     SFoodData m_sFoodData;
 
@@ -148,8 +175,18 @@ private:
 
     UInt32 m_unStateTicks;  /* ticks since the last Enter() */
     UInt32 m_unTripTicks;   /* ticks since leaving REST, for t_search */
-    UInt32 m_unCarryTicks;  /* ticks since pickup, for tau */
-    bool m_bWasCarrying;
+    UInt32 m_unTauTicks;    /* ticks since pickup (honest) or since leaving the decoy (detractor) */
+    bool m_bWasLaying;
+    bool m_bDetractor;
+    bool m_bPeakValid;      /* the last peak was valid (rule 1 needs it) */
+    bool m_bDecoyReach, m_bSuspectAdd, m_bConeAbort; /* flags of this tick, like m_bFollowStart */
+    CVector2 m_cDecoy;
+    struct SSuspect
+    {
+        CVector2 Pos;
+        UInt32 Count;
+    };
+    std::vector<SSuspect> m_vecSuspects; /* private memory, never shared (no communication) */
     UInt32 m_unFlatTicks;   /* consecutive ticks with every probe <= here */
     UInt32 m_unLowTicks;    /* consecutive ticks with every probe < theta_off */
     Real m_fHereEntry;

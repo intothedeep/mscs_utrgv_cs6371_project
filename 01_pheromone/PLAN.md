@@ -183,16 +183,16 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 
 ### Tactic: attack, then defense, then freeze and sweep (kill: D-010 fails, then pm rewrites M3 for B)
 
-- [ ] M3-01 → M3: detractor controller (U9, DESIGN §3.3)
+- [x] M3-01 → M3: detractor controller (U9, DESIGN §3.3)
   - Static: states REST, GO_DECOY, wait 2 s, RETURN_LAY. LED red. Never carries food. Same `t_rest`.
   - Static: decoy assigned by the loop functions at `Init` (D-009 counts). Deposits go to the false layer.
   - Static: `decoy_reach` event is logged. Detractors are added to 20 honest robots (D-005).
-- [ ] M3-02 → M3: defense rule (U10, DESIGN §3.4)
+- [x] M3-02 → M3: defense rule (U10, DESIGN §3.4)
   - Static: rules 1 to 5 run only when the defense param is 1. Only a valid peak with no food adds a suspect.
   - Static: merge within `r_merge`, memory `n_mem`, ignore within `r_suspect`, cone `±α_cone` within `d_cone`.
   - Static: `suspect_add` and `cone_abort` events logged. `suspects_total` filled in `ticks.csv`.
   - Gate: M3 exit 1.
-- [ ] M3-03 → M3: defense tuning scripts (D-011)
+- [x] M3-03 → M3: defense tuning scripts (D-011)
   - Static: `make_tuning.py --defense --round k` writes d = 2, defense on, seeds 101 to 103 into `runs/defense_tuning/`, with values from `tuning_pick.json`.
   - Static: candidate values for `r_suspect`, `α_cone`, `d_cone`, `t_end` are read from `prereg/defense_candidates.json`. The script exits nonzero if that file has no git commit.
   - Static: rounds 2 and 3 refuse more than one change. `tuning_pick.py --defense` picks by mean `F(2, on)`, tie to the earlier round, writes `defense_pick.json`.
@@ -203,7 +203,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Static: `run_sweep.sh` runs one at a time, one core. It skips a run only if its manifest is complete AND has the same cell, `git_commit` and params.
   - Static: README gets a sweep section.
   - Gate: M3 exit 3.
-- [ ] M3-05 → M3: analysis and figures from real logs (U12, part 1)
+- [x] M3-05 → M3: analysis and figures from real logs (U12, part 1)
   - Static: `analyze.py runs/sweep` writes `results/real/g2_recovered_share.png`, a food bar chart and a wasted robot-seconds bar chart per cell, and `summary.csv`.
   - Static: the report table states the crowding note (R10), the decoy-count note (D-009) and the pairing limit (R11).
   - Static: counts of `suspect_add` and `cone_abort` per cell are tabled.
@@ -211,7 +211,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 - [ ] M3-06 → M3: demo `.argos` files (U12, part 2)
   - Static: `pheromone_qt_d2_def0.argos` and `pheromone_qt_d2_def1.argos` with the frozen values. README demo section.
   - Gate: M3 exit 5.
-- [ ] M3-07 → M3: `make_report.py --phase mvp3` and the results page
+- [x] M3-07 → M3: `make_report.py --phase mvp3` and the results page
   - Static: reports for detractor smoke, defense tuning, sweep, check, analyze, demo. Each with 8 fields, one figure, one table.
   - Static: `results/index.html` opens with G1 (logged runs out of 80) and G2 (`R(d)` with intervals), read from `summary.csv`.
   - Static: it links the G2 chart, all stage reports, the demo, and the M1 and M2 pages. `results/README.md` lists every file in `results/`.

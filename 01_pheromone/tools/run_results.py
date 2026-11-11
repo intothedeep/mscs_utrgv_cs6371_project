@@ -13,13 +13,9 @@ from pathlib import Path
 
 import schema as S
 
-__all__ = ["PROJECT", "sha256_hex", "require_committed", "load_manifests", "run_food",
-           "TUNING_PARAMS"]
+__all__ = ["PROJECT", "sha256_hex", "require_committed", "load_manifests", "run_food"]
 
 PROJECT = Path(__file__).resolve().parent.parent
-# Tuned .argos values as they appear in manifest params (the controller ones get a prefix).
-TUNING_PARAMS = {"half_life_s": "half_life_s",
-                 "lambda_dep": "controller_pheromone_lambda_dep"}
 
 
 def sha256_hex(path: Path) -> str:

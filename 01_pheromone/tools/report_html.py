@@ -40,11 +40,11 @@ class Stage:
     table: str     # ready HTML (a <table>) or "" when skipped
 
 
-def page(title: str, body: str) -> str:
+def page(title: str, body: str, theme_href: str = THEME_HREF) -> str:
     return (f'<!doctype html>\n<html lang="en"><head><meta charset="utf-8">\n'
             f"<title>{escape(title)}</title>\n"
             f'<link rel="stylesheet" href="{FONTS}">\n'
-            f'<link rel="stylesheet" href="{THEME_HREF}">\n'
+            f'<link rel="stylesheet" href="{theme_href}">\n'
             f"<style>{EXTRA_CSS}</style></head>\n"
             f'<body><div class="wrap">\n{body}\n</div></body></html>\n')
 

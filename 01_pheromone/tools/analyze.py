@@ -1,7 +1,8 @@
 """Analysis (U3, DESIGN 4.2): recovered loss share R(d) from a runs root.
 
 Usage: analyze.py <root> [--out DIR]
-Reads manifests only (metrics equal the last ticks row, check_runs.py enforces that).
+Also writes food_by_cell, wasted_by_cell charts and events_by_cell.csv (cell_report.py).
+Reads manifests (metrics equal the last ticks row, check_runs.py enforces that), and events.csv for the cell counts.
 Stops when the root mixes mock and real runs. Mock output goes to results/mock/,
 real output to results/real/. A mock chart is stamped MOCK DATA in title and file name.
 """
@@ -22,6 +23,7 @@ matplotlib.use("Agg")  # no display: charts go to files
 import matplotlib.pyplot as plt  # noqa: E402
 
 import schema as S  # noqa: E402
+from cell_report import NOTES, write_cell_outputs  # noqa: E402
 from g2_stats import G2Row, g2_rows  # noqa: E402
 
 __all__ = ["load_runs", "select_cells", "SUMMARY_COLUMNS", "SUMMARY_FILE", "STATS_FILE", "LOG_FILE"]
@@ -190,8 +192,11 @@ def main(argv: list[str]) -> int:
     write_stats(out / STATS_FILE, rows)
     chart = out / ("g2_recovered_share_MOCK.png" if mock else "g2_recovered_share.png")
     draw_chart(chart, rows, mock)
+    extra = write_cell_outputs(out, args.root, cells["chosen"], mock) if cells["chosen"] else []
     lines = log_lines(args.root, mock, len(runs), cells, rows)
-    lines.append(f"OUTPUT chart={chart} summary={out / SUMMARY_FILE} stats={out / STATS_FILE}")
+    lines += [f"NOTE {note}" for note in NOTES]
+    lines.append(f"OUTPUT chart={chart} summary={out / SUMMARY_FILE} stats={out / STATS_FILE}"
+                 + "".join(f" {p.name}={p}" for p in extra))
     (out / LOG_FILE).write_text("\n".join(lines) + "\n")
     print("\n".join(lines))
     return 0
