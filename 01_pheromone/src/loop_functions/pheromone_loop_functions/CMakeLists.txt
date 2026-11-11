@@ -4,7 +4,10 @@ link_directories(${CMAKE_BINARY_DIR}/controllers/pheromone_forager)
 set(pheromone_loop_functions_SOURCES
   pheromone_grid.cpp
   food_field.cpp
-  pheromone_loop_functions.cpp)
+  pheromone_loop_functions.cpp
+  pheromone_loop_functions_log.cpp
+  run_logger.cpp
+  run_info_reader.cpp)
 
 # The Qt user functions exist only when ARGoS was built with Qt-OpenGL.
 if(ARGOS_QTOPENGL_FOUND)

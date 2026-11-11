@@ -7,6 +7,7 @@
 #include <controllers/pheromone_forager/pheromone_forager.h>
 #include "pheromone_grid.h"
 #include "food_field.h"
+#include "run_logger.h"
 #include <functional>
 #include <memory>
 
@@ -25,6 +26,7 @@ public:
 
     virtual void Init(TConfigurationNode &t_tree);
     virtual void Reset();
+    virtual void Destroy();
     virtual CColor GetFloorColor(const CVector2 &c_position_on_plane);
     virtual void PreStep();
     virtual void PostStep();
@@ -34,6 +36,9 @@ private:
     using TRobotFn = std::function<void(CFootBotEntity &, CPheromoneForager &)>;
     void ForEachFootBot(const TRobotFn &f_visit);
     void UpdateRobotPreStep(CFootBotEntity &c_robot, CPheromoneForager &c_controller);
+    /* One tick of the run log (pheromone_loop_functions_log.cpp). No-op without <logger>. */
+    void LogStep();
+    void OpenLogger(TConfigurationNode &t_node);
 
     CFloorEntity *m_pcFloor;
     std::unique_ptr<pheromone::CPheromoneGrid> m_pcGrid;
@@ -45,6 +50,9 @@ private:
     Real m_fProbeRadius;
     UInt32 m_unRepaintEvery; /* 0 = never: headless runs do not repaint */
     UInt32 m_unCollectedFood;
+
+    pheromone::CRunLogger m_cLogger;
+    UInt64 m_unWastedRobotTicks; /* integers, divided once: no float drift in the cumulative sum */
 };
 
 #endif

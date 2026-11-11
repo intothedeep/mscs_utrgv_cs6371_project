@@ -31,7 +31,8 @@ CPheromoneLoopFunctions::CPheromoneLoopFunctions() : m_pcFloor(NULL),
                                                      m_fNestEdgeX(-1.0f),
                                                      m_fProbeRadius(0.15f),
                                                      m_unRepaintEvery(0),
-                                                     m_unCollectedFood(0) {}
+                                                     m_unCollectedFood(0),
+                                                     m_unWastedRobotTicks(0) {}
 
 void CPheromoneLoopFunctions::Init(TConfigurationNode &t_node)
 {
@@ -59,10 +60,16 @@ void CPheromoneLoopFunctions::Init(TConfigurationNode &t_node)
         m_cField.Draw([pcLayoutRNG](double f_min, double f_max)
                       { return static_cast<double>(pcLayoutRNG->Uniform(CRange<Real>(f_min, f_max))); });
         m_vecActiveDecoys = m_cField.ActiveDecoys(unDetractors);
+        OpenLogger(t_node);
     }
     catch (CARGoSException &ex)
     {
         THROW_ARGOSEXCEPTION_NESTED("Error parsing loop functions!", ex);
+    }
+    catch (std::exception &ex)
+    {
+        /* food_field and run_logger throw std exceptions. */
+        THROW_ARGOSEXCEPTION("Error in loop functions: " << ex.what());
     }
 }
 
@@ -71,6 +78,12 @@ void CPheromoneLoopFunctions::Reset()
 {
     m_pcGrid->Clear();
     m_unCollectedFood = 0;
+    m_unWastedRobotTicks = 0;
+}
+
+void CPheromoneLoopFunctions::Destroy()
+{
+    m_cLogger.Close(); /* idempotent: PostExperiment may have closed it already */
 }
 
 /****************************************/
@@ -122,10 +135,12 @@ void CPheromoneLoopFunctions::UpdateRobotPreStep(CFootBotEntity &c_robot, CPhero
             sFood.HasFoodItem = false;
             ++sFood.TotalFoodItems;
             ++m_unCollectedFood;
+            m_cLogger.LogEvent(GetSpace().GetSimulationClock(), c_robot.GetId(), "drop", fX, fY);
         }
         else if (!sFood.HasFoodItem && fX >= m_fNestEdgeX && m_cField.IsOnSource(fX, fY))
         {
             sFood.HasFoodItem = true; /* the source stays full */
+            m_cLogger.LogEvent(GetSpace().GetSimulationClock(), c_robot.GetId(), "pickup", fX, fY);
         }
     }
 
@@ -158,15 +173,14 @@ void CPheromoneLoopFunctions::PostStep()
             m_pcGrid->Deposit(IsHonest(c_robot.GetId()) ? pheromone::LAYER_TRUE : pheromone::LAYER_FALSE,
                               cPos.GetX(), cPos.GetY(), sRequest.amount);
         sRequest.active = false; });
-    /* M2-05 call site: RunLogger::LogTick here, after deposits, reading the
-       controller getters (GetState, IsCarrying, GetPeakEvent, GetFollowStart). */
+    LogStep(); /* after every deposit, so the layer sums are final for this tick */
     if (m_unRepaintEvery > 0 && GetSpace().GetSimulationClock() % m_unRepaintEvery == 0)
         m_pcFloor->SetChanged();
 }
 
 void CPheromoneLoopFunctions::PostExperiment()
 {
-    /* M2-05 call site: RunLogger::Close writes the final manifest. */
+    m_cLogger.Close();
     LOG << "food_collected " << m_unCollectedFood << std::endl;
 }
 

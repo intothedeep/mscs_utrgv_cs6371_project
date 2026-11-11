@@ -41,6 +41,7 @@
   <loop_functions library="build/loop_functions/pheromone_loop_functions/libpheromone_loop_functions"
                   label="pheromone_loop_functions">
     <pheromone n_det="0"
+               defense="0"
                half_life_s="60"
                probe_radius_m="0.15"
                nest_edge_x="-1.0"

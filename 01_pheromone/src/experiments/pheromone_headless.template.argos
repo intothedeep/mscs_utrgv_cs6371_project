@@ -1,7 +1,7 @@
 <?xml version="1.0" ?>
 
 <!-- Sweep template: NO <visualization>. tools/make_sweep.py copies this file to -->
-<!-- experiments/generated/ and sets random_seed, n_det and the run stamps.      -->
+<!-- experiments/generated/, sets random_seed, n_det, defense and adds <logger>.   -->
 <!-- Keep it equal to pheromone_qt.argos except the visualization block and      -->
 <!-- repaint_every (0 here: a headless run never repaints the floor).            -->
 <argos-configuration>
@@ -44,6 +44,7 @@
   <loop_functions library="build/loop_functions/pheromone_loop_functions/libpheromone_loop_functions"
                   label="pheromone_loop_functions">
     <pheromone n_det="0"
+               defense="0"
                half_life_s="60"
                probe_radius_m="0.15"
                nest_edge_x="-1.0"
