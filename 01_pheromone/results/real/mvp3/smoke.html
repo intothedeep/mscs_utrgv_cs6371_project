@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 1: detractor smoke run</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 1 of 6. <a href="index.html">Back to summary</a></p>
+<h1>Stage 1: detractor smoke run</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>One run at d = 2, defense on, seed 1, headless.</td></tr><tr><th>Why</th><td>Detractors and the defense must run before any tuning or sweep (M3 exit 1).</td></tr><tr><th>Input data</th><td>Generated .argos file, d = 2, defense on, seed 1.</td></tr><tr><th>Output data</th><td>runs/smoke/20261111-113131_d2_def1_s6/ (4 files).</td></tr><tr><th>Result (numbers)</th><td>food_collected 37, wasted_robot_seconds 2719.6, decoy_reach 18, suspect_add 61, cone_abort 367.</td></tr><tr><th>Result (good or bad)</th><td>Good: decoy_reach and suspect_add rows exist.</td></tr><tr><th>Status</th><td>ran</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="smoke_fig.png" alt="Smoke events"><div class="scroll-x"><table><thead><tr><th>runid</th><th>complete</th><th>decoy_reach</th><th>suspect_add</th><th>cone_abort</th><th>pickup</th><th>drop</th></tr></thead><tbody><tr><td>20261111-113131_d2_def1_s6</td><td>True</td><td>18</td><td>61</td><td>367</td><td>41</td><td>37</td></tr></tbody></table></div></div>
+</div></body></html>

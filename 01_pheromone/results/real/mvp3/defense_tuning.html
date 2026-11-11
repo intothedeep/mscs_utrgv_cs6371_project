@@ -1,0 +1,20 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8">
+<title>Stage 2: defense tuning (D-011)</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<style>
+.field { width: 100%; }
+.field th, .field td { white-space: normal; text-align: left; vertical-align: top; }
+.field th { width: 190px; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--foreground);
+        padding: 16px; display: flex; flex-direction: column; gap: 8px; }
+.fig img { max-width: 100%; height: auto; border: 1px solid var(--rule); }
+a { color: inherit; }
+</style></head>
+<body><div class="wrap">
+<p class="label">Stage report, step 2 of 6. <a href="index.html">Back to summary</a></p>
+<h1>Stage 2: defense tuning (D-011)</h1>
+<div class="panel"><table class="field"><tr><th>What</th><td>Up to 3 rounds at d = 2, defense on, seeds 101 to 103. Pick the round with the highest mean food.</td></tr><tr><th>Why</th><td>The defense values freeze before the 80-run sweep. Tuning on sweep seeds would fit the result.</td></tr><tr><th>Input data</th><td>Real runs, d = 2, defense on, seeds 101 to 103 (runs/defense_tuning/).</td></tr><tr><th>Output data</th><td>results/real/defense_tuning/defense_pick.json.</td></tr><tr><th>Result (numbers)</th><td>picked round 2: r_suspect 0.4, alpha_cone_deg 10, d_cone 1, t_end 15.</td></tr><tr><th>Result (good or bad)</th><td>Good: round 2 has the highest mean.</td></tr><tr><th>Status</th><td>ran</td></tr></table></div>
+<div class="panel fig"><p class="label">Figure and table</p><img src="defense_tuning_fig.png" alt="Mean food per round"><div class="scroll-x"><table><thead><tr><th>round</th><th>r_suspect</th><th>alpha_cone_deg</th><th>d_cone</th><th>t_end</th><th>food by seed</th><th>mean food</th></tr></thead><tbody><tr><td>1</td><td>0.4</td><td>15</td><td>1</td><td>15</td><td>101: 37, 102: 52, 103: 33</td><td>40.67</td></tr><tr><td>2</td><td>0.4</td><td>10</td><td>1</td><td>15</td><td>101: 29, 102: 58, 103: 39</td><td>42.00</td></tr><tr><td>3</td><td>0.4</td><td>10</td><td>0.5</td><td>15</td><td>101: 35, 102: 45, 103: 31</td><td>37.00</td></tr></tbody></table></div></div>
+</div></body></html>
