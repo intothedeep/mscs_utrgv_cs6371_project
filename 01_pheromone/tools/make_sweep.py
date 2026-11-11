@@ -5,7 +5,7 @@ Usage:
   make_sweep.py --sweep [--run] [--seeds a-b] [--root R] [--t-lock T]
                                                              8 cells x seeds (default 1-10, 80 runs)
                                                              into runs/sweep/, frozen values
-  --cell also takes --t-lock (defense v2 lockout, seconds).
+  --cell also takes --t-lock (defense v2 lockout, seconds) and --honest N (honest robots, default 20, M7 uses 40).
 Files go to src/experiments/generated/<runid>.argos. Run one from src/:
     argos3 -c experiments/generated/<runid>.argos
 It sets the seed, the cell, the run folder and the stamps (git commit, library hashes).
@@ -98,12 +98,23 @@ def add_detractors(tree: ET.ElementTree, d: int) -> None:
     arena.append(block)  # type: ignore[union-attr]
 
 
+def set_honest(tree: ET.ElementTree, n_honest: int) -> None:
+    """M7 (D-042): N honest robots in the same nest area. Records n_honest in the manifest params,
+    since every loop-function attribute lands there (schema.py stays as is). Not called for the
+    default, so a 20-robot file stays equal to the older ones."""
+    set_attr(tree, "arena/distribute/entity", "quantity", str(n_honest))  # first block = the honest one
+    set_attr(tree, PHEROMONE_LF, "n_honest", str(n_honest))
+
+
 def build_argos(d: int, defense: int, seed: int, root: Path,
-                overrides: tuple[Override, ...] = (), tags: dict[str, str] | None = None
-                ) -> tuple[str, Path]:
-    """Return (runid, path of the generated .argos). Tags land in manifest params."""
+                overrides: tuple[Override, ...] = (), tags: dict[str, str] | None = None,
+                n_honest: int | None = None) -> tuple[str, Path]:
+    """Return (runid, path of the generated .argos). Tags land in manifest params.
+    n_honest None keeps the template's 20 robots and writes no n_honest attribute."""
     if d not in S.DETRACTOR_COUNTS or defense not in S.DEFENSES:
         raise SystemExit(f"stop: d in {S.DETRACTOR_COUNTS} and defense in {S.DEFENSES}")
+    if n_honest is not None and n_honest < 1:
+        raise SystemExit("stop: n_honest must be at least 1")
     root = root.resolve()
     tree = load_template()
     runid = fresh_runid(d, defense, seed, root)
@@ -115,6 +126,8 @@ def build_argos(d: int, defense: int, seed: int, root: Path,
         set_attr(tree, PHEROMONE_LF, key, value)
     for path, name, value in overrides:
         set_attr(tree, path, name, value)
+    if n_honest is not None:
+        set_honest(tree, n_honest)
     add_detractors(tree, d)
     commit, dirty = git_stamp()
     logger = {"root": str(root), "runid": runid, "git_commit": commit,
@@ -148,14 +161,17 @@ def main(argv: list[str]) -> int:
     ap.add_argument("--seeds", type=parse_seeds, default=S.SEEDS, metavar="a-b",
                     help="with --sweep: seed range, default 1-10")
     ap.add_argument("--t-lock", type=float, help="defense v2 lockout seconds. Default: template value (0)")
+    ap.add_argument("--honest", type=int, metavar="N", help="with --cell: honest robot count. Default: template value (20)")
     args = ap.parse_args(argv)
+    if args.honest is not None and not args.cell:
+        ap.error("--honest works with --cell only")
     if args.sweep:
         from sweep_plan import ROOT, run_sweep  # late import: sweep_plan uses build_argos from here
         return run_sweep(args.run, args.root or ROOT, args.seeds, args.t_lock)
     if args.root is None:
         ap.error("--cell needs --root")
     set_lock = overrides(t_lock=args.t_lock) if args.t_lock is not None else ()
-    runid, out = build_argos(*args.cell, args.root, set_lock)
+    runid, out = build_argos(*args.cell, args.root, set_lock, n_honest=args.honest)
     print(f"runid={runid}\nargos_file={out}\nrun_folder={args.root.resolve() / runid}")
     print(f"command: cd {SRC} && argos3 -c experiments/generated/{out.name}")
     return 0

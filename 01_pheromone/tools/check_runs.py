@@ -24,6 +24,11 @@ Problem = tuple[str, str, str, str]  # (run, file, column, message)
 LAYOUT_TOL_M = 1e-6
 
 
+def honest_count(m: dict) -> int:
+    """Honest robots of a run: the n_honest param of an M7 run, else the schema default (20)."""
+    return int(m[S.K_PARAMS].get("n_honest", S.N_HONEST))
+
+
 # ---- pure checks -----------------------------------------------------------------
 
 def header_issues(header: list[str], expected: tuple[str, ...]) -> list[Issue]:
@@ -144,12 +149,13 @@ def ticks_issues(header: list[str], rows: list[list[str]], m: dict) -> list[Issu
         out.append((S.COL_WASTED, f"last row {cols[S.COL_WASTED][-1]} != {S.K_METRICS} "
                                   f"{met[S.M_WASTED]}"))
     state_cols = S.STATE_COUNT_COLUMNS
-    if any(sum(vals) != S.N_HONEST for vals in zip(*(cols[c] for c in state_cols))):
-        out.append((state_cols[0], f"state counts do not sum to {S.N_HONEST} honest robots"))
+    n_honest = honest_count(m)
+    if any(sum(vals) != n_honest for vals in zip(*(cols[c] for c in state_cols))):
+        out.append((state_cols[0], f"state counts do not sum to {n_honest} honest robots"))
     return out
 
 
-def robots_issues(header: list[str], rows: list[list[str]], n_det: int) -> list[Issue]:
+def robots_issues(header: list[str], rows: list[list[str]], n_det: int, n_honest: int) -> list[Issue]:
     bad = header_issues(header, S.ROBOTS_COLUMNS)
     if bad:
         return bad
@@ -158,9 +164,9 @@ def robots_issues(header: list[str], rows: list[list[str]], n_det: int) -> list[
         return bad
     out: list[Issue] = []
     per_tick = Counter(cols[S.COL_TICK])
-    want = S.N_HONEST + n_det
+    want = n_honest + n_det
     if any(c != want for c in per_tick.values()):
-        out.append((S.COL_ROBOT, f"every tick must list {want} robots (20 + d, D-005)"))
+        out.append((S.COL_ROBOT, f"every tick must list {want} robots ({n_honest} + d, D-005)"))
     if set(cols[S.COL_ROLE]) - set(S.ROLES):
         out.append((S.COL_ROLE, f"value outside {S.ROLES}"))
     if set(cols[S.COL_STATE]) - set(S.STATES_HONEST) - set(S.STATES_DETRACTOR):
@@ -233,7 +239,7 @@ def check_run(run_dir: Path) -> tuple[list[Problem], dict | None]:
         return problems, None
     n_det = manifest[S.K_PARAMS][S.P_NDET]
     for file, check in ((S.TICKS_FILE, lambda h, r: ticks_issues(h, r, manifest)),
-                        (S.ROBOTS_FILE, lambda h, r: robots_issues(h, r, n_det)),
+                        (S.ROBOTS_FILE, lambda h, r: robots_issues(h, r, n_det, honest_count(manifest))),
                         (S.EVENTS_FILE, events_issues)):
         if file not in absent:
             header, rows = _read_csv(run_dir / file)
