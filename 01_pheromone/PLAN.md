@@ -8,13 +8,14 @@
 
 - Mission: Keep swarm foraging trustworthy when some robots lay false pheromone trails. (Fable, owner-delegated, 2026-11-10, D-004)
 - Vision: One chart and one demo show the defense winning back lost food. (Fable, owner-delegated, 2026-11-10, D-004)
-- Constraints: no local training. The main session builds and runs every run locally, one core, sequential (D-002, D-013). Agents never build, run or commit.
+- Constraints: no local training. The main session builds and runs every run locally, one core, sequential (D-002, D-013, D-031). Agents never build, run or commit.
 - G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (measure: logged runs out of 80 = 4 detractor counts x 2 defense states x 10 seeds). (Fable, owner-delegated, 2026-11-10, D-004)
 - G2: By 2026-11-28, report recovered loss share for 3 of 3 nonzero detractor counts (1, 2, 4) with 10-seed error bars. (Fable, owner-delegated, 2026-11-10, D-004)
 - S1 → G1, G2: A, floor grid with a virtual sensor (picked: A of A/B/C, Fable owner-delegated 2026-11-10, D-006). Listed alternatives: B (fallback, only if the D-010 judgement fails), C (stretch after G2 only).
 - M1 → S1: MVP1 shape, mock end-to-end, by 2026-11-13. Exit: see "M1 exit". cycle 1/2; recovery 0/2. Review 1 ISSUE, fixes closed, gates re-run PASS (`results/reviews/M1_gate.md` Resolution). Closed
 - M2 → S1: MVP2 real slice, 0 detractors, plus the D-010 keep-A judgement, by 2026-11-17. Exit: see "M2 exit". cycle 1/2; recovery 0/2. Review 1 ISSUE (`results/reviews/M2_gate.md`), fixes in progress
-- M3 → S1: MVP3 detractors, defense, 80-run sweep, figures from real logs. Sweep by 2026-11-24, report by 2026-11-28. Exit: see "M3 exit". cycle 0/2; recovery 0/2
+- M3 → S1: MVP3 detractors, defense, 80-run sweep, figures from real logs. Sweep by 2026-11-24, report by 2026-11-28. Exit: see "M3 exit". cycle 0/2; recovery 0/2. Sweep done on v3 (D-025). G1 met (80 of 80 runs). G2 measured (D-026). Gate not yet run
+- M4 → S1 → Vision: defense v2 lockout, one added arm (D-027, D-032: does not block M2 or M3), by 2026-11-21. Exit: v2 `verdict.json` exists, pass or fail (see "M4 exit"). cycle 0/2; recovery 0/2
 
 Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Progress: [STATUS.md](./STATUS.md).
 
@@ -23,7 +24,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 - Format: `[ ]` TODO, `[~]` IN PROGRESS, `[x]` DONE.
 - One task = one developer dispatch. Gate review only, at each milestone exit (no per-task review).
 - "Static AC": the developer checks it (file exists, grep, read). Developers never build or run.
-- "Gate AC": checked at the gate run. The runner is named: main session (1-seed smoke, D-002, D-012) or owner (multi-seed, Qt).
+- "Gate AC": checked at the gate run. The runner is the main session: 1-seed smoke (D-002, D-012), multi-seed (D-013, D-031), headless Qt frames (D-022).
 - No `*.test.*` files. Behavior is checked by deliberate breakage at the gate. Breakage copies go to the session scratchpad, never into the repo.
 - Every gate run writes its stage reports (fields: `.claude/CLAUDE.md` "System build phasing").
 
@@ -37,6 +38,12 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 | Keep-A judgement runs | `runs/judgement/` | ignored |
 | Defense tuning runs | `runs/defense_tuning/` | ignored |
 | 80-run sweep | `runs/sweep/` | ignored |
+| Defense v2 invariance runs (M4-03) | `runs/v4_invariance/` | ignored |
+| Defense v2 tuning runs (M4-04) | `runs/defense_v2_tuning/` | ignored |
+| Defense v2 confirmation, picked `t_lock` | `runs/sweep_v2/` | ignored |
+| Defense v2 confirmation control, `t_lock` 0 | `runs/sweep_v2_lock0/` | ignored |
+| Defense diagnostics (M4-02) | `results/real/defense_diagnostics.csv` | committed |
+| Defense v2 pick and verdict | `results/real/defense_v2/` (`t_lock_pick.json`, `verdict.json`) | committed |
 | Pre-registrations | `prereg/` | committed |
 | Pheromone pick (D-007) | `results/real/tuning/tuning_pick.json` | committed |
 | Keep-A verdict (D-010) | `results/real/judgement/verdict.json` | committed |
@@ -175,10 +182,10 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 ### M3 exit (runnable)
 
 1. Main session smoke: one run at d = 2, defense on, seed 1 into `runs/smoke/` passes `check_runs.py`. Its `events.csv` has `decoy_reach` and `suspect_add` rows.
-2. Owner ran the D-011 defense tuning into `runs/defense_tuning/`. `defense_pick.json` exists. pm wrote the freeze D-row before the sweep.
-3. Owner ran `run_sweep.sh`. `check_runs.py runs/sweep` exits 0 on 80 complete runs (G1, by 2026-11-24).
+2. Main session ran the D-011 defense tuning into `runs/defense_tuning/` (D-013). `defense_pick.json` exists. pm wrote the freeze D-row before the sweep.
+3. Main session ran `tools/make_sweep.py --sweep --run` (D-013). `check_runs.py runs/sweep` exits 0 on 80 complete runs (G1, by 2026-11-24).
 4. `analyze.py runs/sweep` writes `results/real/g2_recovered_share.png` with 95 % error bars for d = 1, 2, 4, or the "loss not resolved" line (G2, by 2026-11-28).
-5. Owner records the Qt demo at d = 2, defense off and on. Frames at later times show a painted trail turning pale again (M2 exit 6 fade part, D-022).
+5. Main session captures the Qt demo frames headless (D-022) at d = 2, defense off and on. Frames at later times show a painted trail turning pale again (M2 exit 6 fade part, D-022).
 6. `make_report.py --phase mvp3` writes the stage reports and `results/index.html`.
 
 ### Tactic: attack, then defense, then freeze and sweep (kill: D-010 fails, then pm rewrites M3 for B)
@@ -196,7 +203,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Static: `make_tuning.py --defense --round k` writes d = 2, defense on, seeds 101 to 103 into `runs/defense_tuning/`, with values from `tuning_pick.json`.
   - Static: candidate values for `r_suspect`, `α_cone`, `d_cone`, `t_end` are read from `prereg/defense_candidates.json`. The script exits nonzero if that file has no git commit.
   - Static: rounds 2 and 3 refuse more than one change. `tuning_pick.py --defense` picks by mean `F(2, on)`, tie to the earlier round, writes `defense_pick.json`.
-  - Gate: M3 exit 2 (owner runs).
+  - Gate: M3 exit 2 (main session runs, D-013).
 - [ ] M3-04 → M3: 80-run sweep script (U11)
   - Static: `tools/make_sweep.py --sweep` writes one `.argos` file per cell not yet done (d 0, 1, 2, 4 x defense 0, 1 x seeds 1 to 10), each with output folder under `runs/sweep/` (D-013).
   - Static: it exits nonzero unless `tuning_pick.json` and `defense_pick.json` exist. All 80 files carry the same frozen values.
@@ -218,9 +225,60 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Static: it links the G2 chart, all stage reports, the demo, and the M1 and M2 pages. `results/README.md` lists every file in `results/`.
   - Gate: M3 exit 6.
 
+## M4: defense v2 lockout (by 2026-11-21, D-027 to D-032)
+
+Spec: `decisions/2026-11-11_fable_defense_v2.md` "Defense v2 spec". It does not block M2 or M3 (D-032).
+
+### M4 exit (runnable, runner: main session, D-031)
+
+1. Invariance: code v4 with `t_lock` = 0 gives the saved v3 `food_collected` for `d2_def1_s1` and `d0_def0_s1` (`CHANGELOG.md` v4).
+2. `t_lock_pick.json` exists. pm wrote the freeze D-row before confirmation.
+3. `check_runs.py` exits 0 on `runs/sweep_v2/` and `runs/sweep_v2_lock0/`, 160 complete runs each.
+4. `results/real/defense_v2/verdict.json` exists, pass or fail, by 2026-11-21.
+5. The final report has the defense v2 section (M4-06).
+
+### Tactic: one lockout arm, pre-registered, new seeds (kill: tuning picks `t_lock` 0, then stop without confirmation. Seeds 11-30 are used once. 2 gate cycles, end 2026-11-21)
+
+- [~] M4-01 → M4: code v4 and tools (developer)
+  - Static: after `cone_abort`, `TryEnterFollow()` returns false for `t_lock` s, read from `<defense t_lock>`, default 0 (D-028).
+  - Static: `CHANGELOG.md` has a v4 row. `code_version` is `v4`. `t_lock` is in manifest params. No new event, no new column (grep `schema.py`: unchanged since v3).
+  - Static: the seed range is a CLI option (D-030). The tuning tool refuses seeds 11 to 30 (D-029).
+  - Static: `prereg/defense_v2.md` restates spec items 5 to 12 in the 4 lines of `rules/measurement.md` §1 (metric, threshold, contrast, failure).
+  - Static: the run tools write only to the M4 roots of the Fixed paths table (D-030). The tuning and confirmation tools exit nonzero if `prereg/defense_v2.md` has no git commit. The invariance rerun (M4-03) is exempt.
+- [ ] M4-02 → M4: defense diagnostics CSV
+  - Static: a tool reads saved `runs/sweep` logs only and writes `results/real/defense_diagnostics.csv`.
+  - Static: one row per d in 1, 2, 4, defense on, mean per run. Columns: abort-to-next-`follow_start` gap, share of gaps ≤ 5 s, false-trail FOLLOW time before and after learning that decoy, `cone_abort` on and off false trail.
+  - Static: one extra row: at d = 0, defense on, `suspect_add` per run and the count within 1.0 m of a real source.
+  - Static: one row per cell (d in 0, 1, 2, 4 x defense 0, 1): mean seconds per run in each controller state, and false-trail FOLLOW seconds.
+  - Static: no number is typed into the tool.
+  - Gate: main session runs it once. The CSV exists with the rows above.
+- [ ] M4-03 → M4: invariance with `t_lock` 0
+  - Gate: main session reruns `d2_def1_s1` and `d0_def0_s1` on v4, `t_lock` = 0. `food_collected` equals the saved v3 value in `runs/sweep`. M4 exit 1.
+  - A mismatch stops M4-04 and goes to `recover`.
+- [ ] M4-04 → M4: tuning, seeds 107-116
+  - Gate: `prereg/defense_v2.md` has a git commit before the first run (D-029).
+  - Gate: cells (d = 2, on) and (d = 0, on) x `t_lock` 0, 5, 10, 20 s x seeds 107 to 116 = 80 runs, other values at D-018.
+  - Gate: the pick tool reads saved runs only. Metric: seed mean of food(d=2,on) + food(d=0,on). Highest wins. Tie goes to the smaller `t_lock`. It writes `t_lock_pick.json`. M4 exit 2.
+  - Pick = 0: stop. No confirmation run (Tactic kill).
+- [ ] M4-05 → M4: confirmation seeds 11-30 and judge
+  - Gate: 8 cells x seeds 11 to 30 into `runs/sweep_v2/` (picked `t_lock`) and `runs/sweep_v2_lock0/` (`t_lock` = 0). 160 runs each, same v4 code. M4 exit 3.
+  - Static: the judge reads saved runs only. Metric: G(2) = F(2,on) − F(2,off), seeds 11-30, paired bootstrap 10,000, 95 % interval.
+  - Static: pass = G(2) interval lower bound > 0. Fail = G(2) interval includes 0, or the d=0 cost interval upper bound < 0.
+  - Static: attribution (picked `t_lock` vs 0) is reported with its interval. d = 1, 4 are reported only.
+  - Static: `verdict.json` holds per-seed values, intervals, pass, the prereg path and the sha256 of the judge script (`rules/measurement.md` §4.1). M4 exit 4.
+- [ ] M4-06 → M4: final report section
+  - Static: the headline stays v3 (D-026). The section text uses "not met with v3" for the Vision line.
+  - Static: the defense v2 section is marked "post-hoc design, confirmed on new seeds". Pass or fail uses the same format.
+  - Static: two figures: time per state, and the abort-to-refollow gap, from `defense_diagnostics.csv`.
+  - Static: limits table: wrong suspects at d = 0, crowding (R10), decoy count (D-009), pairing limit (R11).
+  - Static: every number in the section is read from a saved file (`g2_stats.csv`, `defense_diagnostics.csv`, `verdict.json`).
+  - Gate: M4 exit 5.
+
 ## Open items for the architect
 
 - ~~Source and decoy centres have no field in DESIGN §4.~~ Resolved: DESIGN §4 `layout` (2026-11-10).
+- M4 kill path: if tuning picks `t_lock` 0, no confirmation runs and M4 exit 3 and 4 cannot be met. Open: does a stop record count as the verdict? (main session).
+- M4 names not in the spec are pm proposals: invariance and tuning run roots, `prereg/defense_v2.md`, `results/real/defense_v2/`, `t_lock_pick.json`. M4-01 may set others; then the Fixed paths table follows the code.
 - DESIGN Table 5 says MVP2 by 2026-11-18. This plan uses 2026-11-17 (D-010 deadline).
 - ~~DESIGN Table 5 gives the MVP2 Qt run to the main session. The owner runs the Qt demo (it needs a display).~~ Resolved: the main session grabs MVP2 Qt frames headless (D-022). Headless runs are the main session's (D-013).
 - ~~DESIGN §3.2 gives no LED color for END_SEARCH.~~ Resolved: DESIGN Table 2a, magenta (2026-11-10).
