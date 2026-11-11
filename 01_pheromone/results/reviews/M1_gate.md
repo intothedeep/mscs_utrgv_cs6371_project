@@ -94,3 +94,21 @@
 3. pm and architect align the three "committed" lines with D-014 (I-2).
 4. Architect answers I-4. pm logs the D-row.
 5. Second gate review (cycle 2 of 2) reads the new PNGs and the saved breakage logs.
+
+## Resolution (2026-11-11, appended by `product-manager`)
+
+- The verdict line above is the result of review 1. It is not changed.
+- The fixes are in commit `8ac7e2c`. The main session re-ran the gates after it.
+- No second review artifact was written. The M2 gate review checked the M1 side (`results/reviews/M2_gate.md`, L4 row: "closed in substance").
+
+| Issue | Where it closed |
+| --- | --- |
+| I-1 breakage 2 | `results/reviews/M1_evidence/breakage2_mixed_mock.txt` (exit 1) |
+| I-2 `mock/runs/` lines | `PLAN.md` Fixed paths and M1-01 now cite D-014 |
+| I-3 chart stamp | `results/mock/g2_recovered_share_MOCK.png` (stamp readable, M2 gate L3 row) |
+| I-4 early M2 start | `DECISIONS.md` D-015 |
+| I-5 breakage 1, refusal | `results/reviews/M1_evidence/breakage1_renamed_column.txt`, `results/reviews/M1_evidence/out_path_refused.txt` |
+| I-6 stale lines | `PLAN.md` Constraints (D-013), open item on `layout` struck |
+| I-8 wait state | `tools/schema.py` `STATES_DETRACTOR` gets `WAIT_DECOY` (commit `8ac7e2c`) |
+| I-10 determinism | `results/reviews/M1_evidence/determinism_diff.txt` (`diff_exit=0`). The two refusal files above both end `exit=1` |
+| I-7, I-9, I-11 to I-13 | reported closed in `STATUS.md` (2026-11-11 M1 line). Per-item evidence not checked here |

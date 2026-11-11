@@ -12,8 +12,8 @@
 - G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (measure: logged runs out of 80 = 4 detractor counts x 2 defense states x 10 seeds). (Fable, owner-delegated, 2026-11-10, D-004)
 - G2: By 2026-11-28, report recovered loss share for 3 of 3 nonzero detractor counts (1, 2, 4) with 10-seed error bars. (Fable, owner-delegated, 2026-11-10, D-004)
 - S1 → G1, G2: A, floor grid with a virtual sensor (picked: A of A/B/C, Fable owner-delegated 2026-11-10, D-006). Listed alternatives: B (fallback, only if the D-010 judgement fails), C (stretch after G2 only).
-- M1 → S1: MVP1 shape, mock end-to-end, by 2026-11-13. Exit: see "M1 exit". cycle 0/2; recovery 0/2
-- M2 → S1: MVP2 real slice, 0 detractors, plus the D-010 keep-A judgement, by 2026-11-17. Exit: see "M2 exit". cycle 0/2; recovery 0/2
+- M1 → S1: MVP1 shape, mock end-to-end, by 2026-11-13. Exit: see "M1 exit". cycle 1/2; recovery 0/2. Review 1 ISSUE, fixes closed, gates re-run PASS (`results/reviews/M1_gate.md` Resolution). Closed
+- M2 → S1: MVP2 real slice, 0 detractors, plus the D-010 keep-A judgement, by 2026-11-17. Exit: see "M2 exit". cycle 1/2; recovery 0/2. Review 1 ISSUE (`results/reviews/M2_gate.md`), fixes in progress
 - M3 → S1: MVP3 detractors, defense, 80-run sweep, figures from real logs. Sweep by 2026-11-24, report by 2026-11-28. Exit: see "M3 exit". cycle 0/2; recovery 0/2
 
 Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Progress: [STATUS.md](./STATUS.md).
@@ -99,7 +99,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 3. `check_runs.py runs/smoke` exits 0 with `check_runs.py` and `schema.py` unchanged since M1.
 4. That run has `food_collected` > 0, and `events.csv` has `pickup` and `drop` rows.
 5. `analyze.py runs/smoke` lists 79 missing cells and exits 0.
-6. Owner runs `pheromone_qt.argos`: green trails form and fade (two screenshots, saved under `results/real/mvp2/`).
+6. Main session grabs Qt frames headless with `src/experiments/generated/qt_capture_mvp2.argos` (D-022): green trails form (two frames, saved under `results/real/mvp2/`). Fading is shown in M3 (M3 exit 5, M3-06).
 7. Main session ran the D-007 tuning rounds into `runs/tuning/`. `tuning_pick.json` exists. pm wrote the freeze D-row.
 8. Main session ran the 6 D-010 runs into `runs/judgement/`. `verdict.json` exists. pm wrote the keep-A or switch-B D-row by 2026-11-17.
 9. `make_report.py --phase mvp2` writes the stage reports and `results/real/mvp2/index.html`.
@@ -149,14 +149,14 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Static: sets the run seed, runid, output folder `<root>/<runid>/`, `git_commit`, `git_dirty`, and sha256[:12] of both built libraries.
   - Static: exits nonzero if a built library is missing (no stale hash).
   - Gate: M2 exit 2.
-- [ ] M2-07 → M2: pheromone tuning scripts (D-007)
+- [x] M2-07 → M2: pheromone tuning scripts (D-007)
   - Static: `prereg/pheromone_tuning.md` restates D-007 in the 4 lines of `rules/measurement.md` §1 (metric, threshold, contrast, failure condition).
   - Static: `tools/make_tuning.py --round k` writes 3 `.argos` files (d = 0, defense off, seeds 101 to 103) into `src/experiments/generated/`. With `--run` it runs them into `runs/tuning/` (D-013).
   - Static: round 1 uses start values. Rounds 2 and 3 refuse more than one change from the previous best, or a value outside the D-007 candidates.
   - Static: `tools/tuning_pick.py` reads saved runs only, prints mean `food_collected` per round, picks by D-007 (tie to the earlier round), writes `tuning_pick.json`.
   - Static: runs go one at a time, one core, `timeout 300` each (`tools/run_argos.py`). Seeds 1 to 10 are refused.
   - Gate: M2 exit 7 (main session runs, D-013).
-- [ ] M2-08 → M2: keep-A judgement scripts, seeds 104 to 106 (D-010)
+- [x] M2-08 → M2: keep-A judgement scripts, seeds 104 to 106 (D-010)
   - Static: `prereg/keep_a_judgement.md` restates D-010 in the 4 lines of `rules/measurement.md` §1. It is committed before the runs.
   - Static: `tools/make_judgement.py` writes 6 `.argos` files (arm 1 and arm 2 x seeds 104 to 106) with values from `tuning_pick.json`. With `--run` it runs them into `runs/judgement/`. It exits nonzero if `tuning_pick.json` is missing.
   - Static: `tools/judge_keep_a.py` reads saved runs only. Pass = arm 1 mean ≥ 1.2 x arm 2 mean AND arm 1 > arm 2 on all 3 seeds.
@@ -178,7 +178,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 2. Owner ran the D-011 defense tuning into `runs/defense_tuning/`. `defense_pick.json` exists. pm wrote the freeze D-row before the sweep.
 3. Owner ran `run_sweep.sh`. `check_runs.py runs/sweep` exits 0 on 80 complete runs (G1, by 2026-11-24).
 4. `analyze.py runs/sweep` writes `results/real/g2_recovered_share.png` with 95 % error bars for d = 1, 2, 4, or the "loss not resolved" line (G2, by 2026-11-28).
-5. Owner records the Qt demo at d = 2, defense off and on.
+5. Owner records the Qt demo at d = 2, defense off and on. Frames at later times show a painted trail turning pale again (M2 exit 6 fade part, D-022).
 6. `make_report.py --phase mvp3` writes the stage reports and `results/index.html`.
 
 ### Tactic: attack, then defense, then freeze and sweep (kill: D-010 fails, then pm rewrites M3 for B)
@@ -198,9 +198,9 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Static: rounds 2 and 3 refuse more than one change. `tuning_pick.py --defense` picks by mean `F(2, on)`, tie to the earlier round, writes `defense_pick.json`.
   - Gate: M3 exit 2 (owner runs).
 - [ ] M3-04 → M3: 80-run sweep script (U11)
-  - Static: `make_sweep.py --sweep` writes 80 `.argos` files (d 0, 1, 2, 4 x defense 0, 1 x seeds 1 to 10) into `runs/sweep/` and `run_sweep.sh`.
+  - Static: `tools/make_sweep.py --sweep` writes one `.argos` file per cell not yet done (d 0, 1, 2, 4 x defense 0, 1 x seeds 1 to 10), each with output folder under `runs/sweep/` (D-013).
   - Static: it exits nonzero unless `tuning_pick.json` and `defense_pick.json` exist. All 80 files carry the same frozen values.
-  - Static: `run_sweep.sh` runs one at a time, one core. It skips a run only if its manifest is complete AND has the same cell, `git_commit` and params.
+  - Static: `tools/make_sweep.py --sweep --run` runs them one at a time, one core, `timeout 300` each. It skips a cell only if a manifest is complete AND has the same cell, params and code (same `git_commit`, or no `src/` change since it).
   - Static: README gets a sweep section.
   - Gate: M3 exit 3.
 - [x] M3-05 → M3: analysis and figures from real logs (U12, part 1)
@@ -210,6 +210,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
   - Gate: M3 exit 4.
 - [ ] M3-06 → M3: demo `.argos` files (U12, part 2)
   - Static: `pheromone_qt_d2_def0.argos` and `pheromone_qt_d2_def1.argos` with the frozen values. README demo section.
+  - Gate: at least two frames of one place, earlier and later, show a trail forming and then fading (D-022). Saved under `results/real/mvp3/`.
   - Gate: M3 exit 5.
 - [x] M3-07 → M3: `make_report.py --phase mvp3` and the results page
   - Static: reports for detractor smoke, defense tuning, sweep, check, analyze, demo. Each with 8 fields, one figure, one table.
@@ -221,5 +222,5 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Pro
 
 - ~~Source and decoy centres have no field in DESIGN §4.~~ Resolved: DESIGN §4 `layout` (2026-11-10).
 - DESIGN Table 5 says MVP2 by 2026-11-18. This plan uses 2026-11-17 (D-010 deadline).
-- DESIGN Table 5 gives the MVP2 Qt run to the main session. The owner runs the Qt demo (it needs a display). Headless runs are the main session's (D-013).
+- ~~DESIGN Table 5 gives the MVP2 Qt run to the main session. The owner runs the Qt demo (it needs a display).~~ Resolved: the main session grabs MVP2 Qt frames headless (D-022). Headless runs are the main session's (D-013).
 - ~~DESIGN §3.2 gives no LED color for END_SEARCH.~~ Resolved: DESIGN Table 2a, magenta (2026-11-10).
