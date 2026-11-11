@@ -1,0 +1,29 @@
+{
+  "rule": "D-010: arm 1 mean >= 1.2 x arm 2 mean AND arm 1 > arm 2 on all 3 seeds",
+  "seeds": [
+    104,
+    105,
+    106
+  ],
+  "arm1_food_by_seed": {
+    "104": 94,
+    "105": 79,
+    "106": 83
+  },
+  "arm2_food_by_seed": {
+    "104": 41,
+    "105": 27,
+    "106": 29
+  },
+  "arm1_mean": 85.33333333333333,
+  "arm2_mean": 32.333333333333336,
+  "ratio_threshold": 1.2,
+  "arm1_above_arm2_by_seed": {
+    "104": true,
+    "105": true,
+    "106": true
+  },
+  "pass": true,
+  "criterion_file": "prereg/keep_a_judgement.md",
+  "judge_code_sha256": "b6af80f42842697121416243814468fcf5d157cb9d483d33d27f4e249e5c777e"
+}

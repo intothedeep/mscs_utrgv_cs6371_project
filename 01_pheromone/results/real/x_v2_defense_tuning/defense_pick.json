@@ -1,0 +1,66 @@
+{
+  "rule": "D-011: highest mean F(2, on), d = 2, defense on, seeds 101 to 103; tie to the earlier round",
+  "picked_round": 2,
+  "r_suspect": 0.4,
+  "alpha_cone_deg": 10.0,
+  "d_cone": 1.0,
+  "t_end": 15.0,
+  "rounds": [
+    {
+      "round": 1,
+      "r_suspect": 0.4,
+      "alpha_cone_deg": 15.0,
+      "d_cone": 1.0,
+      "t_end": 15.0,
+      "food_by_seed": {
+        "101": 58,
+        "102": 68,
+        "103": 51
+      },
+      "mean_food": 59.0,
+      "runids": [
+        "20261111-112622_d2_def1_s101",
+        "20261111-112622_d2_def1_s102",
+        "20261111-112622_d2_def1_s103"
+      ]
+    },
+    {
+      "round": 2,
+      "r_suspect": 0.4,
+      "alpha_cone_deg": 10.0,
+      "d_cone": 1.0,
+      "t_end": 15.0,
+      "food_by_seed": {
+        "101": 60,
+        "102": 83,
+        "103": 54
+      },
+      "mean_food": 65.66666666666667,
+      "runids": [
+        "20261111-112626_d2_def1_s101",
+        "20261111-112626_d2_def1_s102",
+        "20261111-112626_d2_def1_s103"
+      ]
+    },
+    {
+      "round": 3,
+      "r_suspect": 0.4,
+      "alpha_cone_deg": 10.0,
+      "d_cone": 0.5,
+      "t_end": 15.0,
+      "food_by_seed": {
+        "101": 60,
+        "102": 66,
+        "103": 52
+      },
+      "mean_food": 59.333333333333336,
+      "runids": [
+        "20261111-112634_d2_def1_s101",
+        "20261111-112634_d2_def1_s102",
+        "20261111-112634_d2_def1_s103"
+      ]
+    }
+  ],
+  "criterion_file": "prereg/defense_tuning.md",
+  "pick_code_sha256": "b555d671946d2f5e358c705126ae4078d39ade1e8e4cb4a51e0293907c338cf9"
+}
