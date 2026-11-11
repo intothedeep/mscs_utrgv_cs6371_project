@@ -69,6 +69,7 @@ void CPheromoneForager::Reset()
     m_bFollowStart = m_bDecoyReach = m_bSuspectAdd = m_bConeAbort = false;
     m_bPeakValid = false;
     m_vecSuspects.clear();
+    m_unLockLeft = 0;
     m_eTurning = NO_TURN;
     m_unTripTicks = 0;
     m_unTauTicks = 0;
@@ -140,6 +141,10 @@ void CPheromoneForager::ControlStepBody()
     case STATE_RETURN_LAY: ReturnLay(); break;
     }
     RequestDeposit();
+    /* Count down after the state ran, and not on the abort tick, so the lock covers the next
+       LockTicks ticks exactly. It never touches the RNG, so t_lock = 0 equals v3. */
+    if (m_unLockLeft > 0 && !m_bConeAbort)
+        --m_unLockLeft;
 }
 
 /****************************************/

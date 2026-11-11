@@ -63,9 +63,13 @@ void CPheromoneForager::Rest()
 
 /* FOLLOW entry: the largest probe beats theta_on and beats here + delta_up.
    A flat ridge therefore never starts a follow. With the defense on, a suspect
-   point ahead in the cone blocks the entry: the abort would fire at once. */
+   point ahead in the cone blocks the entry: the abort would fire at once.
+   v4: for t_lock after a cone abort the entry is closed. Follow() turns the robot 90 degrees,
+   so without the lock the cone is empty and the robot re-enters 0.6 s later. */
 bool CPheromoneForager::TryEnterFollow()
 {
+    if (m_unLockLeft > 0)
+        return false;
     Real fBest = m_sSeen.probe[BestProbe()];
     if (fBest > m_sParams.ThetaOn && fBest > m_sSeen.here + m_sParams.DeltaUp && !IsConeHit())
     {
@@ -91,6 +95,7 @@ void CPheromoneForager::Follow()
     if (IsConeHit())
     {
         m_bConeAbort = true;
+        m_unLockLeft = m_sParams.LockTicks;
         Enter(STATE_SEARCH);
         const Real fSide = m_pcRNG->Bernoulli(0.5f) ? 1.0f : -1.0f;
         m_cWanderYaw = (m_cYaw + CRadians::PI_OVER_TWO * fSide).SignedNormalize();

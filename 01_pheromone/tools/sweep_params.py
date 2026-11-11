@@ -6,7 +6,7 @@ controller attributes as controller_<node>_<attribute> (run_info_reader.cpp).
 """
 from __future__ import annotations
 
-__all__ = ["Override", "PARAM_SITES", "overrides", "manifest_key"]
+__all__ = ["Override", "PARAM_SITES", "overrides", "manifest_key", "parse_seeds"]
 
 Override = tuple[str, str, str]  # (element path from <argos-configuration>, attribute, value)
 
@@ -21,6 +21,7 @@ PARAM_SITES: dict[str, tuple[str, str]] = {
     "alpha_cone_deg": (f"{_CTRL}/defense", "alpha_cone_deg"),
     "d_cone": (f"{_CTRL}/defense", "d_cone"),
     "enabled": (f"{_CTRL}/defense", "enabled"),
+    "t_lock": (f"{_CTRL}/defense", "t_lock"),  # v4 lockout seconds (D-028)
 }
 
 
@@ -35,3 +36,14 @@ def manifest_key(name: str) -> str:
     return attr if path == _LF else f"controller_{path.rsplit('/', 1)[1]}_{attr}"
 
 
+
+
+def parse_seeds(text: str) -> tuple[int, ...]:
+    """'a-b' -> seeds a to b inclusive. D-030: the seed range is a CLI option, not a schema column."""
+    try:
+        first, last = (int(v) for v in text.split("-"))
+    except ValueError:
+        raise ValueError("use a-b, for example 11-30")
+    if first < 1 or last < first:
+        raise ValueError("seeds need 1 <= a <= b")
+    return tuple(range(first, last + 1))

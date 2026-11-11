@@ -9,7 +9,7 @@ from dataclasses import dataclass
 
 import numpy as np
 
-__all__ = ["G2Row", "g2_rows", "N_BOOT", "BOOT_SEED"]
+__all__ = ["G2Row", "g2_rows", "paired_diff_interval", "N_BOOT", "BOOT_SEED"]
 
 N_BOOT = 10_000     # resamples of the seed index (DESIGN 4.2)
 BOOT_SEED = 20261128  # fixed, so the same logs give the same intervals
@@ -85,3 +85,15 @@ def g2_rows(food: Food, detractor_counts: tuple[int, ...]) -> list[G2Row]:
         base, off, on = (np.array([c[s] for s in seeds], dtype=float) for c in cells)
         rows.append(_row(d, base, off, on, rng))
     return rows
+
+
+def paired_diff_interval(a: np.ndarray, b: np.ndarray) -> tuple[float, float, float]:
+    """Mean of a - b and its 95 % paired percentile bootstrap interval (same N_BOOT, BOOT_SEED).
+
+    a and b hold one value per common seed, in the same seed order. The attribution contrast
+    of defense v2 (picked t_lock against 0) uses it, so every interval here is made one way.
+    """
+    rng = np.random.default_rng(BOOT_SEED)
+    idx = rng.integers(0, len(a), size=(N_BOOT, len(a)))
+    lo, hi = _interval((a - b)[idx].mean(axis=1))
+    return float((a - b).mean()), lo, hi

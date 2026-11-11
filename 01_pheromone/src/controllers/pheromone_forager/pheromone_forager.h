@@ -114,6 +114,7 @@ private:
         bool DefenseEnabled;
         Real RMerge, RSuspect, DCone;
         UInt32 NMem;
+        UInt32 LockTicks; /* v4: FOLLOW lockout after a cone abort, 0 = v3 */
         CRadians AlphaCone;
         /* Nest by position (D-008) */
         Real NestEdgeX;
@@ -188,6 +189,7 @@ private:
         UInt32 Count;
     };
     std::vector<SSuspect> m_vecSuspects; /* private memory, never shared (no communication) */
+    UInt32 m_unLockLeft;    /* ticks left of the FOLLOW lockout, 0 = open (v4) */
     UInt32 m_unFlatTicks;   /* consecutive ticks with every probe <= here */
     UInt32 m_unLowTicks;    /* consecutive ticks with every probe < theta_off */
     Real m_fHereEntry;

@@ -41,6 +41,7 @@ def write_demo(defense: int, values: dict[str, float]) -> Path:
     set_attr(tree, "loop_functions/pheromone", "defense", str(defense))
     set_attr(tree, "controllers/pheromone_forager_controller/params/defense", "enabled",
              "true" if defense else "false")
+    set_attr(tree, "controllers/pheromone_forager_controller/params/defense", "t_lock", "0")  # demo = v3 behaviour
     for path, name, value in overrides(**values):
         set_attr(tree, path, name, value)
     add_detractors(tree, DEMO_D)

@@ -1,6 +1,6 @@
 """Analysis (U3, DESIGN 4.2): recovered loss share R(d) from a runs root.
 
-Usage: analyze.py <root> [--out DIR]
+Usage: analyze.py <root> [--out DIR] [--seeds a-b]   (default seeds 1-10)
 Also writes food_by_cell, wasted_by_cell charts and events_by_cell.csv (cell_report.py).
 Reads manifests (metrics equal the last ticks row, check_runs.py enforces that), and events.csv for the cell counts.
 Stops when the root mixes mock and real runs. Mock output goes to results/mock/,
@@ -25,6 +25,7 @@ import matplotlib.pyplot as plt  # noqa: E402
 import schema as S  # noqa: E402
 from cell_report import NOTES, write_cell_outputs  # noqa: E402
 from g2_stats import G2Row, g2_rows  # noqa: E402
+from sweep_params import parse_seeds  # noqa: E402
 
 __all__ = ["load_runs", "select_cells", "SUMMARY_COLUMNS", "SUMMARY_FILE", "STATS_FILE", "LOG_FILE"]
 
@@ -51,12 +52,13 @@ def check_out_side(out: Path, mock: bool) -> None:
         raise SystemExit(f"stop: {S.COL_MOCK}={int(mock)} output may not go under results/{wrong}/")
 
 
-def select_cells(runs: list[dict]) -> dict:
-    """Cell check: one complete run per cell. A duplicate keeps the latest complete run."""
+def select_cells(runs: list[dict], seeds: tuple[int, ...] = S.SEEDS) -> dict:
+    """Cell check: one complete run per cell. A duplicate keeps the latest complete run.
+    seeds: the expected seed set. Default 1-10 (G1); defense v2 passes 11-30 (D-030)."""
     by_cell: dict[tuple, list[dict]] = defaultdict(list)
     ignored = []
     for r in runs:
-        if r["d"] in S.DETRACTOR_COUNTS and r["defense"] in S.DEFENSES and r["seed"] in S.SEEDS:
+        if r["d"] in S.DETRACTOR_COUNTS and r["defense"] in S.DEFENSES and r["seed"] in seeds:
             by_cell[(r["d"], r["defense"], r["seed"])].append(r)
         else:
             ignored.append(r["runid"])
@@ -68,7 +70,7 @@ def select_cells(runs: list[dict]) -> dict:
         if done:
             chosen[key] = done[-1]
             duplicates += [r["runid"] for r in done[:-1]]
-    expected = [(d, f, s) for d in S.DETRACTOR_COUNTS for f in S.DEFENSES for s in S.SEEDS]
+    expected = [(d, f, s) for d in S.DETRACTOR_COUNTS for f in S.DEFENSES for s in seeds]
     return {"chosen": chosen, "expected": expected,
             "missing": [k for k in expected if k not in chosen],
             "duplicates": duplicates, "incomplete": incomplete, "ignored": ignored}
@@ -176,6 +178,8 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     ap.add_argument("root", type=Path)
     ap.add_argument("--out", type=Path, help="default: results/mock or results/real by the flag")
+    ap.add_argument("--seeds", type=parse_seeds, default=S.SEEDS, metavar="a-b",
+                    help="expected seed range, default 1-10. Defense v2 confirmation: 11-30")
     args = ap.parse_args(argv)
     if not args.root.is_dir():
         raise SystemExit(f"stop: {args.root} is not a folder")
@@ -186,7 +190,7 @@ def main(argv: list[str]) -> int:
     out = args.out or PROJECT / "results" / ("mock" if mock else "real")
     check_out_side(out, mock)
     out.mkdir(parents=True, exist_ok=True)
-    cells = select_cells(runs)
+    cells = select_cells(runs, args.seeds)
     rows = g2_rows(food_by_cell(cells["chosen"]), S.DETRACTOR_COUNTS)
     write_summary(out / SUMMARY_FILE, runs)
     write_stats(out / STATS_FILE, rows)

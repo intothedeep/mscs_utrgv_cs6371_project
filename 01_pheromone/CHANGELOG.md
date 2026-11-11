@@ -8,6 +8,9 @@ Raise it by hand with a row here (`rules/measurement.md` 2.1, 2.2).
 | v1 | 2026-11-11 | First real pipeline: honest forager, pheromone grid, food field, run logger. No detractors, no defense | none before it |
 | v2 | 2026-11-11 | M3: detractor states (GO_DECOY, WAIT_DECOY, RETURN_LAY), defense rule (suspect list, mask, cone), events `decoy_reach`, `suspect_add`, `cone_abort`, `suspects_total`. New controller params `decoy_reach_m`, `t_wait`, `probe_radius_m`, `<defense>` | Runs with `code_version` v1 (smoke, tuning, judgement). Their d = 0, defense off path is meant to be unchanged |
 | v3 | 2026-11-11 | M2 gate fixes: layout redraw when no decoy spot fits (D-019), decoy-to-decoy gap 1.0 m (D-020), valid peak needs `here` at least 2 x max(`here_entry`, `theta_on`) (D-021), no deposit in cells whose centre is inside the nest (I-7), `Reset()` closes the run log (I-14) | Every run with `code_version` v1 or v2. Layouts of seeds that broke the new gap change, and deposits near the nest change, so v3 results are not comparable with v1 or v2 results. The D-018 defense freeze and sweep runs made under v2 need a decision |
+| v4 | 2026-11-11 | Defense v2 (D-028): FOLLOW-entry lockout `t_lock` seconds after a `cone_abort`, controller param `<defense t_lock>`, default 0. No new event or column | none by itself. With `t_lock` = 0 v4 must equal v3 (invariance check below). v3 runs in `runs/sweep` stay valid for the G2 answer (D-026) |
+
+Invariance for v4 (to be done before any v2 run): re-run `d2_def1_s1` and `d0_def0_s1` of `runs/sweep` with `t_lock` = 0. `food_collected` must equal the saved v3 value. The lock adds no random draw, so the RNG order is the same.
 
 Invariance check for v2 (to be done at the M3 gate, not yet done):
 

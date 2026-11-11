@@ -64,6 +64,10 @@ void CPheromoneForager::SParams::Init(TConfigurationNode &t_params, Real f_tps)
     GetNodeAttribute(tDef, "alpha_cone_deg", cAngle);
     AlphaCone = ToRadians(cAngle);
     GetNodeAttribute(tDef, "d_cone", DCone);
+    /* v4 lockout (D-028). Optional, so a v3 file without it still loads. 0 = v3 behaviour. */
+    Real fLockSeconds = 0.0f;
+    GetNodeAttributeOrDefault(tDef, "t_lock", fLockSeconds, fLockSeconds);
+    LockTicks = static_cast<UInt32>(fLockSeconds * f_tps + 0.5f);
 
     TConfigurationNode &tNest = GetNode(t_params, "nest");
     Real fX, fY;

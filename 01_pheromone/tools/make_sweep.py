@@ -2,7 +2,10 @@
 
 Usage:
   make_sweep.py --cell d,defense,seed --root <runs root>     one file, template values
-  make_sweep.py --sweep [--run]                              80 runs into runs/sweep/, frozen values
+  make_sweep.py --sweep [--run] [--seeds a-b] [--root R] [--t-lock T]
+                                                             8 cells x seeds (default 1-10, 80 runs)
+                                                             into runs/sweep/, frozen values
+  --cell also takes --t-lock (defense v2 lockout, seconds).
 Files go to src/experiments/generated/<runid>.argos. Run one from src/:
     argos3 -c experiments/generated/<runid>.argos
 It sets the seed, the cell, the run folder and the stamps (git commit, library hashes).
@@ -22,7 +25,7 @@ from pathlib import Path
 
 import schema as S
 from run_results import PROJECT, sha256_hex
-from sweep_params import Override
+from sweep_params import Override, overrides, parse_seeds
 
 __all__ = ["build_argos", "add_detractors", "GENERATED", "SRC", "git_stamp", "load_template", "set_attr"]
 
@@ -139,16 +142,20 @@ def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     mode = ap.add_mutually_exclusive_group(required=True)
     mode.add_argument("--cell", type=parse_cell, help="d,defense,seed")
-    mode.add_argument("--sweep", action="store_true", help="the 80 runs of G1 into runs/sweep/")
-    ap.add_argument("--root", type=Path, help="runs root for --cell, for example runs/smoke")
+    mode.add_argument("--sweep", action="store_true", help="8 cells x seeds into runs/sweep/ (80 runs for 1-10)")
+    ap.add_argument("--root", type=Path, help="runs root: needed for --cell, default runs/sweep for --sweep")
     ap.add_argument("--run", action="store_true", help="with --sweep: also run the new files")
+    ap.add_argument("--seeds", type=parse_seeds, default=S.SEEDS, metavar="a-b",
+                    help="with --sweep: seed range, default 1-10")
+    ap.add_argument("--t-lock", type=float, help="defense v2 lockout seconds. Default: template value (0)")
     args = ap.parse_args(argv)
     if args.sweep:
-        from sweep_plan import run_sweep  # late import: sweep_plan uses build_argos from here
-        return run_sweep(args.run)
+        from sweep_plan import ROOT, run_sweep  # late import: sweep_plan uses build_argos from here
+        return run_sweep(args.run, args.root or ROOT, args.seeds, args.t_lock)
     if args.root is None:
         ap.error("--cell needs --root")
-    runid, out = build_argos(*args.cell, args.root)
+    set_lock = overrides(t_lock=args.t_lock) if args.t_lock is not None else ()
+    runid, out = build_argos(*args.cell, args.root, set_lock)
     print(f"runid={runid}\nargos_file={out}\nrun_folder={args.root.resolve() / runid}")
     print(f"command: cd {SRC} && argos3 -c experiments/generated/{out.name}")
     return 0
