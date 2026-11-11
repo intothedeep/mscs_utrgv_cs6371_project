@@ -41,7 +41,8 @@
 
 ## 8. M5: confirm-twice (PASS)
 - k2t10: no-attack cost 0.125 [−0.975, 1.15], gain at 2 detractors 2.75 [0.40, 4.975].
-- Trade-off: k = 2 lowers the gain from 5.05 (k1t10) to 2.75. Lockout effect is not resolved at d = 0 and d = 2.
+- Confirm-count effect is resolved both ways: removes the cost at d = 0 (+3.0625 [1.5375, 4.625]), lowers the gain at d = 2 (−2.7875 [−4.475, −1.1625]).
+- Lockout effect includes 0 at d = 0 and d = 2. D-057 corrects D-051 on this.
 - Figure: `real/final/fig_cost_vs_gain.png`
 
 ## 9. M6: the identifier arm differs
@@ -56,11 +57,13 @@
 
 ## 11. M7: v5 scales worse
 - Gain per robot falls from 0.273 to 0.0275. Difference −0.246 [−0.411, −0.085]. v3 not resolved.
-- Not congestion: food ratio 0.6117, above the 0.5 line. Root cause: pending (`real/scale/root_cause.md`).
+- Not congestion: food ratio 0.6117, above the 0.5 line.
+- Root cause (D-056): private confirmation does not scale with density. cover_time 0.244 to 0.126, decoy peaks per robot per decoy 3.55 to 1.98. Causes (a) supported, (b) (c) (e) (f) not supported, (d) partial.
+- Limit: v5 drop minus v3 drop in food is −0.100 [−0.230, 0.032], not resolved.
 - Figure: `real/final/fig_scale.png`
 
 ## 12. Limits, future work, takeaways
 - Limits: crowding (R10), decoy cap (D-009), adapted not replicated, quarantine paper and detection paper unread.
-- Future work: dynamic food, a learned suspect test, quarantine regions, shared confirmation without identifiers (proposal).
+- Future work: dynamic food, a learned suspect test, quarantine regions, shared confirmation through local stigmergy (`root_cause.md` §7 option A, untested).
 - Take-away: more information buys more food and costs more trust.
 - Figure: none (text slide).

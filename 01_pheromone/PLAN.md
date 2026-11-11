@@ -11,18 +11,18 @@
 - Constraints: no local training. The main session builds and runs every run locally, one core, sequential (D-002, D-013, D-031, D-044). Agents never build, run or commit.
 - G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (measure: logged runs out of 80 = 4 detractor counts x 2 defense states x 10 seeds). (Fable, owner-delegated, 2026-11-10, D-004)
 - G2: By 2026-11-28, report recovered loss share for 3 of 3 nonzero detractor counts (1, 2, 4) with 10-seed error bars. (Fable, owner-delegated, 2026-11-10, D-004)
-- G3: By 2026-11-28, 3 of 3 run tracks (T-A, T-B, T-D) have a committed `verdict.json`, plus a root-cause memo for each fail. (Fable, owner-delegated, 2026-11-11, D-036)
-- Goals (question-type): [RQ.md](./RQ.md): 3 open (D-037)
+- G3: By 2026-11-28, 3 of 3 run tracks (T-A, T-B, T-D) have a committed `verdict.json`, plus a root-cause memo for each fail. (Fable, owner-delegated, 2026-11-11, D-036). Met 2026-11-12: 3 of 3 run tracks have a `verdict.json`. Every fail or scales-worse has a root-cause memo (D-055, D-056)
+- Goals (question-type): [RQ.md](./RQ.md): 0 open, 3 answered (2026-11-12), 1 proposed (D-037)
 - S1 → G1, G2: A, floor grid with a virtual sensor (picked: A of A/B/C, Fable owner-delegated 2026-11-10, D-006). Listed alternatives: B (fallback, only if the D-010 judgement fails), C (stretch after G2 only).
 - S2 → G3, RQ1 to RQ3: run tracks in order, step 0, T-A, T-B, T-D, then T-E and T-F. Each track pre-registered on its own fresh seed block (Fable, owner-delegated, 2026-11-11, D-038, D-043). Listed alternatives: T-B first, T-D first. T-C not run (D-041).
 - M1 → S1: MVP1 shape, mock end-to-end, by 2026-11-13. Exit: TASKS.md "M1 exit". cycle 1/2; recovery 0/2. Review 1 ISSUE, fixes closed, gates re-run PASS (`results/reviews/M1_gate.md` Resolution). Closed
 - M2 → S1: MVP2 real slice, 0 detractors, plus the D-010 keep-A judgement, by 2026-11-17. Exit: TASKS.md "M2 exit". cycle 1/2; recovery 0/2. Review 1 ISSUE (`results/reviews/M2_gate.md`). Fixes applied (D-020 to D-025). No re-review yet; M3-08 checks I-1 and I-2
 - M3 → S1: MVP3 detractors, defense, 80-run sweep, figures from real logs. Sweep by 2026-11-24, report by 2026-11-28. Exit: TASKS.md "M3 exit". cycle 0/2; recovery 0/2. Sweep done on v3 (D-025). G1 met (80 of 80 runs). G2 measured (D-026). Gate review open (M3-08)
 - M4 → S1 → Vision: defense v2 lockout, one added arm (D-027, D-032), by 2026-11-21. Exit: `results/real/v2/verdict.json` exists, pass or fail (TASKS.md "M4 exit"). cycle 0/2; recovery 0/2. Verdict FAIL (D-033). Open: M4-06 report section, M4-07 gate
-- M5 → S2 → RQ1: T-A, defense v5 confirm-twice x lockout, by 2026-11-17. Exit: `results/real/v5/verdict.json` on seeds 221 to 260, pass or fail, plus a root-cause memo on fail (TASKS.md "M5 exit"). cycle 0/2; recovery 0/2
-- M6 → S2 → RQ2: T-B, ID-based adapted arm, by 2026-11-22. Exit: `results/real/id_arm/verdict.json` on seeds 321 to 360, plus a root-cause memo on fail (TASKS.md "M6 exit"). Kill: no gate-ready code by 2026-11-21. cycle 0/2; recovery 0/2
-- M7 → S2 → RQ3: T-D, 20 vs 40 honest robots, by 2026-11-24. Exit: `results/real/scale/verdict.json` on seeds 401 to 430, plus a root-cause memo on fail (TASKS.md "M7 exit"). Kill: M5 or M6 past 2026-11-22, then v3 and off only. cycle 0/2; recovery 0/2
-- M8 → S2 → Vision, G3: T-E table and T-F final report, 2026-11-24 to 2026-11-28. Exit: T-E table, report with one comparison chart and one failure section per failed verdict, G3 check (TASKS.md "M8 exit"). cycle 0/2; recovery 0/2
+- M5 → S2 → RQ1: T-A, defense v5 confirm-twice x lockout, by 2026-11-17. Exit: `results/real/v5/verdict.json` on seeds 221 to 260, pass or fail, plus a root-cause memo on fail (TASKS.md "M5 exit"). cycle 0/2; recovery 0/2. Verdict PASS for k2t10 (D-051, D-057). 8 of 10 done. Open: M5-09 "not required" line, M5-10 gate
+- M6 → S2 → RQ2: T-B, ID-based adapted arm, by 2026-11-22. Exit: `results/real/id_arm/verdict.json` on seeds 321 to 360, plus a root-cause memo on fail (TASKS.md "M6 exit"). Kill: no gate-ready code by 2026-11-21. cycle 0/2; recovery 0/2. Verdict "differs" (D-054). 7 of 9 done. Open: M6-08 "not required" line, M6-09 gate
+- M7 → S2 → RQ3: T-D, 20 vs 40 honest robots, by 2026-11-24. Exit: `results/real/scale/verdict.json` on seeds 401 to 430, plus a root-cause memo on fail (TASKS.md "M7 exit"). Kill: M5 or M6 past 2026-11-22, then v3 and off only. cycle 0/2; recovery 0/2. Verdict: v5 scales worse (D-055), root-cause memo done (D-056). 4 of 5 done. Open: M7-05 gate
+- M8 → S2 → Vision, G3: T-E table and T-F final report, 2026-11-24 to 2026-11-28. Exit: T-E table, report with one comparison chart and one failure section per failed verdict, G3 check (TASKS.md "M8 exit"). cycle 0/2; recovery 0/2. M8-01 and M8-03 done, G3 check met. M8-02 in progress, M8-04 open
 
 Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Questions: [RQ.md](./RQ.md). Progress: [STATUS.md](./STATUS.md). Track spec: `decisions/2026-11-11_fable_tracks.md`.
 
@@ -67,8 +67,8 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Que
 
 ### Task list: split out (2026-11-11)
 
-> Current state: M1 to M3 tasks done, M3 gate review open (M3-08). M4 verdict FAIL (D-033), M4-06 and M4-07 open. M5 to M8: 28 open. Total 31 open, 0 in progress. <!-- see TASKS.md -->
-> Gating fact: M5-01 (step-0 kill check) runs before any v5 code.
+> Current state (2026-11-12): M1 to M3 tasks done, M3 gate review open (M3-08). M4 verdict FAIL (D-033), M4-06 and M4-07 open. M5 to M7 verdicts exist (D-051, D-054, D-055). Open: M5-09, M5-10, M6-08, M6-09, M7-05, M8-04. Total 9 open, 1 in progress (M8-02). <!-- see TASKS.md -->
+> Gating fact: M8-04 project-end review waits for M8-02 and the M3 to M7 gate reviews.
 > Detail: [TASKS.md](./TASKS.md)
 
 ## Open items for the architect

@@ -250,13 +250,13 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M5 = T-A". Runner: main session, l
 
 ### Tactic: measure the cause, then one pre-registered 2 x 2 (kill: M5-01 predicts above 7.2 active wrong points per run at d = 0, then switch to A')
 
-- [ ] M5-01 → M5 → RQ1: step-0 kill check (data-analyst)
+- [x] M5-01 → M5 → RQ1: step-0 kill check (data-analyst). Done: go v5, D-046. Output path set by the tool: `results/real/v5_killcheck.md` (M5 exit 1 path), not `v5/step0_kill.md`
   - Static: reads saved defense-off logs, seeds 11 to 30, only. No run.
   - Static: writes per source at d = 0 the same-robot repeat failures. Writes per decoy at d = 2 the time to the second failure.
   - Static: writes the predicted active wrong points per run at d = 0 under k = 2.
   - Static: compares it with 7.2 (half of 14.45, source file "Kill before code"). Above 7.2: "switch to A'" (a pickup within `r_merge` clears a pending point).
   - Static: output `results/real/v5/step0_kill.md`, every number read from a saved file.
-- [ ] M5-02 → M5: v5 design (system-architect)
+- [x] M5-02 → M5: v5 design (system-architect). Done: `DESIGN_M5.md`, D-047
   - Static: a design section names k (fixed 2) and `t_lock` (0 or 10 s), or A' if M5-01 says switch.
   - Static: it states the schema impact. A needed schema change sends the slice back to M1 (DESIGN §5).
   - Static: it names the 5 arms: off, and (k 1 or 2) x (`t_lock` 0 or 10).
@@ -271,19 +271,20 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M5 = T-A". Runner: main session, l
   - Static: threshold G(2) lower bound > 0. Failure: G(2) interval includes 0, or the d = 0 cost upper bound < 0.
   - Static: contrast: 2 x 2 plus off, d = 0, 1, 2, 4. Both main effects reported at d = 0 and d = 2.
   - Gate: the git commit of the prereg is older than the first M5 run (M5-06).
-- [ ] M5-05 → M5: invariance, v5 with k = 1 (main session run)
+- [x] M5-05 → M5: invariance, v5 with k = 1 (main session run). Done: 2 cells in `runs/invariance_v5/` (ignored root), STATUS 2026-11-11
   - Gate: 2 saved v4 cells rerun on v5 with k = 1 give equal `food_collected`. A mismatch stops M5 and goes to `recover`.
-- [ ] M5-06 → M5: mechanism check, seeds 201 to 210 (main session run, tool reads saved runs)
+- [x] M5-06 → M5: mechanism check, seeds 201 to 210 (main session run, tool reads saved runs). Done: `results/real/v5/mechanism.md`, `mechanism.csv`
   - Gate: cells (d 0, on) and (d 2, on) on v5. A table of `sus_cls_src`, `sus_cls_dec` per run is saved under `results/real/v5/`.
   - Static: the table is reported only. No value is picked from it.
-- [ ] M5-07 → M5: confirm runs, seeds 221 to 260 (main session run)
+- [x] M5-07 → M5: confirm runs, seeds 221 to 260 (main session run). Done: `results/real/v5/check_confirm.txt` (800 runs, 0 failed)
   - Gate: 5 arms x d 0, 1, 2, 4 x 40 seeds = 800 runs. `check_runs.py` exits 0 on the root. M5 exit 4.
-- [ ] M5-08 → M5 → RQ1: verdict (main session runs the judge)
+- [x] M5-08 → M5 → RQ1: verdict (main session runs the judge). Done: PASS for k2t10, `results/real/v5/verdict.json`, D-051, D-057
   - Gate: `results/real/v5/verdict.json` holds per-seed values, intervals, both main effects, pass, prereg path, judge sha256 (`rules/measurement.md` §4.1).
   - Gate: pm writes the verdict D-row. Pass or fail closes the task.
 - [ ] M5-09 → M5 → RQ1: root cause (data-analyst; required on fail)
   - Static: `tools/failure_analysis.py` (or its extension) runs on the M5 roots. A memo `results/real/v5/root_cause.md` names the cause with saved-file paths.
   - Static: on pass, the memo states "not required" in one line.
+  - Open: verdict PASS (D-051). `results/real/v5/root_cause.md` with the one line does not exist yet.
 - [ ] M5-10 → M5: M5 gate review (reviewer)
   - Gate: reviewer checks M5 exit 1 to 6 and writes `results/reviews/M5_gate.md`.
 
@@ -301,33 +302,34 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M6 = T-B". Name: "adapted arm", ne
 
 ### Tactic: shared trail store, DBSCAN, creator-ID graph (kill: above)
 
-- [ ] M6-01 → M6 → RQ2: TAROS defense re-read (researcher)
+- [x] M6-01 → M6 → RQ2: TAROS defense re-read (researcher). Done: written as `research/taros_defense_spec.md`, not `taros_defense.md`
   - Static: reads the TAROS 2024 defense section only. Writes `research/taros_defense.md`.
   - Static: lists each mechanism step with page numbers: clustering, creator-ID graph, travel-time check, strike count, reintegration.
   - Static: marks each step "kept", "adapted to grid" or "dropped", with one reason.
-- [ ] M6-02 → M6: ID arm design (system-architect)
+- [x] M6-02 → M6: ID arm design (system-architect). Done: `DESIGN_M6.md`, D-048, D-049
   - Static: shared trail store in the loop functions. DBSCAN on trail ends, minPts 2, eps frozen before runs (D-045).
   - Static: creator-ID graph, travel-time check, 5 strikes isolate a creator, reintegration on a late pickup.
   - Static: isolation log as a sidecar file per run. `schema.py` unchanged.
-- [ ] M6-03 → M6: ID arm code (developer)
+- [x] M6-03 → M6: ID arm code (developer). Done: `CHANGELOG.md` v6 row, v6 invariance in `runs/invariance_v6/`
   - Static: `CHANGELOG.md` has a row for the ID arm. The arm is a `<defense>` mode. The sidecar file is written per run.
   - Static: grep `schema.py`: unchanged.
   - Static: run tools accept only seeds 301 to 310 and 321 to 360 for this arm. They exit nonzero if the M6 prereg has no git commit.
-- [ ] M6-04 → M6 → RQ2: prereg (developer writes, main session commits)
+- [x] M6-04 → M6 → RQ2: prereg (developer writes, main session commits). Done: written as `prereg/defense_id_arm.md`
   - Static: `prereg/id_arm.md` holds the 4 lines of `rules/measurement.md` §1 from the source "M6 = T-B".
   - Static: it names the best no-ID arm, read from the M5 verdict, before the first M6 run. Metric delta = F(2, ID arm) − F(2, best no-ID arm).
   - Static: threshold: interval excludes 0 = "differs", else "not resolved". No win line.
   - Static: failure: fewer than 1 of 2 detractors isolated by run end in most seeds = "adapted arm did not function".
   - Static: eps value is written in the prereg.
-- [ ] M6-05 → M6: arm check, seeds 301 to 310 (main session run)
+- [x] M6-05 → M6: arm check, seeds 301 to 310 (main session run). Done: `results/real/id_arm/arm_check.csv`
   - Gate: d = 2, ID arm. A table of detractors isolated per run, from the sidecar files, is saved under `results/real/id_arm/`.
-- [ ] M6-06 → M6: confirm runs, seeds 321 to 360 (main session run)
+- [x] M6-06 → M6: confirm runs, seeds 321 to 360 (main session run). Done: 800 runs, 5 arms with k1t10 added (D-052), `results/real/id_arm/check_*.txt` 0 failed, `isolation.csv`
   - Gate: off, v3, v5, ID arm x d 0, 1, 2, 4 x 40 seeds = 640 runs. `check_runs.py` exits 0. Honest robots isolated per run are tabled.
-- [ ] M6-07 → M6 → RQ2: verdict (main session runs the judge)
+- [x] M6-07 → M6 → RQ2: verdict (main session runs the judge). Done: "differs", `results/real/id_arm/verdict.json`, D-054
   - Gate: `results/real/id_arm/verdict.json` holds delta per seed, interval, the word ("differs", "not resolved" or "did not function"), prereg path, judge sha256.
   - Gate: pm writes the verdict D-row.
 - [ ] M6-08 → M6 → RQ2: root cause (data-analyst; required on fail)
   - Static: `results/real/id_arm/root_cause.md` names the cause with saved-file paths. On pass, one line "not required".
+  - Open: verdict "differs" (D-054), not a fail. `results/real/id_arm/root_cause.md` with the one line does not exist yet.
 - [ ] M6-09 → M6: M6 gate review (reviewer)
   - Gate: reviewer checks M6 exit 1 to 4 and writes `results/reviews/M6_gate.md`.
 
@@ -344,17 +346,17 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M7 = T-D". No new defense code. Fr
 
 ### Tactic: one density step, same arena (kill: above)
 
-- [ ] M7-01 → M7 → RQ3: prereg and the N option (developer; main session commits the prereg)
+- [x] M7-01 → M7 → RQ3: prereg and the N option (developer; main session commits the prereg). Done: `prereg/scale.md`, best arm k2t10 (D-053)
   - Static: `prereg/scale.md` holds the 4 lines of `rules/measurement.md` §1 from the source "M7 = T-D".
   - Static: metric G/N at 10 % detractors (d = 2 at N = 20, d = 4 at N = 40), seeds 401 to 430. Threshold: the N=40 minus N=20 interval excludes 0.
   - Static: failure: F(0, off) per robot at N = 40 below half of N = 20 = "confounded by congestion". "Best arm" is named from the M5 and M6 verdicts.
   - Static: `make_sweep.py` takes the honest robot count as an option. Controller and defense code unchanged (git diff on `src/controllers/` empty).
-- [ ] M7-02 → M7: runs, seeds 401 to 430 (main session run)
+- [x] M7-02 → M7: runs, seeds 401 to 430 (main session run). Done: 360 runs, `results/real/scale/check_*.txt` 0 failed
   - Gate: N 20, 40 x d 0, 10 % x off, v3, best arm x 30 seeds = 360 runs. `check_runs.py` exits 0.
-- [ ] M7-03 → M7 → RQ3: verdict (main session runs the judge)
+- [x] M7-03 → M7 → RQ3: verdict (main session runs the judge). Done: v5 scales worse, v3 not resolved, `results/real/scale/verdict.json`, D-055
   - Gate: `results/real/scale/verdict.json` holds G/N per seed, the difference interval, the congestion check, wrong source suspects per robot, prereg path, judge sha256.
   - Gate: pm writes the verdict D-row.
-- [ ] M7-04 → M7 → RQ3: root cause (data-analyst; required on fail)
+- [x] M7-04 → M7 → RQ3: root cause (data-analyst; required on fail). Done: private confirmation, `results/real/scale/root_cause.md`, D-056
   - Static: `results/real/scale/root_cause.md` names the cause with saved-file paths. On pass, one line "not required".
 - [ ] M7-05 → M7: M7 gate review (reviewer)
   - Gate: reviewer checks M7 exit 1 to 3 and writes `results/reviews/M7_gate.md`.
@@ -367,21 +369,21 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M8 = T-E + T-F". No runs. Headline
 
 1. The T-E table file exists with 7 rows and 5 columns (M8-01).
 2. The final report HTML opens with one comparison chart and has one failure section per failed verdict (M8-02).
-3. G3 check: 3 of 3 run tracks (M5, M6, M7) have a committed `verdict.json`, and each fail has a root-cause memo.
+3. G3 check: 3 of 3 run tracks (M5, M6, M7) have a committed `verdict.json`, and each fail has a root-cause memo. Met 2026-11-12: 3 of 3 verdict files exist. The one scales-worse (M7) has `results/real/scale/root_cause.md` (D-056).
 4. The slides outline exists (M8-03).
 
 ### Tactic: one table, one chart, one page
 
-- [ ] M8-01 → M8: T-E comparison table (researcher; no runs)
+- [x] M8-01 → M8: T-E comparison table (researcher; no runs). Done: written as `research/cost_of_trust.md` Table 1, not `results/real/te_table.md`. 8 rows (adds k1t10)
   - Static: `results/real/te_table.md`. Rows: blockchain, TAROS, ICCCR, cautionary pheromone, v3, v5, ID arm.
   - Static: columns: messages, IDs, shared store, per-robot memory, measured d = 0 cost (ours only, read from verdict files).
   - Static: ICCCR (T-C, D-041) is a row only. Cells without a source say "not reported".
-- [ ] M8-02 → M8 → Vision: final report HTML (developer for the script, main session runs it)
+- [~] M8-02 → M8 → Vision: final report HTML (developer for the script, main session runs it). In final edit
   - Static: one comparison chart: no-ID arms beside the ID arm (Vision, D-035). Every number read from saved verdict and stats files.
   - Static: one failure section per failed verdict, linking its root-cause memo. Includes the M4 section (M4-06).
   - Static: future work: dynamic food, a learned suspect test, quarantine regions.
   - Static: uses `skills/html-theme/theme.css`. Rendered once in headless Chrome per `rules/answering.md` §3.
-- [ ] M8-03 → M8: slides outline (sonnet-writer, from M8-02)
+- [x] M8-03 → M8: slides outline (sonnet-writer, from M8-02). Done: `results/slides_outline.md`
   - Static: `results/slides_outline.md`, one line per slide, each slide names its source figure or table.
 - [ ] M8-04 → M8: project-end review (reviewer, system-architect, data-analyst)
   - Gate: final verdict and open items list, per `.claude/CLAUDE.md` Workflow step 4 "Project end".

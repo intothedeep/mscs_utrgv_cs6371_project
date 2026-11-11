@@ -32,7 +32,7 @@ svg line, svg path { stroke: var(--foreground); fill: none; }
 <p><b>Research question 2: The two defenses differ. The identifier-based adapted arm beats the best defense without identifiers (arm k1t10) at 2 detractors by 4.375 [2.25, 6.45] food items per run. It pays by isolating honest robots: 9.05 per run when no attacker is present.</b> Seeds 321 to 360, 40 seeds. Source: <code>real/id_arm/verdict.json</code>.</p>
 <p><b>Research question 3: No for v5. The gain per honest robot falls from 0.273 (20 robots, 2 detractors) to 0.0275 (40 robots, 4 detractors). The difference is −0.246 [−0.411, −0.085]. The no-attack cost per robot holds, −0.010 [−0.056, 0.036]. For v3 the result is not resolved.</b> Seeds 401 to 430, 30 seeds. Source: <code>real/scale/verdict.json</code>.</p>
 <p><b>Headline stays v3 (D-026): recovered loss share R(2) = 0.07 [−0.02, 0.15] at 2 detractors. No gain was resolved on 10 seeds.</b> Defense v2 (the lockout) failed its pre-registration (D-033). Source: <code>real/g2_stats.csv</code>, <code>real/v2/verdict.json</code>.</p>
-<p class="abbr">Gain G(d) = food collected with the defense on minus food collected with the defense off, at d detractors, per run. Intervals are 95 % paired bootstrap intervals. Negative at d = 0 means food lost with no attacker. Research question status in <code>../RQ.md</code> still reads "open, evidence none". That file is stale. The answers above come from D-051, D-054, D-055 and the verdict files.</p>
+<p class="abbr">Gain G(d) = food collected with the defense on minus food collected with the defense off, at d detractors, per run. Intervals are 95 % paired bootstrap intervals. Negative at d = 0 means food lost with no attacker. Research question status: <code>../RQ.md</code>, all three answered (D-051, D-054, D-055).</p>
 </div>
 
 <div class="panel sec" id="steps">
@@ -213,7 +213,9 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <ul>
 <li>Confirm-twice removes the no-attack cost: E_k at d = 0 is +3.0625 [1.5375, 4.625].</li>
 <li>Confirm-twice also lowers the gain at d = 2: E_k at d = 2 is −2.7875 [−4.475, −1.1625]. D-051 says it halves the gain.</li>
-<li>D-051 also says the lockout raises the gain at every d. In Table 6 the E_t intervals include 0 at d = 0 and d = 2. This report does not call the lockout effect resolved at those two counts.</li>
+<li>The lockout main effect E_t includes 0 at both counts: −0.2375 [−1.3375, 0.825] at d = 0 and 0.9625 [−0.4128, 2.3628] at d = 2. It is not resolved.</li>
+<li>The confirm-count main effect E_k is resolved both ways: it removes the cost at d = 0 and lowers the gain at d = 2.</li>
+<li>D-057 corrects one clause of D-051. "The lockout raises the gain at every d" is not supported. The rest of D-051 stands.</li>
 </ul>
 <p>The best arm without identifiers by the D-050 rule is k1t10. Its mean food at d = 2 on seeds 221 to 260 is 46.1, then k1t0 45.6, then k2t10 43.8 (D-052). Sources: <code>real/v5/verdict.json</code>, <code>real/v5/mechanism.md</code>, <code>real/v5/g2_stats.csv</code>.</p>
 </div>
@@ -284,7 +286,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <p class="cap"><b>Figure 7.</b> Gain per honest robot at 20 robots with 2 detractors and at 40 robots with 4 detractors, for v3 and v5. Why: the v5 line falls toward 0, and its interval at 40 robots includes 0. Source: <code>real/final</code>.</p>
 <p class="abbr">Labels: v3 = confirm count 1, no lockout. v5 = confirm count 2, lockout 10 s. N = number of honest robots.</p>
 </div>
-<p><b>Reading.</b> The M7 verdict is "v3 not resolved, v5 scales worse" (D-055). Congestion does not explain it. Defense-off food per robot at no attack is 3.9533 at N = 20 and 2.4183 at N = 40. The ratio is 0.6117, above the 0.5 line. The no-attack cost per robot of v5 holds. The gain per robot does not. The cause is pending, see <a href="#m7-root-cause">the M7 root-cause placeholder</a>. Sources: <code>real/scale/verdict.json</code>, <code>real/scale/contrast.csv</code>.</p>
+<p><b>Reading.</b> The M7 verdict is "v3 not resolved, v5 scales worse" (D-055). Congestion does not explain it. Defense-off food per robot at no attack is 3.9533 at N = 20 and 2.4183 at N = 40. The ratio is 0.6117, above the 0.5 line. The no-attack cost per robot of v5 holds. The gain per robot does not. The cause is private confirmation, see <a href="#m7-root-cause">the M7 root cause</a> (D-056). Sources: <code>real/scale/verdict.json</code>, <code>real/scale/contrast.csv</code>.</p>
 </div>
 
 <div class="panel sec" id="cost">
@@ -354,8 +356,19 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <h2>F3. v5 scales worse from 20 to 40 honest robots</h2>
 <div id="m7-root-cause" class="panel">
 <p class="label">Root cause of the M7 result</p>
-<p><b>Pending: results/real/scale/root_cause.md.</b> The memo file exists as a skeleton with method and verdict rules. Its conclusion is not filled in. This report takes no conclusion from it.</p>
-<p>Known design limit for the reader (from the memo method): N = 20 to N = 40 changes two things at once. Honest robots double. Detractors per decoy rise from 1 to 2.</p>
+<p><b>Root cause (D-056): private, same-robot confirmation does not scale with robot density.</b> Defense v5 needs the same robot to fail twice at a decoy. Visits per decoy stay about equal from N = 20 to N = 40, but they spread over twice the robots. So each robot meets each decoy less often. Decoy peaks per robot per decoy fall from 3.55 to 1.98 (defense off). The protected robot-time share (cover_time) falls from 0.244 to 0.126. Source: <code>real/scale/root_cause.md</code>.</p>
+<p class="cap"><b>Table 16.</b> Verdict per candidate cause of the M7 result. Seeds 401 to 430. Numbers are N = 40 minus N = 20 differences [95 % interval].</p>
+<table>
+<tr><th>Candidate</th><th>Key number</th><th>Verdict</th></tr>
+<tr><td>(a) Slower or rarer confirmation per decoy</td><td>cover_time −0.118 [−0.134, −0.102]. False follow seconds saved per robot +12.29 [6.76, 17.82] (less saved). v5 over v3 share of robots with a decoy point active −0.210 [−0.260, −0.163]</td><td><b>supported</b></td></tr>
+<tr><td>(b) Attack per decoy doubles</td><td>Trail refresh +2.25 [1.63, 2.83]. At fixed N = 20, gain per robot is 0.138 at d = 2 and 0.250 at d = 4, so it rises</td><td>not supported</td></tr>
+<tr><td>(c) Crowding raises wrong source suspects</td><td>Wrong source points activated −0.036 [−0.061, −0.013] at d = 0 and −0.019 [−0.038, −0.003] at 10 % detractors</td><td>not supported</td></tr>
+<tr><td>(d) Loss per robot shrinks, so less to recover</td><td>Loss per robot −0.766 [−0.948, −0.580]. Drop from loss −0.107 [−0.182, −0.043]. Drop from recovered share −0.139 [−0.243, −0.032]</td><td>unclear by the rule, a real part shared with v3</td></tr>
+<tr><td>(e) Lockout side effects grow with density</td><td>Lockout seconds after a true-trail abort −7.18 [−9.03, −5.44]. v5 drop minus v3 drop −0.100 [−0.230, 0.032]</td><td>not supported</td></tr>
+<tr><td>(f) Saved time does not become food</td><td>v5 saves less time (+12.29), so (a) applies</td><td>not supported for v5</td></tr>
+</table>
+<p>Pickups gained per robot fall from 0.247 to 0.011. The recovered share falls from 0.140 to 0.023.</p>
+<p><b>Limit stated by the memo.</b> The food-level contrast "v5 drop minus v3 drop" is −0.100 [−0.230, 0.032]. It is not resolved. The cause is resolved at the mechanism level, not as a separate food number. Candidates (a) and (b) are confounded inside the M7 runs, because detractors per decoy rise from 1 to 2 with N. No k1t10 or k2t0 arm exists at N = 40.</p>
 </div>
 
 <h2>Not a failure verdict, but a cost</h2>
@@ -385,7 +398,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>Dynamic food</td><td>Prof. Lu names dynamic environments. A moving food patch makes a stale trail look false. Needs a new food model (D-042).</td><td>Luna and Lu 2024, p. 317</td></tr>
 <tr><td>A learned suspect test</td><td>Prof. Lu names machine learning. The 15 s end test confuses a crowded real source with a decoy.</td><td>Luna and Lu 2024, p. 317, <code>real/failure_analysis.md</code></td></tr>
 <tr><td>Quarantine regions</td><td>The Luna and Lu 2024 quarantine paper blocks the bait, not the robot. The masks already cover the source centre in 66 % of wrong suspects (D-041).</td><td><code>../research/lu_lineage.md</code></td></tr>
-<tr><td>Shared confirmation without identifiers</td><td>Proposal only, no source in the project files. Robots could share confirm counts without sharing who laid a trail. It is untested and has no numbers.</td><td>none (proposal)</td></tr>
+<tr><td>Shared confirmation without identifiers</td><td>The M7 root cause is that confirmation is private. A failure leaves a short-lived local mark, a pickup clears it nearby, and a point confirms when marks from any robots reach k. This pools evidence without identifiers. The benefit is inference. No replay or run has tested it (D-056).</td><td><code>real/scale/root_cause.md</code> §7, option A</td></tr>
 </table>
 </div>
 
@@ -414,7 +427,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <li><b>Choices before data.</b> The comparison arm for M6 (D-050) and the scaled arm for M7 (D-053) were named by rule before the data existed. No retry after a fail (D-033).</li>
 <li><b>Invariance checks.</b> Version v4: 8 of 8 cells equal v3 on seed 1. Version v5: pass on 2 cells, strict. Version v6: byte-equal, pass. Every confirm run set: check 0 failed.</li>
 <li><b>Honest failures.</b> v2 and the 10-seed v3 stay in the report as null or fail results.</li>
-<li><b>Decision log.</b> 55 decisions, D-001 to D-055, in <a href="../DECISIONS.md">DECISIONS.md</a>.</li>
+<li><b>Decision log.</b> 57 decisions, D-001 to D-057, in <a href="../DECISIONS.md">DECISIONS.md</a>.</li>
 </ul>
 <p class="cap"><b>Table 15.</b> Held-out seeds. Each confirm block was used once.</p>
 <table>

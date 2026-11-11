@@ -8,12 +8,12 @@
 
 | ID | Question | Serves | Status | Evidence | Opened | Changed | By |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| RQ1 | Does a second independent failure before marking remove the d = 0 cost and keep G(2) above 0? | Mission; informs G3 (M5, T-A) | open | none | 2026-11-11 | none | Fable (owner-delegated) |
-| RQ2 | On one grid, one attack and one seed block, how do the no-ID defense and the ID-based defense differ in food and false positives? | Vision; informs G3 (M6, T-B) | open | none | 2026-11-11 | none | Fable (owner-delegated) |
-| RQ3 | Do per-robot gain and d = 0 cost hold from 20 to 40 honest robots at 10 % detractors? | Mission ("scale"); informs G3 (M7, T-D) | open | none | 2026-11-11 | none | Fable (owner-delegated) |
+| RQ1 | Does a second independent failure before marking remove the d = 0 cost and keep G(2) above 0? | Mission; informs G3 (M5, T-A) | answered 2026-11-12: yes for k2t10 | `results/real/v5/verdict.json`, D-051, D-057 | 2026-11-11 | none | Fable (owner-delegated) |
+| RQ2 | On one grid, one attack and one seed block, how do the no-ID defense and the ID-based defense differ in food and false positives? | Vision; informs G3 (M6, T-B) | answered 2026-11-12: the ID arm differs, +4.38 [2.25, 6.45] at d = 2, at the price of honest isolations | `results/real/id_arm/verdict.json`, D-054 | 2026-11-11 | none | Fable (owner-delegated) |
+| RQ3 | Do per-robot gain and d = 0 cost hold from 20 to 40 honest robots at 10 % detractors? | Mission ("scale"); informs G3 (M7, T-D) | answered 2026-11-12: no for v5, it scales worse. Root cause: private confirmation | `results/real/scale/verdict.json`, `results/real/scale/root_cause.md`, D-055, D-056 | 2026-11-11 | none | Fable (owner-delegated) |
 
 ## Proposed
 
 | Proposer | Date | Source file | Question |
 | --- | --- | --- | --- |
-| none | | | |
+| data-analyst | 2026-11-12 | `results/real/scale/root_cause.md` §7 | Does shared no-ID confirmation through local stigmergy keep v5's d = 0 cost and scale with N? |
