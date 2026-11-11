@@ -32,6 +32,7 @@ class Arm:
 
 # v5 = the M5 primary arm (k2, t10), PREREG of defense v5. A different M5 freeze needs a product-manager D-row.
 ARMS: dict[str, Arm] = {"off": Arm("off", 0, 1, 0), "v3": Arm("v3", 1, 1, 0),
+                        "k1t10": Arm("v5", 1, 1, 10),  # mode v5 runs the controller rule with these k, t_lock. D-052: best no-ID arm by the D-050 rule
                         "v5": Arm("v5", 1, 2, 10), "id": Arm("id", 1, 1, 0)}
 ARM_ORDER = tuple(ARMS)
 SMOKE_SEEDS = (900,)                              # D-048 D6: a throwaway block outside D-043
@@ -72,8 +73,8 @@ def prereg_values() -> tuple[str, float, float]:
     if missing:
         raise SystemExit(f"stop: {PREREG.name} has no line '- {missing[0]}: <value>'")
     best, margin, eps = (found[k].group(1) for k in ("Best no-ID arm", "Margin", "Eps"))  # type: ignore[union-attr]
-    if best not in ("off", "v3", "v5"):
-        raise SystemExit(f"stop: {PREREG.name} must name the best no-ID arm (off, v3 or v5) before any M6 run, got {best}")
+    if best not in ("off", "v3", "k1t10", "v5"):
+        raise SystemExit(f"stop: {PREREG.name} must name the best no-ID arm (off, v3, k1t10 or v5) before any M6 run, got {best}")
     try:
         margin_v, eps_v = float(margin), float(eps)
     except ValueError:
