@@ -142,6 +142,19 @@ Figure 2. Honest forager states
 - Grid merge: a cell takes the max of its value and the deposit [S-PH-6]. Why: it stops build-up near the nest.
 - Footprint: a deposit writes the 3 × 3 cells (0.30 m) under the robot. Why: a robot that swerves around a returner stays on the trail.
 
+Table 2a. LED colour per state (display only)
+
+| Robot | State | LED |
+| --- | --- | --- |
+| Honest | REST | off |
+| Honest | SEARCH | green |
+| Honest | FOLLOW | yellow |
+| Honest | END_SEARCH | magenta |
+| Honest | RETURN | blue |
+| Detractor | REST, GO_DECOY, RETURN_LAY | red (page Table 1) |
+
+- Why: the demo shows each state at a glance. No controller senses LEDs, so red does not reveal the role.
+
 ### 3.3 Detractor controller
 
 - REST, then GO_DECOY: drive to its assigned decoy by position. LED red (page Table 1).
@@ -219,7 +232,16 @@ Defense tuning rule (D-011, fixed before running, start of MVP3):
 
 1. Runs: d = 2, defense on, seeds 101 to 103.
 2. Round 1 uses the start values. Rounds 2 and 3 change one value only.
-3. Values in scope: `r_suspect`, `α_cone`, `d_cone`, `t_end`.
+3. Values in scope, start value first (all inference):
+
+   | Value | Start | Alternates |
+   | --- | --- | --- |
+   | `r_suspect` | 0.4 m | 0.25 m, 0.6 m |
+   | `α_cone` | 15° | 10°, 25° |
+   | `d_cone` | 1.0 m | 0.5 m, 1.5 m |
+   | `t_end` | 15 s | 10 s, 25 s |
+
+   - Cone check at the widest pair (25°, 1.5 m): source gap atan(1.5 / 1.5) = 45°, outside 25°.
 4. Metric: mean `F(2, on)`. A tie goes to the earlier round.
 5. At most 3 rounds. The picked values freeze in a D-row before the 80-run sweep (`rules/measurement.md` §1).
 
@@ -264,6 +286,8 @@ Table 4. Other files
   "code_sha": {"loop_functions": "<sha256[:12]>", "controller": "<sha256[:12]>"},
   "git_commit": "<sha>", "git_dirty": false,
   "params": {"n_det": 2, "defense": 1, "seed": 3, "length_s": 600, "...": "every .argos value"},
+  "layout": {"layout_seed": 3, "sources": [[x, y], [x, y], [x, y]],
+             "decoys": [[x, y], [x, y]], "n_decoys_used": 2, "radius_m": 0.25},
   "env": {"machine": "...", "argos": "3.0.0-beta59", "threads": 0},
   "metrics": {"food_collected": 0, "wasted_robot_seconds": 0.0, "ticks": 6000, "complete": true}
 }
@@ -274,6 +298,12 @@ Table 4. Other files
 - It writes `git_commit`, `git_dirty` and both hashes as attributes in the generated `.argos` file.
 - The loop functions copy them into `manifest.json`. Why: C++ has no built-in hash or git access.
 - `metrics` must equal the last `ticks.csv` row. `check_runs.py` enforces it.
+- `layout` holds the source and decoy centres in metres, from the `layout` stream (§3.1).
+- It always lists all 3 sources and both drawn decoys. `n_decoys_used` says how many decoys are active (0, 1, 2, 2).
+- Layout check in `check_runs.py`: group manifests by `layout_seed`.
+- Within a group, `sources` and `decoys` must be equal across all 8 cells, to 1e-6 m.
+- A mismatch fails the check and lists the runids. Why: the paired bootstrap (§4.2) needs one layout per seed.
+- `analyze.py` reads the active decoys from `layout` to count R5 false positives.
 - `complete` is false if the run stopped before `length`.
 
 ### 4.1 Metric definitions
