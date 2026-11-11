@@ -1,0 +1,70 @@
+/* Page layout for the final-project site. Colors come from theme.css tokens.
+   Only the chart series colors below are new (charts and series colors only). */
+:root {
+    --s1: #0f766e;   /* series 1: teal */
+    --s2: #c2410c;   /* series 2: burnt orange */
+    --s3: #7c3aed;   /* series 3: violet */
+    --s4: #1d6fa5;   /* series 4: steel blue */
+    --s5: #15803d;   /* series 5: green */
+    --base: #8a8a8a; /* baseline: always grey */
+}
+a { color: inherit; text-underline-offset: 3px; }
+a.t { text-decoration: underline dotted; }
+a.s { color: var(--muted-foreground); font-size: 12px; text-decoration: none; }
+a.s:hover { text-decoration: underline; }
+.wrap { gap: 28px; }
+.wrap > section { display: flex; flex-direction: column; gap: 14px; }
+.topnav { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; }
+.topnav a { border: 1px solid var(--border); padding: 4px 12px; text-decoration: none; background: var(--card); }
+.topnav a:hover { background: var(--secondary); }
+.topnav .off { border: 1px solid var(--rule); padding: 4px 12px; color: var(--muted-foreground); }
+.lead { border-left: 4px solid var(--primary); background: var(--secondary); padding: 12px 16px; display: flex; flex-direction: column; gap: 8px; }
+.lead strong { font-weight: 700; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { border: 1px solid var(--border); padding: 2px 10px; font-size: 12px; background: var(--card); }
+.mark { background: var(--signal-flag-fill); box-shadow: inset 2px 0 0 var(--signal-flag-line); padding: 0 4px; font-size: 12px; }
+table.t th, table.t td { white-space: normal; text-align: left; vertical-align: top; }
+table.t th { font-size: 12px; }
+table.t td.c, table.t th.c { text-align: center; white-space: nowrap; }
+table.t td.n, table.t th.n { text-align: right; white-space: nowrap; }
+table.t caption { text-align: left; font-size: 12px; color: var(--muted-foreground); padding: 0 0 6px 0; caption-side: top; }
+ul, ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 4px; }
+.toc { display: flex; flex-direction: row; flex-wrap: wrap; gap: 6px 14px; padding: 0; list-style: none; }
+.toc li { white-space: nowrap; }
+.tabs { gap: 6px; }
+.tabs li { white-space: nowrap; }
+.tabs a { display: block; border: 1px solid var(--border); padding: 4px 12px; text-decoration: none; background: var(--card); }
+.tabs a:hover { background: var(--secondary); }
+.tabs a.on { background: var(--primary); color: var(--primary-foreground); }
+.js section.tab:not(.on) { display: none; }
+.step { border: 1px solid var(--border); border-top: 4px solid var(--primary); padding: 10px 14px; display: flex; flex-direction: column; gap: 4px; background: var(--card); }
+.step .k { font-size: 11px; letter-spacing: .08em; text-transform: uppercase; color: var(--muted-foreground); }
+.steps { display: flex; flex-direction: column; gap: 12px; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 6px; }
+figure svg { width: 100%; height: auto; display: block; background: #fff; border: 1px solid var(--rule); }
+figcaption { font-size: 12px; color: var(--muted-foreground); }
+figcaption .ab { display: block; margin-top: 2px; }
+svg .ax { stroke: #444; stroke-width: 1.2; fill: none; }
+svg .gr { stroke: #e3e3e3; stroke-width: 1; fill: none; }
+svg .wall { stroke: #333; stroke-width: 2; fill: #fafafa; }
+svg text.b { fill: #222; font-weight: 500; }
+svg text.m { fill: #555; }
+svg text.c { text-anchor: middle; }
+svg text.e { text-anchor: end; }
+.sig { background: var(--signal-dead-fill); padding: 1px 6px; font-size: 12px; }
+.pager { display: flex; justify-content: space-between; gap: 8px; flex-wrap: wrap; border-top: 1px solid var(--rule); padding-top: 14px; }
+.pager a { border: 1px solid var(--border); padding: 4px 12px; text-decoration: none; background: var(--card); }
+.pager .off { border: 1px solid var(--rule); padding: 4px 12px; color: var(--muted-foreground); }
+dl.terms { margin: 0; display: flex; flex-direction: column; gap: 8px; }
+dl.terms dt { font-weight: 500; }
+dl.terms dd { margin: 0 0 0 16px; color: var(--muted-foreground); }
+dl.terms dt:target { background: var(--signal-flag-fill); }
+:target { scroll-margin-top: 12px; }
+.src { font-size: 12px; }
+.src li { word-break: break-all; }
+.src a { color: var(--muted-foreground); }
+.rowflag td { background: var(--signal-flag-fill); }
+.rowflag td:first-child { box-shadow: inset 2px 0 0 var(--signal-flag-line); }
+svg g.e text { text-anchor: end; }
+svg g.b text { fill: #222; font-weight: 500; }
+svg g.m text { fill: #555; }

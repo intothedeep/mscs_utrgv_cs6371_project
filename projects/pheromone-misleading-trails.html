@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>1위 페로몬 먹이 찾기와 거짓 흔적 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav">
+  <span class="off">이전 없음 (1위)</span>
+  <a href="../index.html">목록(index)</a>
+  <a href="spiral-search.html">다음: 2위 나선 탐색 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 1위 / 9개 (순위 순서)</div>
+  <h1>페로몬 먹이 찾기와 거짓 흔적<br><span class="muted" style="font-size:15px;font-weight:400">Pheromone foraging under misleading trails</span></h1>
+  <div class="lead">
+    <p><strong>결론: 1위, 27점. Lu 교수 연구실이 낸 거짓 페로몬 흔적 공격·방어 논문에 바로 붙는다.</strong></p>
+    <p>왜 1위인가: 연구 가능성, 2주 구현 가능성, 적합도가 모두 3점이다. 바닥 칠하기만으로 구현이 쉽다.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 3</span>
+      <span class="chip">2주 구현 가능성(feasibility) 3</span>
+      <span class="chip">교수 연구와의 적합도(fit) 3</span>
+      <span class="chip">합계 = 곱 = 27 (추정, inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제</a></li>
+    <li><a href="#s2">2 목표</a></li>
+    <li><a href="#s3">3 ARGoS 작동</a></li>
+    <li><a href="#s4">4 알고리즘 단계</a></li>
+    <li><a href="#s5">5 측정</a></li>
+    <li><a href="#s6">6 연구 가능성</a></li>
+    <li><a href="#s7">7 관련 논문</a></li>
+    <li><a href="#s8">8 분담과 일정</a></li>
+    <li><a href="#s9">9 위험</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="경기장 위에서 본 참 흔적과 거짓 흔적, 그리고 방해 로봇 수에 따른 먹이 수집량 차트의 빈 틀">
+      <text class="b" x="40" y="22">그림 1 왼쪽: 경기장 위에서 본 모습</text>
+      <g>
+        <line x1="40" y1="38" x2="70" y2="38" stroke="var(--s5)" stroke-width="4"/><text class="m" x="76" y="42">참 흔적(true trail)</text>
+        <line x1="230" y1="38" x2="260" y2="38" stroke="var(--s2)" stroke-width="4" stroke-dasharray="6 4"/><text class="m" x="266" y="42">거짓 흔적(false trail)</text>
+        <circle cx="48" cy="56" r="5" fill="#222"/><text class="m" x="76" y="60">정직한 로봇(honest robot)</text>
+        <circle cx="238" cy="56" r="5" fill="var(--s2)"/><text class="m" x="266" y="60">방해 로봇(detractor)</text>
+      </g>
+      <rect class="wall" x="40" y="72" width="420" height="280"/>
+      <rect x="50" y="300" width="84" height="42" fill="#d9d9d9" stroke="#666"/>
+      <text class="b c" x="92" y="326">둥지(nest)</text>
+      <circle cx="400" cy="117" r="22" fill="none" stroke="var(--s5)" stroke-width="2" stroke-dasharray="4 3"/>
+      <text class="m c" x="400" y="160">먹이(food)</text>
+      <path d="M134 322 C190 262 300 212 390 127" stroke="var(--s5)" stroke-width="4" fill="none"/>
+      <path d="M85 300 C60 236 100 172 135 122" stroke="var(--s2)" stroke-width="4" fill="none" stroke-dasharray="6 4"/>
+      <path d="M128 115 L142 129 M142 115 L128 129" stroke="var(--s2)" stroke-width="3"/>
+      <text class="m c" x="150" y="104">빈 곳(empty area)</text>
+      <circle cx="243" cy="233" r="5" fill="#222"/><circle cx="318" cy="184" r="5" fill="#222"/>
+      <circle cx="200" cy="336" r="5" fill="#222"/><circle cx="300" cy="322" r="5" fill="#222"/>
+      <circle cx="380" cy="282" r="5" fill="#222"/><circle cx="250" cy="150" r="5" fill="#222"/>
+      <circle cx="88" cy="202" r="5" fill="var(--s2)"/><circle cx="114" cy="152" r="5" fill="var(--s2)"/>
+
+      <text class="b" x="560" y="22">그림 1 오른쪽: 방해 로봇 수와 먹이 수집량 (계획)</text>
+      <line x1="580" y1="38" x2="610" y2="38" stroke="var(--base)" stroke-width="3"/><text class="m" x="616" y="42">방어 없음(no defense)</text>
+      <line x1="800" y1="38" x2="830" y2="38" stroke="var(--s1)" stroke-width="3"/><text class="m" x="836" y="42">방어 있음(defense)</text>
+      <line class="gr" x1="580" y1="110" x2="960" y2="110"/><line class="gr" x1="580" y1="190" x2="960" y2="190"/><line class="gr" x1="580" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="580" y1="72" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <line class="ax" x1="600" y1="320" x2="600" y2="326"/><line class="ax" x1="685" y1="320" x2="685" y2="326"/>
+      <line class="ax" x1="770" y1="320" x2="770" y2="326"/><line class="ax" x1="940" y1="320" x2="940" y2="326"/>
+      <text class="m c" x="600" y="342">0</text><text class="m c" x="685" y="342">1</text>
+      <text class="m c" x="770" y="342">2</text><text class="m c" x="940" y="342">4</text>
+      <text class="b c" x="770" y="366">방해 로봇 수(number of detractors)</text>
+      <text class="b c" transform="translate(540 196) rotate(-90)">수집한 먹이(food collected)</text>
+      <text class="m c" x="770" y="200">실측 전 빈 틀 (계획)</text>
+      <text class="m c" x="770" y="218">값은 아직 없다</text>
+    </svg>
+    <figcaption>
+      그림 1. 왼쪽은 경기장의 참 흔적과 거짓 흔적을, 오른쪽은 계획한 차트의 축을 보인다. 왜: 거짓 흔적이 로봇을 빈 곳으로 끈다는 점과, 방어가 그 손실을 얼마나 줄이는지가 이 프로젝트의 핵심이다.
+      <span class="ab">약어: 없음. 출처: 원문 Suggested figure <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>. 오차 막대는 시드(seed) 10개 기준이다.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 문제</h2>
+  <ul>
+    <li>페로몬(<a class="t" href="#term-pheromone">pheromone</a>)을 쓴 먹이 찾기(<a class="t" href="#term-foraging">foraging</a>)는 빠르다.</li>
+    <li>그러나 나쁜 로봇 하나가 거짓 흔적을 깔 수 있다.</li>
+    <li>Lu 교수 연구실은 이 공격과 방어를 연구한다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a> <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 목표</h2>
+  <ul>
+    <li>방해 로봇(<a class="t" href="#term-detractor">detractor</a>) 몇 대가 군집의 먹이 수집을 얼마나 깎는지 보인다.</li>
+    <li>간단한 방어가 그 손실을 얼마나 되찾는지 보인다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 ARGoS에서 작동하는 방식</h2>
+  <table class="t">
+    <caption>표 1. ARGoS 구성 (출처: 원문 How it works in ARGoS)</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>로봇</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>) 20대에서 40대. 몇 대는 방해 로봇이다. LED 색은 빨강이다.</td></tr>
+      <tr><td>센서</td><td>지면 센서(ground sensor)는 바닥을 읽는다. 근접 센서(proximity sensor)는 장애물을 피한다. 범위·방향 센서(<a class="t" href="#term-rab">range-and-bearing sensor</a>)는 선택이며 흔적 끝을 공유한다. 위치 센서(positioning sensor)도 쓴다.</td></tr>
+      <tr><td>행동 규칙</td><td>무작위로 걸어 탐색한다. 먹이를 찾으면 둥지로 돌아오며 페로몬을 남긴다. 페로몬이 느껴지면 가장 센 쪽을 따른다.</td></tr>
+      <tr><td>루프 함수</td><td>루프 함수(<a class="t" href="#term-loop">loop functions</a>)가 바닥 격자로 가상 페로몬을 만든다. <code>GetFloorColor</code>가 격자 색을 칠하고, <code>SetChanged()</code>가 매 단계 다시 칠한다. 격자는 시간이 지나면 증발한다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>먹이</td><td>바닥의 점으로 둔다. argos3-examples의 먹이 찾기 데모와 같은 방식이다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 알고리즘 단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 감쇠</a></li>
+    <li><a href="#a2">Step 2 정직한 로봇</a></li>
+    <li><a href="#a3">Step 3 방해 로봇</a></li>
+    <li><a href="#a4">Step 4 흔적 따르기</a></li>
+    <li><a href="#a5">Step 5 방어</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>매 단계마다 루프 함수가 모든 페로몬 칸을 일정한 비율로 줄인다.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>먹이를 지고 돌아오는 정직한 로봇이 먹이에서 둥지까지 경로를 따라 페로몬을 더한다.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>방해 로봇은 빈 곳으로 가는 경로를 따라 페로몬을 더한다.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>탐색 중인 로봇이 발밑 칸의 페로몬을 읽고 기울기(gradient)를 따라간다.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5 (방어)</div><p>흔적을 따라갔는데 먹이가 없으면 그 흔적 끝을 "의심(suspect)"으로 표시한다. 의심 끝은 거리로 묶어 무시한다.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 측정할 것</h2>
+  <ul>
+    <li>시뮬레이션 10분당 모은 먹이를 방해 로봇 수(0, 1, 2, 4)에 따라 잰다.</li>
+    <li>방어가 있을 때와 없을 때 같은 곡선을 그린다. 각각 시드(<a class="t" href="#term-seed">seed</a>) 10개로 돌린다.</li>
+    <li>거짓 흔적에 쓴 시간을 로봇·초(robot-seconds)로 잰다.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 연구 가능성과 학회</h2>
+  <ul>
+    <li>열린 질문: 스티그머지(<a class="t" href="#term-stigmergy">stigmergy</a>, 환경을 통한 간접 소통)는 적대적 로봇에 얼마나 강한가 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+    <li>데모를 넘는 점: 통신이 필요 없는 값싼 방어, 또는 방해 로봇 비율과 손실의 규모 곡선이다.</li>
+    <li>Lu 교수의 방어는 밀도 기반 군집화(<a class="t" href="#term-dbscan">density-based spatial clustering of applications with noise, DBSCAN</a>)를 페로몬 흔적에 쓴다. 군집 묶기와 적응형 타이밍도 더한다 <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>.</li>
+    <li>기여가 될 것: 더 단순한 새 규칙을 재구현과 비교한다 (추정, inference).</li>
+    <li>학회 후보 (추정, inference): <a class="t" href="#term-taros">Towards Autonomous Robotic Systems (TAROS)</a>, <a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-ur">International Conference on Ubiquitous Robots (UR)</a>.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 관련 논문</h2>
+  <table class="t">
+    <caption>표 2. 관련 논문</caption>
+    <thead><tr><th>논문</th><th>핵심</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Luna, Qi Lu. Robust mitigation of misleading pheromone trails. TAROS 2024 논문집, 2025 <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a></td><td>방해 로봇 비율이 늘수록 먹이 수집이 줄어든다. 장애물이 있어도 방어를 시험했다.</td><td>첫 두 쪽을 읽음</td></tr>
+      <tr><td>Qi Lu의 페로몬 흔적 논문. UR 2024와 ICCCR 2024 이름표(ICCCR의 전체 이름은 읽지 못함) <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a></td><td>링크와 이름표만 있다. 제목은 못 읽었다.</td><td>부분 확인(partial)</td></tr>
+      <tr><td>Qi Lu. 동적 로봇 사슬과 ARGoS. International Conference on Robotics and Automation (ICRA) 2021, 2022 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a></td><td>같은 연구실이 ARGoS를 쓴 근거다.</td><td>확인됨</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">주의: ICCCR의 전체 이름과 두 논문의 제목은 IEEE가 접속을 막아 읽지 못했다.</p>
+</section>
+
+<section id="s8">
+  <h2>8 4인 분담과 2주 일정</h2>
+  <table class="t">
+    <caption>표 3. 4인 분담 (출처: 원문)</caption>
+    <thead><tr><th>사람</th><th>1주차</th><th>2주차</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>페로몬 격자 루프 함수, 증발, 바닥 칠하기</td><td>방해 로봇 배치, 데이터 기록</td></tr>
+      <tr><td class="c">B</td><td>정직한 먹이 찾기 제어기</td><td>방어 규칙</td></tr>
+      <tr><td class="c">C</td><td>실험 파일, 시드, 소유자용 일괄 실행 스크립트</td><td>그래프: 먹이 대 방해 로봇 수</td></tr>
+      <tr><td class="c">D</td><td>문헌 조사, 관련 연구 슬라이드</td><td>발표, 시연 영상</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 위험</h2>
+  <ul>
+    <li>격자가 촘촘하면 매 단계 바닥 다시 칠하기가 시뮬레이션을 늦출 수 있다. 성긴 격자를 쓴다 (추정, inference).</li>
+    <li>Lu 교수가 이미 낸 방어와 겹친다. 재현 하나에 새 규칙 하나로 내세운다.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <span class="off">이전 없음</span>
+  <a href="../index.html">목록(index)</a>
+  <a href="spiral-search.html">다음: 2위 나선 탐색 →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-pheromone">페로몬(pheromone)</dt><dd>개미가 길에 남기는 냄새 신호다. 여기서는 바닥 격자에 저장한 가상 값이다.</dd>
+    <dt id="term-foraging">먹이 찾기(foraging)</dt><dd>먹이를 찾아 둥지로 가져오는 일이다.</dd>
+    <dt id="term-detractor">방해 로봇(detractor)</dt><dd>거짓 흔적을 깔아 군집을 속이는 로봇이다.</dd>
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+    <dt id="term-rab">범위·방향 센서(range-and-bearing sensor)</dt><dd>이웃 로봇의 거리와 방향을 알고 짧은 메시지를 주고받는 장치다.</dd>
+    <dt id="term-loop">루프 함수(loop functions)</dt><dd>ARGoS 시뮬레이션 매 단계에 끼어드는 사용자 코드다. 바닥 색과 점수를 관리한다.</dd>
+    <dt id="term-seed">시드(seed)</dt><dd>난수 생성의 시작 값이다. 시드 10개는 같은 실험을 10번 다르게 돌린다는 뜻이다.</dd>
+    <dt id="term-stigmergy">스티그머지(stigmergy)</dt><dd>환경에 남긴 흔적으로 서로 소통하는 방식이다.</dd>
+    <dt id="term-dbscan">밀도 기반 군집화(density-based spatial clustering of applications with noise, DBSCAN)</dt><dd>점이 빽빽한 곳을 한 무리로 묶고 드문 점은 잡음으로 보는 군집화 방법이다.</dd>
+    <dt id="term-taros">Towards Autonomous Robotic Systems (TAROS)</dt><dd>자율 로봇 학회다. Lu 교수가 이 줄기 논문을 낸 곳이다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-ur">International Conference on Ubiquitous Robots (UR)</dt><dd>로봇 학회다. Lu 교수가 2024년에 논문을 냈다 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

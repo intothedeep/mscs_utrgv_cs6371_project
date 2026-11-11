@@ -1,0 +1,236 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>6위 땅따먹기 게임 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav">
+  <a href="risk-aware-navigation.html">← 이전: 4위 위험 인지 항법</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="sorting-segregation.html">다음: 7위 분류와 분리 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 6위 / 9개 (순위 순서)</div>
+  <h1>땅따먹기 게임<br><span class="muted" style="font-size:15px;font-weight:400">Territory capture game (ttangttameokgi)</span></h1>
+  <div class="lead">
+    <p><strong>결론: 6위, 12점. 소유자가 지금 가장 좋아하는 안이다. 점수는 다른 안과 같은 방식으로 매겼고 가산점은 없다.</strong></p>
+    <p>왜 6위인가: 12점 동점 4개 중 연구 가능성이 2점이고 적합도도 2점이다. Lu 교수의 연구는 먹이 찾기이고 경쟁이 아니다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 2</span>
+      <span class="chip">2주 구현 가능성(feasibility) 3</span>
+      <span class="chip">교수 연구와의 적합도(fit) 2</span>
+      <span class="chip">합계 = 곱 = 12 (추정, inference)</span>
+    </div>
+    <p class="muted">다리 놓기: 이 게임에 방해 로봇이나 위험 표시를 더하면 1위나 4위 공동 안과 이어진다 (추정, inference).</p>
+    <p>설계 문서: <a href="../DESIGN.md">DESIGN.md</a> (격자, 포획 규칙, 기록 파일, 선택안 A, B, C). 아래 9절 앞의 표 4가 그 요약이다.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제</a></li>
+    <li><a href="#s2">2 목표</a></li>
+    <li><a href="#s3">3 ARGoS 작동</a></li>
+    <li><a href="#s4">4 알고리즘 단계</a></li>
+    <li><a href="#s5">5 측정</a></li>
+    <li><a href="#s6">6 연구 가능성</a></li>
+    <li><a href="#s7">7 관련 논문</a></li>
+    <li><a href="#s8">8 분담과 일정</a></li>
+    <li><a href="#design">설계안 A, B, C</a></li>
+    <li><a href="#s9">9 위험</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="두 팀이 칠한 칸과 로봇이 보이는 경기장 장면, 그리고 전략 네 개의 승률 행렬 빈 틀">
+      <text class="b" x="40" y="22">그림 1 왼쪽: 경기장 장면 (설명용 스케치)</text>
+      <rect x="40" y="32" width="14" height="10" fill="var(--s4)" fill-opacity=".45"/><text class="m" x="60" y="41">팀 0 칸(blue)</text>
+      <rect x="190" y="32" width="14" height="10" fill="var(--s2)" fill-opacity=".45"/><text class="m" x="210" y="41">팀 1 칸(orange)</text>
+      <rect x="360" y="32" width="14" height="10" fill="#fff" stroke="#999"/><text class="m" x="380" y="41">빈 칸(free)</text>
+      <circle cx="47" cy="58" r="5" fill="var(--s4)"/><circle cx="68" cy="58" r="5" fill="var(--s2)"/><text class="m" x="80" y="62">로봇(robot, 팀 색)</text>
+      <rect x="40" y="72" width="420" height="280" fill="#fff"/>
+      <polygon points="40,72 220,72 220,128 250,128 250,212 190,212 190,268 160,268 160,352 40,352" fill="var(--s4)" fill-opacity=".45"/>
+      <polygon points="460,72 310,72 310,100 280,100 280,184 340,184 340,240 370,240 370,352 460,352" fill="var(--s2)" fill-opacity=".45"/>
+      <g class="gr">
+        <line x1="40" y1="100" x2="460" y2="100"/><line x1="40" y1="128" x2="460" y2="128"/><line x1="40" y1="156" x2="460" y2="156"/><line x1="40" y1="184" x2="460" y2="184"/><line x1="40" y1="212" x2="460" y2="212"/><line x1="40" y1="240" x2="460" y2="240"/><line x1="40" y1="268" x2="460" y2="268"/><line x1="40" y1="296" x2="460" y2="296"/><line x1="40" y1="324" x2="460" y2="324"/>
+        <line x1="70" y1="72" x2="70" y2="352"/><line x1="100" y1="72" x2="100" y2="352"/><line x1="130" y1="72" x2="130" y2="352"/><line x1="160" y1="72" x2="160" y2="352"/><line x1="190" y1="72" x2="190" y2="352"/><line x1="220" y1="72" x2="220" y2="352"/><line x1="250" y1="72" x2="250" y2="352"/><line x1="280" y1="72" x2="280" y2="352"/><line x1="310" y1="72" x2="310" y2="352"/><line x1="340" y1="72" x2="340" y2="352"/><line x1="370" y1="72" x2="370" y2="352"/><line x1="400" y1="72" x2="400" y2="352"/><line x1="430" y1="72" x2="430" y2="352"/>
+      </g>
+      <rect class="wall" x="40" y="72" width="420" height="280" style="fill:none"/>
+      <circle cx="100" cy="150" r="6" fill="var(--s4)"/><circle cx="145" cy="300" r="6" fill="var(--s4)"/><circle cx="205" cy="100" r="6" fill="var(--s4)"/><circle cx="235" cy="190" r="6" fill="var(--s4)"/>
+      <circle cx="400" cy="120" r="6" fill="var(--s2)"/><circle cx="325" cy="210" r="6" fill="var(--s2)"/><circle cx="415" cy="300" r="6" fill="var(--s2)"/><circle cx="295" cy="140" r="6" fill="var(--s2)"/>
+
+      <text class="b" x="540" y="22">그림 1 오른쪽: 전략별 승률 행렬 (계획)</text>
+      <text class="m" x="540" y="42">행 = 팀 0 전략, 열 = 팀 1 전략</text>
+      <rect x="540" y="50" width="100" height="10" fill="url(#g)" stroke="#999"/>
+      <defs><linearGradient id="g" x1="0" x2="1"><stop offset="0" stop-color="#fff"/><stop offset="1" stop-color="#333"/></linearGradient></defs>
+      <text class="m" x="648" y="59">승률(win rate): 왼쪽 낮음, 오른쪽 높음</text>
+      <g>
+        <text class="b c" x="740" y="96">A</text><text class="b c" x="800" y="96">B</text><text class="b c" x="860" y="96">C</text><text class="b c" x="920" y="96">D</text>
+        <text class="m e" x="702" y="136">A 무작위 걷기</text><text class="m e" x="702" y="196">B 구역 훑기</text><text class="m e" x="702" y="256">C 전선 탐색</text><text class="m e" x="702" y="316">D Q-러닝 (선택)</text>
+        <rect x="710" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="104" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+        <rect x="710" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="164" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+        <rect x="710" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="224" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+        <rect x="710" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="770" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="830" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/><rect x="890" y="284" width="60" height="60" fill="#f6f6f6" stroke="#999"/>
+      </g>
+      <text class="m c" x="830" y="368">실측 전 빈 틀 (계획). 칸 값은 아직 없다</text>
+    </svg>
+    <figcaption>
+      그림 1. 왼쪽은 두 팀이 칠한 칸을, 오른쪽은 전략끼리의 승률을 담을 빈 행렬을 보인다. 왜: 상대가 칸을 다시 칠하는 게임에서 어떤 탐색 방식이 이기는지가 핵심 질문이다.
+      <span class="ab">약어: 없음. 출처: 원문 Suggested figure와 DESIGN.md 표 3. 색 불일치: 조사 원문은 빨강과 파랑을 적고, DESIGN.md는 파랑과 주황을 정했다. 이 그림은 DESIGN.md를 따른다.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 문제</h2>
+  <ul>
+    <li>커버리지 연구는 보통 로봇이 협력한다고 가정한다.</li>
+    <li>경쟁 커버리지(<a class="t" href="#term-compcov">competitive coverage</a>)에서는 로봇이 서로 먼저 또는 나중에 칸을 덮으려 다툰다 <a class="s" href="../index.html#S-LQ-19">[S-LQ-19]</a>.</li>
+    <li>Shats, Amir, Agmon은 상대를 쫓는 것이 핵심 전략임을 찾았다. Q-러닝(Q-learning)과 심층 Q-러닝은 지식 격차를 메우지 못했다 <a class="s" href="../index.html#S-LQ-19">[S-LQ-19]</a>.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 목표</h2>
+  <ul>
+    <li>풋봇 두 팀이 바닥 칸을 자기 색으로 칠한다.</li>
+    <li>시각 T에 칸을 더 많이 가진 팀이 이긴다. 전략을 비교한다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 ARGoS에서 작동하는 방식</h2>
+  <table class="t">
+    <caption>표 1. ARGoS 구성 (출처: 원문 How it works in ARGoS)</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>로봇</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>) 2팀, 팀마다 4대에서 10대. LED 색이 팀 색이다.</td></tr>
+      <tr><td>센서</td><td>위치 센서(내가 어느 칸인가), 지면 센서(발밑 칸 색), 근접 센서, 범위·방향 센서(<a class="t" href="#term-rab">range-and-bearing sensor</a>, 팀 메시지).</td></tr>
+      <tr><td>행동 규칙</td><td>아래 전략마다 다르다.</td></tr>
+      <tr><td>루프 함수</td><td>칸 격자를 둔다. 매 단계 로봇 발밑 칸이 그 로봇의 팀 색이 된다. <code>GetFloorColor</code>가 칸 색을 돌려주고 <code>SetChanged()</code>가 다시 칠한다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>사람 플레이어 (선택)</td><td>로봇 한 대를 키보드 I, J, K, L로 몬다. <code>manualcontrol</code> 예제를 쓴다 <a class="s" href="../index.html#S-LQ-8">[S-LQ-8]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 알고리즘 단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 무작위 걷기</a></li>
+    <li><a href="#a2">Step 2 구역 훑기</a></li>
+    <li><a href="#a3">Step 3 전선 탐색</a></li>
+    <li><a href="#a4">Step 4 Q-러닝 (선택)</a></li>
+    <li><a href="#a5">Step 5 대전</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5 (전략 A)</div><p>무작위 걷기(<a class="t" href="#term-rw">random walk</a>)다.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5 (전략 B)</div><p>로봇마다 구역을 맡아 훑는다. 왕복 훑기(<a class="t" href="#term-boustro">boustrophedon</a>)나 나선을 쓴다 <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a>.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5 (전략 C)</div><p>전선 탐색(<a class="t" href="#term-frontier">frontier seeking</a>)이다. 우리 팀 것이 아닌 가장 가까운 칸으로 간다.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5 (전략 D, 선택)</div><p>거친 격자에서 표 형식 Q-러닝(<a class="t" href="#term-qlearn">tabular Q-learning</a>)을 자기 대전(self-play)으로 한다. 상태는 주변 3x3 칸 색이다 (추정, inference).</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>전략끼리 리그전(round-robin)을 한다. 쌍마다 시드(seed) 10개다.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 측정할 것</h2>
+  <ul>
+    <li>팀별 최종 칸 점유율과 전략 사이의 승률 행렬이다.</li>
+    <li>시간에 따른 점유율 곡선이다.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 연구 가능성과 학회</h2>
+  <ul>
+    <li>열린 질문: 상대가 내 칸을 다시 칠할 때 어떤 탐색 패턴이 이기는가 (추정, inference).</li>
+    <li>데모를 넘는 점: 가위바위보 꼴의 비전이적(non-transitive) 전략 관계가 나타나면 승률 행렬로 보인다 (추정, inference).</li>
+    <li>학회 후보 (추정, inference): <a class="t" href="#term-aamas">International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</a> 워크숍, <a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-taros">Towards Autonomous Robotic Systems (TAROS)</a>.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 관련 논문</h2>
+  <table class="t">
+    <caption>표 2. 관련 논문</caption>
+    <thead><tr><th>논문</th><th>핵심</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Shats, Amir, Agmon. Competitive Ant Coverage: The Value of Pursuit. International Conference on Intelligent Robots and Systems (IROS) 2023 <a class="s" href="../index.html#S-LQ-19">[S-LQ-19]</a></td><td>쫓기가 핵심 전략이다.</td><td>첫 쪽을 읽음. IROS 2023은 파일 이름에서만 나왔다</td></tr>
+      <tr><td>Qi Lu, Ryan Luna. ARGoS 나선 탐색, 2023. 훑기 전략의 출처 <a class="s" href="../index.html#S-LQ-5">[S-LQ-5]</a></td><td>전략 B의 근거다.</td><td>부분 확인(partial)</td></tr>
+      <tr><td>Qi Lu 외. 먹이 찾기용 다중 에이전트 강화학습, 2021 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a></td><td>학습 전략의 이웃 연구다.</td><td>Scholar 목록만 확인</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 4인 분담과 2주 일정</h2>
+  <table class="t">
+    <caption>표 3. 4인 분담 (출처: 조사 원문). 모듈 담당 슬롯 분담은 <a href="../DESIGN.md">DESIGN.md</a> 7절에 있다.</caption>
+    <thead><tr><th>사람</th><th>1주차</th><th>2주차</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>칸 격자 루프 함수, 칠하기, 점수</td><td>키보드 플레이어 로봇</td></tr>
+      <tr><td class="c">B</td><td>전략 A와 B</td><td>전략 D (선택)</td></tr>
+      <tr><td class="c">C</td><td>전략 C</td><td>소유자용 대회 스크립트</td></tr>
+      <tr><td class="c">D</td><td>관련 연구, 슬라이드</td><td>승률 행렬 그래프, 발표</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="design">
+  <h2>설계안 A, B, C 요약 (<a href="../DESIGN.md">DESIGN.md</a> 표 7)</h2>
+  <p class="muted">DESIGN.md는 소유자의 선택을 기다리는 초안이다 (2026-11-10). 노력은 사람·일(person-day, 약 4시간) 추정이고 측정값이 아니다. 1단계(MVP1, 가짜 전략으로 흐름만 증명)는 약 6 사람·일이고, 그 뒤 약 18 사람·일이 남는다.</p>
+  <table class="t">
+    <caption>표 4. 선택안 A, B, C (출처: DESIGN.md 5절, 표 7)</caption>
+    <thead><tr><th></th><th>A 규칙 기반 군집 팀</th><th>B 표 형식 Q-러닝 자기 대전</th><th>C 학습된 행동 선택기</th></tr></thead>
+    <tbody>
+      <tr><td>내용</td><td>무작위, 분산, 색 흔적, 전선 탐색의 규칙 네 가지</td><td>팀마다 Q 표 하나. 상태 약 120개, 행동 4개</td><td>학습기가 A0, A1, A2 중 하나를 2초마다 고른다. 상태 약 24개</td></tr>
+      <tr><td>1단계 뒤 노력 (사람·일, 추정)</td><td>약 10</td><td>약 15에서 17</td><td>약 14에서 16</td></tr>
+      <tr><td>남는 여유 (약 18 대비)</td><td>8</td><td>1에서 3</td><td>2에서 4</td></tr>
+      <tr><td>주요 위험</td><td>학습 이야기가 약하다</td><td>시간 안에 못 배울 수 있다. 클러스터 빌드가 실패할 수 있다</td><td>클러스터 빌드</td></tr>
+      <tr><td>훈련</td><td>없음</td><td>Cradle 클러스터</td><td>Cradle 클러스터</td></tr>
+      <tr><td>발표 결과</td><td>전략 순위, 시간별 점유율</td><td>학습 곡선, 학습 대 A0</td><td>군집 대 학습 점유율</td></tr>
+      <tr><td>교수 관심과의 적합도</td><td>강함: 군집 로봇과 스티그머지는 그의 핵심이다. 나선 훑기는 그의 2023년 논문을 인용할 수 있다</td><td>중간: 그의 강화학습 논문(2021)은 Scholar에만 있고 심층 다중 에이전트 학습이다</td><td>중간에서 강함: 군집 규칙이 중심이고 학습은 작은 덧붙임이다</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">DESIGN.md 8절 Q13 메모: 그 문서는 이 게임을 "8개 중 5위, 12점"이라 적는다. 조사 원문(research/lu_qi.md)은 9개 중 6위로 적는다. 이 사이트는 조사 원문을 따른다.</p>
+</section>
+
+<section id="s9">
+  <h2>9 위험</h2>
+  <ul>
+    <li>Lu 교수와의 적합도가 약하다. 그의 연구는 먹이 찾기이고 경쟁이 아니다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+    <li>2주 안의 표 형식 강화학습은 위험하다. 훈련은 소유자가 명령할 때만 돈다. 선택 목표로 둔다.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="risk-aware-navigation.html">← 이전: 4위 위험 인지 항법</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="sorting-segregation.html">다음: 7위 분류와 분리 →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-compcov">경쟁 커버리지(competitive coverage)</dt><dd>여러 팀이 같은 지역을 서로 먼저 덮으려 다투는 문제다.</dd>
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+    <dt id="term-rab">범위·방향 센서(range-and-bearing sensor)</dt><dd>이웃 로봇의 거리와 방향을 알고 짧은 메시지를 주고받는 장치다.</dd>
+    <dt id="term-rw">무작위 걷기(random walk)</dt><dd>방향을 무작위로 바꾸며 움직이는 탐색이다.</dd>
+    <dt id="term-boustro">왕복 훑기(boustrophedon)</dt><dd>밭을 갈듯 줄을 따라 왕복하며 구역 전체를 훑는 경로다.</dd>
+    <dt id="term-frontier">전선 탐색(frontier seeking)</dt><dd>이미 덮은 곳과 덮지 않은 곳의 경계로 가는 탐색이다.</dd>
+    <dt id="term-qlearn">표 형식 Q-러닝(tabular Q-learning)</dt><dd>상태와 행동마다 가치를 표에 적고 보상으로 갱신하는 강화학습이다.</dd>
+    <dt id="term-aamas">International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</dt><dd>자율 에이전트와 다중 에이전트 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-taros">Towards Autonomous Robotic Systems (TAROS)</dt><dd>자율 로봇 학회다. Lu 교수가 페로몬 논문을 낸 곳이다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

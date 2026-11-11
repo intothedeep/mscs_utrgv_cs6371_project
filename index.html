@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>최종 프로젝트 후보 조사 결과 | CSCI 6371</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="assets/theme.css">
+<link rel="stylesheet" href="assets/site.css">
+<script>document.documentElement.className += " js";</script>
+</head>
+<body>
+<div class="wrap">
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">CSCI 6371 로봇 프로그래밍 / 4명 / 2주 / ARGoS 시뮬레이터</div>
+  <h1>최종 프로젝트 후보 조사 결과<br><span class="muted" style="font-size:15px;font-weight:400">Final-project research results</span></h1>
+  <div class="lead">
+    <p><strong>결론: 1위 페로몬 먹이 찾기와 거짓 흔적(27점), 2위 나선 탐색(18점), 3위 진화한 제어기(12점).</strong></p>
+    <p>왜 이 셋인가: Lu 교수가 직접 낸 논문 줄기에 가장 가깝다. 후속 연구로 이어질 가능성이 가장 크다.</p>
+    <ol>
+      <li>1위 <a href="projects/pheromone-misleading-trails.html">페로몬 먹이 찾기와 거짓 흔적</a>: 그의 2024년 방어 논문을 재현하고 새 규칙 하나를 더한다.</li>
+      <li>2위 <a href="projects/spiral-search.html">나선 탐색 대 무작위 걷기 대 혼합</a>: 그의 2023년 ARGoS 논문을 다시 만들고 혼합 규칙을 더한다.</li>
+      <li>3위 <a href="projects/evolved-controller.html">진화한 먹이 찾기 제어기</a>: Scholar의 신경진화 논문을 따른다. 위험은 소유자가 직접 돌리는 진화 실행이다.</li>
+    </ol>
+    <p>읽을 때 주의할 점 세 가지다.</p>
+    <ul>
+      <li>모든 점수는 저자의 판단(추정, inference)이다.</li>
+      <li>3위에서 6위까지 4개가 12점으로 동점이다. 동점은 적합도를 먼저 보는 조사자의 규칙으로 풀었다. 소유자가 바꿀 수 있다.</li>
+      <li>정밀 관개는 적합도가 3점이면 18점으로 2위가 된다. 지금은 2점이다.</li>
+    </ul>
+    <p>소유자가 지금 가장 좋아하는 땅따먹기 게임은 6위(12점)다. 가산점은 주지 않았다. <a href="projects/territory-game.html">땅따먹기 페이지</a>와 <a href="DESIGN.md">DESIGN.md</a>를 보라.</p>
+  </div>
+  <ol class="toc tabs">
+    <li><a href="#rank">1 순위표</a></li>
+    <li><a href="#prof">2 Qi (Luki) Lu 교수</a></li>
+    <li><a href="#swarm">3 군집이 맞는 도구인가</a></li>
+    <li><a href="#other">4 그 밖의 아이디어</a></li>
+    <li><a href="#gaps">5 확인하지 못한 것</a></li>
+    <li><a href="#sources">출처</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section class="tab" id="rank">
+  <h2>1 순위표: 9개 프로젝트</h2>
+  <p class="muted">점수 = 연구 가능성(research potential) × 2주 구현 가능성(feasibility) × 교수 연구와의 적합도(fit). 각 1점에서 3점, 곱의 최대는 27이다. 모든 점수는 추정(inference)이다. 땅따먹기에 가산점은 없다. 출처: research/lu_qi.md 2.0절.</p>
+  <figure>
+    <svg viewBox="0 0 1000 350" role="img" aria-label="아홉 개 프로젝트의 합계 점수 막대 차트">
+      <text class="b" x="20" y="22">그림 1. 프로젝트별 합계 점수 (최대 27)</text>
+      <rect x="20" y="34" width="14" height="10" fill="var(--s1)"/><text class="m" x="40" y="43">상위 3 (1위에서 3위)</text>
+      <rect x="260" y="34" width="14" height="10" fill="var(--base)"/><text class="m" x="280" y="43">나머지</text>
+      <g class="gr">
+        <line x1="310" y1="58" x2="310" y2="330"/><line x1="508" y1="58" x2="508" y2="330"/><line x1="706" y1="58" x2="706" y2="330"/><line x1="904" y1="58" x2="904" y2="330"/>
+      </g>
+      <text class="m c" x="310" y="346">0</text><text class="m c" x="508" y="346">9</text><text class="m c" x="706" y="346">18</text><text class="m c" x="904" y="346">27</text>
+      <g class="m e">
+        <text x="300" y="80">1 페로몬 먹이 찾기</text>
+        <text x="300" y="110">2 나선 탐색</text>
+        <text x="300" y="140">3 진화한 제어기</text>
+        <text x="300" y="170">4 정밀 관개 (공동)</text>
+        <text x="300" y="200">4 위험 인지 항법 (공동)</text>
+        <text x="300" y="230">6 땅따먹기 게임</text>
+        <text x="300" y="260">7 분류와 분리</text>
+        <text x="300" y="290">8 집단 결정</text>
+        <text x="300" y="320">9 양 몰기</text>
+      </g>
+      <rect x="310" y="66" width="594" height="20" fill="var(--s1)"/>
+      <rect x="310" y="96" width="396" height="20" fill="var(--s1)"/>
+      <rect x="310" y="126" width="264" height="20" fill="var(--s1)"/>
+      <rect x="310" y="156" width="264" height="20" fill="var(--base)"/>
+      <rect x="310" y="186" width="264" height="20" fill="var(--base)"/>
+      <rect x="310" y="216" width="264" height="20" fill="var(--base)"/>
+      <rect x="310" y="246" width="176" height="20" fill="var(--base)"/>
+      <rect x="310" y="276" width="132" height="20" fill="var(--base)"/>
+      <rect x="310" y="306" width="88" height="20" fill="var(--base)"/>
+      <g class="b">
+        <text x="912" y="81">27</text><text x="714" y="111">18</text><text x="582" y="141">12</text><text x="582" y="171">12</text><text x="582" y="201">12</text><text x="582" y="231">12</text><text x="494" y="261">8</text><text x="450" y="291">6</text><text x="406" y="321">4</text>
+      </g>
+    </svg>
+    <figcaption>
+      그림 1. 아홉 프로젝트의 합계 점수를 순위 순서로 비교한다. 왜: 12점 동점이 네 개라 순위 차이가 작은 구간을 한눈에 봐야 한다.
+      <span class="ab">약어: 없음. 출처: research/lu_qi.md 2.0절 표.</span>
+    </figcaption>
+  </figure>
+
+  <table class="t">
+    <caption>표 1. 9개 프로젝트 비교. 강조한 행이 상위 3이다.</caption>
+    <thead><tr><th class="c">순위</th><th>프로젝트</th><th class="c">점수</th><th class="c">연구 가능성</th><th class="c">2주 구현 가능성</th><th class="c">Lu 교수 적합도</th><th>한 줄 근거</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td class="c">1</td><td><a href="projects/pheromone-misleading-trails.html">페로몬 먹이 찾기와 거짓 흔적</a></td><td class="c">27</td><td class="c">3</td><td class="c">3</td><td class="c">3</td><td>그의 2024에서 2025년 페로몬 보안 논문을 잇고, 바닥 칠하기가 ARGoS에서 쉽다.</td></tr>
+      <tr class="rowflag"><td class="c">2</td><td><a href="projects/spiral-search.html">나선 탐색 대 무작위 걷기 대 혼합</a></td><td class="c">18</td><td class="c">2</td><td class="c">3</td><td class="c">3</td><td>그의 2023년 ARGoS 나선 논문을 다시 만들고 혼합 규칙 하나를 더한다.</td></tr>
+      <tr class="rowflag"><td class="c">3</td><td><a href="projects/evolved-controller.html">진화한 먹이 찾기 제어기</a></td><td class="c">12</td><td class="c">2</td><td class="c">2</td><td class="c">3</td><td>동점 중 적합도로 3위. Scholar의 신경진화 논문을 따른다. 소유자가 돌리는 진화가 위험이다.</td></tr>
+      <tr><td class="c">4 (공동)</td><td><a href="projects/irrigation.html">적응형 자원 분배 (정밀 관개)</a></td><td class="c">12</td><td class="c">3</td><td class="c">2</td><td class="c">2</td><td>논문과 직접 겹치지 않는다. 적합도 3이면 18점으로 2위다.</td></tr>
+      <tr><td class="c">4 (공동)</td><td><a href="projects/risk-aware-navigation.html">위험 인지 집단 항법</a></td><td class="c">12</td><td class="c">3</td><td class="c">2</td><td class="c">2</td><td>그의 페로몬 보안 연구의 보호 쪽 짝이라는 추정이다.</td></tr>
+      <tr><td class="c">6</td><td><a href="projects/territory-game.html">땅따먹기 게임 (소유자의 현재 선택)</a></td><td class="c">12</td><td class="c">2</td><td class="c">3</td><td class="c">2</td><td>구현은 쉽지만 그의 연구는 경쟁이 아니라 먹이 찾기다.</td></tr>
+      <tr><td class="c">7</td><td><a href="projects/sorting-segregation.html">집단 분류와 분리</a></td><td class="c">8</td><td class="c">2</td><td class="c">2</td><td class="c">2</td><td>오래된 문제라 새로움을 주장하기 어렵다.</td></tr>
+      <tr><td class="c">8</td><td><a href="projects/best-of-n.html">집단 결정 (n개 중 최선)</a></td><td class="c">6</td><td class="c">2</td><td class="c">3</td><td class="c">1</td><td>구현은 쉽지만 잘 연구된 주제이고 그의 논문과 겹치지 않는다.</td></tr>
+      <tr><td class="c">9</td><td><a href="projects/herding.html">양 몰기</a></td><td class="c">4</td><td class="c">2</td><td class="c">2</td><td class="c">1</td><td>그의 먹이 찾기 연구와 거의 겹치지 않는다.</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">이 사이트의 이전·다음 순서는 순위 순서다. 3위 이후 동점은 표의 순서를 따른다. 원문의 절 순서는 순위 순서와 다르다.</p>
+
+  <p><strong>Fit(교수 연구 적합도)을 빼고 R × F로만 매긴 순위</strong></p>
+  <p>R은 연구 가능성(research potential), F는 2주 구현 가능성(feasibility)이다. 동점은 R이 높은 쪽을 먼저 둔다. 소유자의 목표가 연구이기 때문이다. R + F로 매겨도 같은 세 묶음이 나온다. 1개, 5개, 3개 묶음이다.</p>
+  <table class="t">
+    <caption>표 2. R × F 순위와 전체 순위(Fit 포함)의 비교. 왜: Fit이 순위를 얼마나 바꾸는지 보려는 것이다. 출처: research/lu_qi.md 2.0절 표.</caption>
+    <thead><tr><th class="c">R × F 순위</th><th>프로젝트</th><th class="c">연구 가능성(research potential, R)</th><th class="c">2주 구현 가능성(feasibility, F)</th><th class="c">R × F</th><th class="c">전체 순위 (Fit 포함)</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td class="c">1</td><td><a href="projects/pheromone-misleading-trails.html">페로몬 먹이 찾기와 거짓 흔적</a></td><td class="c">3</td><td class="c">3</td><td class="c">9</td><td class="c">1</td></tr>
+      <tr><td class="c">2 (공동)</td><td><a href="projects/irrigation.html">적응형 자원 분배 (정밀 관개)</a></td><td class="c">3</td><td class="c">2</td><td class="c">6</td><td class="c">4</td></tr>
+      <tr><td class="c">2 (공동)</td><td><a href="projects/risk-aware-navigation.html">위험 인지 집단 항법</a></td><td class="c">3</td><td class="c">2</td><td class="c">6</td><td class="c">4</td></tr>
+      <tr><td class="c">4 (공동)</td><td><a href="projects/spiral-search.html">나선 탐색 대 무작위 걷기 대 혼합</a></td><td class="c">2</td><td class="c">3</td><td class="c">6</td><td class="c">2</td></tr>
+      <tr><td class="c">4 (공동)</td><td><a href="projects/territory-game.html">땅따먹기 게임 (소유자의 현재 선택)</a></td><td class="c">2</td><td class="c">3</td><td class="c">6</td><td class="c">6</td></tr>
+      <tr><td class="c">4 (공동)</td><td><a href="projects/best-of-n.html">집단 결정 (n개 중 최선)</a></td><td class="c">2</td><td class="c">3</td><td class="c">6</td><td class="c">8</td></tr>
+      <tr><td class="c">7 (공동)</td><td><a href="projects/evolved-controller.html">진화한 먹이 찾기 제어기</a></td><td class="c">2</td><td class="c">2</td><td class="c">4</td><td class="c">3</td></tr>
+      <tr><td class="c">7 (공동)</td><td><a href="projects/sorting-segregation.html">집단 분류와 분리</a></td><td class="c">2</td><td class="c">2</td><td class="c">4</td><td class="c">7</td></tr>
+      <tr><td class="c">7 (공동)</td><td><a href="projects/herding.html">양 몰기</a></td><td class="c">2</td><td class="c">2</td><td class="c">4</td><td class="c">9</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="prof">
+  <h2>2 Qi (Luki) Lu 교수</h2>
+  <p>왜 보나: 프로젝트가 교수의 연구와 겹칠수록 후속 연구로 이어지기 쉽다. 출처: research/lu_qi.md 1부.</p>
+
+  <table class="t">
+    <caption>표 3. 신원 확인</caption>
+    <thead><tr><th>사실</th><th>값</th><th>확인</th></tr></thead>
+    <tbody>
+      <tr><td>인쇄된 이름</td><td>"Qi (Luki) Lu" <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>확인됨(verified)</td></tr>
+      <tr><td>과제의 "Lu Qi"가 이 사람인가</td><td>성을 앞에 둔 같은 이름이고 학교와 학과가 같다 <a class="s" href="#S-LQ-1">[S-LQ-1]</a> <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>추정(inference)</td></tr>
+      <tr><td>직위</td><td>텍사스대학교 리오그란데밸리(University of Texas Rio Grande Valley, UTRGV) 컴퓨터과학과 조교수 <a class="s" href="#S-LQ-1">[S-LQ-1]</a> <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>확인됨</td></tr>
+      <tr><td>논문 소속</td><td>Towards Autonomous Robotic Systems (TAROS) 논문에 UTRGV 컴퓨터과학과와 utrgv.edu 주소가 인쇄돼 있다 <a class="s" href="#S-LQ-21">[S-LQ-21]</a></td><td>확인됨</td></tr>
+      <tr><td>Scholar 일치</td><td>Google Scholar의 "Qi Lu", UTRGV 컴퓨터과학, utrgv.edu 인증 이메일 <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>확인됨</td></tr>
+      <tr><td>박사(Doctor of Philosophy, PhD)</td><td>뉴멕시코대학교 컴퓨터과학, 지도교수 Melanie Moses <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>확인됨</td></tr>
+      <tr><td>동명이인</td><td>검색 요약에서 텍사스대학교 샌안토니오(University of Texas at San Antonio, UTSA)의 "Qi Lu"가 뉴멕시코의 군집 연구와 함께 나왔다. 해결하지 못했다</td><td>확인 불가(unverifiable)</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>표 4. 연구 분야와 연구실</caption>
+    <thead><tr><th>항목</th><th>값</th><th>확인</th></tr></thead>
+    <tbody>
+      <tr><td>관심 분야 (연구실 사이트)</td><td>"Swarm Robotics, Heterogeneous Multi-Robot and Multi-Agent Systems" <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>확인됨</td></tr>
+      <tr><td>관심 분야 (Scholar)</td><td>지능형 <a class="t" href="#term-swarm">군집 로봇공학(swarm robotics)</a>, 다중 로봇 시스템 <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>확인됨</td></tr>
+      <tr><td>관심 분야 (CAHSI 전문가 페이지)</td><td>군집 로봇공학, 다중 로봇 시스템, 자율 이동 로봇 <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>확인됨</td></tr>
+      <tr><td>연구실</td><td>MARS(Multiple Autonomous Robot Systems) 연구실, 2022년 9월(2022년 가을) 설립 <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>확인됨</td></tr>
+      <tr><td>주 과제</td><td>무인 지상 차량(unmanned ground vehicle, UGV)과 무인 항공기(unmanned aerial vehicle, UAV)가 함께 하는 이종 <a class="t" href="#term-foraging">먹이 찾기(foraging)</a> 군집 <a class="s" href="#S-LQ-2">[S-LQ-2]</a> <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>확인됨</td></tr>
+      <tr><td>그 밖의 과제</td><td>먹이 찾기 군집의 거짓 페로몬 흔적(공격과 방어), 나노 규모 먹이 찾기와 자기 조립, 동적 로봇 사슬 네트워크, 먹이 찾기 로봇 군집 <a class="s" href="#S-LQ-2">[S-LQ-2]</a></td><td>확인됨</td></tr>
+      <tr><td>시뮬레이터</td><td>ARGoS가 로봇 사슬 과제와 2023년 나선 탐색 초록에 나온다 <a class="s" href="#S-LQ-2">[S-LQ-2]</a> <a class="s" href="#S-LQ-5">[S-LQ-5]</a></td><td>확인됨</td></tr>
+      <tr><td>학습</td><td>다중 행위자 주의 비평가 강화학습(2021)과 신경진화(NeuroEvolution of Augmenting Topologies, NEAT, 2025)는 Scholar에만 있다. 연구 페이지에는 학습이 없다 <a class="s" href="#S-LQ-3">[S-LQ-3]</a></td><td>부분 확인(partial)</td></tr>
+      <tr><td>커버리지와 탐사</td><td>커버리지나 탐사 논문은 찾지 못했다. 나선 탐색은 먹이 찾기용 탐색 패턴이다. 이를 커버리지로 보는 것은 추정이다 <a class="s" href="#S-LQ-5">[S-LQ-5]</a></td><td>추정(inference)</td></tr>
+      <tr><td>연구비</td><td>미국 국립과학재단(National Science Foundation, NSF)의 Expand AI, CISE-MSI, CREST-MECIS 사업, 연방철도청(Federal Railroad Administration, FRA), 국토안보부(Department of Homeland Security, DHS) SLA. 사업 이름은 원문 표기다 <a class="s" href="#S-LQ-1">[S-LQ-1]</a></td><td>확인됨</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>표 5. 대표 논문 13건 (research/lu_qi.md 1.3절). 제목은 원문 그대로 둔다.</caption>
+    <thead><tr><th class="c">번호</th><th>제목</th><th>학회 또는 저널</th><th class="c">연도</th><th>확인</th></tr></thead>
+    <tbody>
+      <tr><td class="c">P1</td><td><a href="https://link.springer.com/article/10.1007/s10514-017-9693-2">Multiple-place swarm foraging with dynamic depots</a></td><td>Autonomous Robots 42</td><td class="c">2018</td><td>확인됨</td></tr>
+      <tr><td class="c">P2</td><td><a href="https://ieeexplore.ieee.org/abstract/document/8794240">Comparing Physical and Simulated Performance of a Deterministic and a Bio-inspired Stochastic Foraging Strategy for Robot Swarms</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2019</td><td>확인됨</td></tr>
+      <tr><td class="c">P3</td><td><a href="https://ieeexplore.ieee.org/abstract/document/9196762">A Bio-Inspired Transportation Network for Scalable Swarm Foraging</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2020</td><td>확인됨</td></tr>
+      <tr><td class="c">P4</td><td>Swarm Foraging Review: Closing the Gap Between Proof and Practice</td><td>Current Robotics Reports</td><td class="c">2020</td><td>부분 확인. Scholar 목록만 있고 직접 링크는 읽지 못했다</td></tr>
+      <tr><td class="c">P5</td><td>Multi-Actor-Attention-Critic Reinforcement Learning for Central Place Foraging Swarms</td><td>International Joint Conference on Neural Networks (IJCNN)</td><td class="c">2021</td><td>부분 확인. Scholar 목록만 있다</td></tr>
+      <tr><td class="c">P6</td><td><a href="https://ieeexplore.ieee.org/abstract/document/9561124">Multiple-Place Swarm Foraging with Dynamic Robot Chains</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2021</td><td>확인됨. ARGoS 사용</td></tr>
+      <tr><td class="c">P7</td><td><a href="https://ieeexplore.ieee.org/abstract/document/9811625">Dynamic Robot Chain Networks for Swarm Foraging</a></td><td>International Conference on Robotics and Automation (ICRA)</td><td class="c">2022</td><td>확인됨. ARGoS 사용</td></tr>
+      <tr><td class="c">P8</td><td><a href="https://par.nsf.gov/biblio/10591790">Adaptive Multiple Distributed Bidirectional Spiral Path Planning for Foraging Robot Swarms</a> (Qi Lu, Ryan Luna)</td><td>Scholar는 Conference on Robots and Vision (CRV)이라 적는다. NSF 기록은 "IEEE, Montreal"만 적는다</td><td class="c">2023</td><td>제목, 저자, 연도, ARGoS는 확인됨. 학회 이름은 부분 확인</td></tr>
+      <tr><td class="c">P9</td><td>Tuning PID controller for quadrotor using particle swarm optimization</td><td>21st International Conference on Ubiquitous Robots (UR)</td><td class="c">2024</td><td>부분 확인. Scholar 목록만 있다</td></tr>
+      <tr><td class="c">P10</td><td>Evolving Adaptive Foraging Robot Swarms with NEAT in Environments with Obstacles</td><td>8th International Conference on Intelligent Robotics and Control</td><td class="c">2025</td><td>부분 확인. Scholar 목록만 있고 저자 명단은 읽지 못했다</td></tr>
+      <tr><td class="c">P11</td><td><a href="https://arxiv.org/abs/2605.01461">LLM-Foraging: Large Language Models for Decentralized Swarm Robot Foraging</a> (Li, Gutierrez, Hernandez, Qi Lu, Zhou). 대규모 언어 모델(large language model, LLM). 시뮬레이터는 Gazebo이고 ARGoS가 아니다</td><td>arXiv 사전 공개본 2605.01461</td><td class="c">2026</td><td>부분 확인. 페이지에 "Qi Lu"의 소속이 없다</td></tr>
+      <tr><td class="c">P12</td><td><a href="https://doi.org/10.1007/978-3-031-72062-8_27">Robust Mitigation Strategy for Misleading Pheromone Trails in Foraging Robot Swarms</a> (Ryan Luna, Qi Lu)</td><td>Towards Autonomous Robotic Systems (TAROS) 2024, LNAI 15052, 307쪽에서 319쪽</td><td class="c">2025</td><td>확인됨. 첫 두 쪽을 읽음</td></tr>
+      <tr><td class="c">P13</td><td>페로몬 흔적 논문 두 편: <a href="https://ieeexplore.ieee.org/abstract/document/10597515">링크 1</a>, <a href="https://ieeexplore.ieee.org/abstract/document/10585509">링크 2</a>. 이름표는 UR2024와 ICCCR2024</td><td>UR, ICCCR(전체 이름은 읽지 못함)</td><td class="c">2024</td><td>부분 확인. 이름표와 링크만 있다. IEEE가 접속을 막아 제목을 못 읽었다</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">P1, P2, P3, P6, P7은 연구 페이지가 연도 이름표와 링크를 주었고 제목은 Scholar에서 왔다. 조사자가 학회와 연도로 제목과 링크를 짝지었다(추정, inference). 출처: <a class="s" href="#S-LQ-2">[S-LQ-2]</a> <a class="s" href="#S-LQ-3">[S-LQ-3]</a>.</p>
+  <p class="muted">Google Scholar 프로필은 처음 20건만 읽혔다. 저자 검색 주소는 로그인 페이지로 넘어갔다 <a class="s" href="#S-LQ-3">[S-LQ-3]</a>.</p>
+
+  <table class="t">
+    <caption>표 6. ARGoS 기능 확인 (프로젝트 구현에 필요한 것)</caption>
+    <thead><tr><th>기능</th><th>근거</th><th>확인</th></tr></thead>
+    <tbody>
+      <tr><td>키보드 제어</td><td>argos3-examples에 <code>manualcontrol_loop_functions</code>가 있다 <a class="s" href="#S-LQ-7">[S-LQ-7]</a>. I는 앞, K는 뒤, J는 왼쪽, L은 오른쪽이다. 마우스로 풋봇을 고른다 <a class="s" href="#S-LQ-8">[S-LQ-8]</a></td><td>확인됨</td></tr>
+      <tr><td>바닥 색칠</td><td><code>CForagingLoopFunctions::GetFloorColor</code>가 바닥 점마다 색을 돌려준다 <a class="s" href="#S-LQ-9">[S-LQ-9]</a></td><td>확인됨</td></tr>
+      <tr><td>실행 중 바닥 다시 칠하기</td><td>먹이를 집거나 놓은 뒤 <code>PreStep()</code>에서 <code>m_pcFloor-&gt;SetChanged();</code>를 부른다 <a class="s" href="#S-LQ-9">[S-LQ-9]</a></td><td>확인됨</td></tr>
+      <tr><td>ARGoS 기준 논문</td><td>Pinciroli 외, Swarm Intelligence 6:271에서 295, 2012 <a class="s" href="#S-LQ-22">[S-LQ-22]</a></td><td>첫 쪽 확인</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="swarm">
+  <h2>3 군집은 언제 맞는 도구인가</h2>
+  <p>왜 보나: 군집이 필요 없는 문제를 고르면 "왜 로봇이 여러 대인가"에 답할 수 없다. 출처: research/lu_qi.md 2.1절.</p>
+  <p class="muted">Şahin(2005)은 군집 로봇공학과 다른 다중 로봇 연구를 가르는 기준과 응용 분야를 제안했다 <a class="s" href="#S-LQ-23">[S-LQ-23]</a>. 검색 요약에서만 확인했다(부분 확인, partial). 아래 기준은 소유자의 목록이고 논문의 인용이 아니다. Brambilla 외(2013)는 군집 로봇공학이 공학 분야로는 아직 한계가 있다고 본다 <a class="s" href="#S-LQ-24">[S-LQ-24]</a>.</p>
+
+  <table class="t">
+    <caption>표 7. 군집이 맞는 조건 (이유는 추정, inference)</caption>
+    <thead><tr><th>기준</th><th>군집이 돕는 이유</th></tr></thead>
+    <tbody>
+      <tr><td>넓거나 흩어진 지역</td><td>값싼 로봇이 많으면 병렬로 더 넓게 덮는다</td></tr>
+      <tr><td>모르거나 바뀌는 환경</td><td>지역 규칙은 전체 지도 없이 반응한다</td></tr>
+      <tr><td>중앙 기반 시설 없음</td><td>서버, 전역 위치, 중앙 무선이 필요 없다</td></tr>
+      <tr><td>고장에 강함</td><td>몇 대를 잃어도 임무가 멈추지 않는다</td></tr>
+      <tr><td>규모 확장</td><td>로봇을 늘려도 다시 설계하지 않는다</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>표 8. 각 아이디어가 정말 군집을 필요로 하는가 (추정, inference)</caption>
+    <thead><tr><th>아이디어</th><th>군집 필요</th><th>이유</th></tr></thead>
+    <tbody>
+      <tr><td><a href="projects/pheromone-misleading-trails.html">페로몬 먹이 찾기</a></td><td class="c">예</td><td><a class="t" href="#term-stigmergy">스티그머지(stigmergy)</a>와 나쁜 로봇에 대한 견고함은 군집의 질문이다</td></tr>
+      <tr><td><a href="projects/irrigation.html">정밀 관개</a></td><td class="c">예</td><td>넓은 밭, 변하는 필요, 로봇 고장. 중앙 계획기가 기준선이다</td></tr>
+      <tr><td><a href="projects/spiral-search.html">나선 탐색</a></td><td class="c">일부</td><td>규모 확장이 질문이다. 로봇 한 대가 하한선이다</td></tr>
+      <tr><td><a href="projects/evolved-controller.html">진화한 제어기</a></td><td class="c">일부</td><td>학습이 초점이고 군집은 시험대다</td></tr>
+      <tr><td><a href="projects/risk-aware-navigation.html">위험 인지 항법</a></td><td class="c">예</td><td>로봇 손실이 예상된다. 위험 정보 공유가 군집의 이점이다</td></tr>
+      <tr><td><a href="projects/territory-game.html">땅따먹기 게임</a></td><td class="c">일부</td><td>팀 게임이다. 중앙 팀 계획기도 할 수 있다</td></tr>
+      <tr><td><a href="projects/sorting-segregation.html">분류와 분리</a></td><td class="c">예</td><td>지도자가 없고 지역 규칙만 쓴다</td></tr>
+      <tr><td><a href="projects/best-of-n.html">집단 결정</a></td><td class="c">예</td><td>집단 감지가 잡음 있는 로봇 하나보다 낫다</td></tr>
+      <tr><td><a href="projects/herding.html">양 몰기</a></td><td class="c">일부</td><td>목동 하나로도 무리를 몰 수 있다 <a class="s" href="#S-LQ-10">[S-LQ-10]</a>. 큰 무리에는 여럿이 돕는다 <a class="s" href="#S-LQ-12">[S-LQ-12]</a></td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>표 9. 응용 분야와 군집 로봇 예시</caption>
+    <thead><tr><th>분야</th><th>예시</th><th>확인</th></tr></thead>
+    <tbody>
+      <tr><td>농업</td><td>Texas A&amp;M의 지상·공중 농장 로봇 "구성 가능하고 적응하며 확장되는 군집". 미국 농무부(USDA) 지원, 2021 <a class="s" href="#S-LQ-28">[S-LQ-28]</a></td><td>확인됨 (대학 공식 뉴스)</td></tr>
+      <tr><td>수색과 구조</td><td>무인기 군집의 복원력 리뷰. 수색과 구조는 세 응용 종류 중 하나다. 2023 <a class="s" href="#S-LQ-30">[S-LQ-30]</a></td><td>확인됨</td></tr>
+      <tr><td>가스 출처 찾기</td><td>SniffySquad: 다중 로봇 가스 출처 위치 추정, 2024 <a class="s" href="#S-LQ-25">[S-LQ-25]</a></td><td>확인됨 (초록)</td></tr>
+      <tr><td>환경 감시</td><td>subCULTron: 베네치아 석호를 감시하는 수중 로봇 군집(홍합, 물고기, 연잎 로봇). 2015년부터 2019년 <a class="s" href="#S-LQ-27">[S-LQ-27]</a></td><td>확인됨</td></tr>
+      <tr><td>기름 유출 청소</td><td>MIT Seaswarm 시제품: 유출 위에 로봇이 고르게 퍼진다. 무선과 GPS를 쓴다. 2010 <a class="s" href="#S-LQ-29">[S-LQ-29]</a></td><td>부분 확인 (뉴스, 시제품만). 오래됨 [STALE]</td></tr>
+      <tr><td>행성 탐사</td><td>NASA Swarmathon: 학생 로봇 군집이 화성 시제품으로 자원을 모은다. 2018 <a class="s" href="#S-LQ-26">[S-LQ-26]</a></td><td>확인됨 (초록). 오래됨 [STALE]</td></tr>
+      <tr><td>창고 물류</td><td>Kiva 시스템: 수백 대의 창고 로봇, AI Magazine 2008. 군집이 아니라 중앙 시스템이 조율하는 대조 사례다 <a class="s" href="#S-LQ-31">[S-LQ-31]</a></td><td>[UNVERIFIED]. 페이지 접속 차단</td></tr>
+      <tr><td>이종 먹이 찾기, 수색 구조 (Qi Lu)</td><td>UGV와 UAV 먹이 찾기 군집. 수색 구조, 지뢰 제거, 농업, 우주 <a class="s" href="#S-LQ-4">[S-LQ-4]</a></td><td>확인됨</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">광산 탐사: 군집 예시를 확인하지 못했다 <span class="mark">[UNVERIFIED]</span>.</p>
+</section>
+
+<section class="tab" id="other">
+  <h2>4 그 밖의 아이디어 (간단히)</h2>
+  <p>왜 보나: 전체 항목으로 쓰지 않은 아이디어를 왜 뺐는지 알아야 다시 꺼낼 수 있다. 출처: research/lu_qi.md "Other ideas".</p>
+  <table class="t">
+    <caption>표 10. 짧은 판정. 점수 칸은 연구 가능성, 구현 가능성, 적합도 순서다.</caption>
+    <thead><tr><th>아이디어</th><th>판정</th><th>이유</th><th class="c">점수</th></tr></thead>
+    <tbody>
+      <tr><td>다중 로봇 A* 경로 계획 (미로 수집기 포함)</td><td>간단히 다룸</td><td>조사 논문이 이미 있다 <a class="s" href="#S-LQ-18">[S-LQ-18]</a>. 격자 지도와 충돌 처리가 필요하다. Lu 교수와 적합도가 낮다</td><td class="c">1, 2, 1</td></tr>
+      <tr><td>과제 배정 먹이 찾기</td><td>정밀 관개의 배달 변형으로 합침</td><td>누가 어느 요청을 맡을지가 과제 배정이다</td><td class="c">없음</td></tr>
+      <tr><td>전선 기반 커버리지 탐사</td><td>땅따먹기로 합침</td><td>땅따먹기의 전략 C가 전선 탐색이다</td><td class="c">없음</td></tr>
+      <tr><td>먹이 찾기 경주 (팀 대 팀)</td><td>페로몬과 땅따먹기로 합침</td><td>같은 작동 방식에 점수만 더한다</td><td class="c">없음</td></tr>
+      <tr><td>대형과 떼 짓기</td><td>간단히 다룸</td><td>기본 <code>flocking.argos</code> 예제가 있다 <a class="s" href="#S-LQ-7">[S-LQ-7]</a> (목록에서만 확인). 위험 인지 항법의 기준선이기도 하다</td><td class="c">1, 3, 1</td></tr>
+      <tr><td>추격과 회피</td><td>간단히 다룸</td><td>구현은 되지만 Lu 교수 연구와 이어지지 않는다. 위험 인지 항법의 감시자 변형이 회피를 다룬다</td><td class="c">2, 2, 1</td></tr>
+      <tr><td>로봇 축구</td><td>간단히 다룸</td><td>풋봇으로 공 물리를 다루는 것이 불확실하다 <span class="mark">[UNVERIFIED]</span>. 적합도가 낮다</td><td class="c">1, 1, 1</td></tr>
+      <tr><td>이어달리기 먹이 찾기 (과제 분할)</td><td>간단히 다룸</td><td>Pini 외가 ARGoS와 e-puck으로 캐시를 통해 물건을 넘겼다 <a class="s" href="#S-LQ-13">[S-LQ-13]</a>. Lu 교수의 로봇 사슬도 자원을 둥지로 옮긴다 <a class="s" href="#S-LQ-2">[S-LQ-2]</a>. 적합도는 3이다</td><td class="c">2, 2, 3</td></tr>
+      <tr><td>요리 군집 (주방 작업)</td><td>간단히 다룸. 추천하지 않음</td><td>작고 아는 공간에 순서 제약이 있어 중앙 일정 계획이 낫다. 순서 제약이 있는 과제 배정은 따로 분류가 있다 <a class="s" href="#S-LQ-37">[S-LQ-37]</a>. ARGoS는 요리를 모형화할 수 없다(추정, inference)</td><td class="c">1, 1, 1</td></tr>
+      <tr><td>물리적 던지기</td><td>제외</td><td>소유자가 자원을 제자리에 놓는 아이디어라고 바로잡았고, 지금은 정밀 관개다. 기본 풋봇으로 던지기는 불가능하다고 판단했다(추정, inference) <a class="s" href="#S-LQ-9">[S-LQ-9]</a> <a class="s" href="#S-LQ-20">[S-LQ-20]</a> <span class="mark">[UNVERIFIED]</span></td><td class="c">없음</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="gaps">
+  <h2>5 확인하지 못한 것</h2>
+  <p>왜 보나: 순위가 이 빈틈 위에 서 있다. 출처: research/lu_qi.md open_questions. 주요 항목만 옮긴다.</p>
+  <ul>
+    <li>UTSA의 "Qi Lu"가 다른 사람인지 같은 사람의 옛 직장인지 확인하지 않았다.</li>
+    <li>UR2024와 ICCCR2024 페로몬 논문의 제목은 IEEE 접속 차단으로 읽지 못했다. TAROS 논문은 확인했다.</li>
+    <li>나선 논문의 방법 세부(구역 분할, 반대쪽 끝에서 출발)는 초록의 검색 요약에서 가져왔다 <a class="s" href="#S-LQ-5">[S-LQ-5]</a>.</li>
+    <li>arXiv 2605.01461의 "Qi Lu"가 UTRGV의 Qi Lu인지 확인하지 못했다. P10의 저자 명단도 읽지 못했다.</li>
+    <li>Şahin 2005 전문을 읽지 않았다. 군집 적합 기준은 소유자의 목록이다 <a class="s" href="#S-LQ-23">[S-LQ-23]</a>.</li>
+    <li>Competitive Ant Coverage의 학회(IROS 2023)는 파일 이름에서만 나왔다 <a class="s" href="#S-LQ-19">[S-LQ-19]</a>.</li>
+    <li>Deneubourg 외 1991과 Macharet 외 2020은 읽지 않았다. 광산 탐사와 2022년부터 2026년 군집 관개 논문도 확인하지 못했다.</li>
+    <li>학회 후보는 모두 추정이다. 마감일은 확인하지 않았다.</li>
+  </ul>
+</section>
+
+<section class="tab" id="sources">
+  <h2>출처 (Sources)</h2>
+  <p class="muted">각 페이지의 [S-LQ-n] 표시는 이 목록의 항목으로 이어진다. 제목은 원문 표기다. 출처: research/lu_qi.md Sources.</p>
+  <ul class="src">
+    <li id="S-LQ-1">[S-LQ-1] Qi (Luki) Lu 개인 사이트. 공식. <a href="https://sites.google.com/view/qilu/">https://sites.google.com/view/qilu/</a></li>
+    <li id="S-LQ-2">[S-LQ-2] Qi Lu: Research. 공식. <a href="https://sites.google.com/view/qilu/research">https://sites.google.com/view/qilu/research</a></li>
+    <li id="S-LQ-3">[S-LQ-3] Qi Lu: Google Scholar 프로필. 모음 사이트. 처음 20건만. <a href="https://scholar.google.com/citations?user=5471pIYAAAAJ&amp;hl=en">https://scholar.google.com/citations?user=5471pIYAAAAJ&amp;hl=en</a></li>
+    <li id="S-LQ-4">[S-LQ-4] CAHSI 전문가 프로필: Qi Lu. 공식. <a href="https://cahsi.utep.edu/expert/qi-lu/">https://cahsi.utep.edu/expert/qi-lu/</a></li>
+    <li id="S-LQ-5">[S-LQ-5] Adaptive Multiple Distributed Bidirectional Spiral Path Planning for Foraging Robot Swarms. 2023. NSF PAR 기록과 초록만. <a href="https://par.nsf.gov/biblio/10591790">https://par.nsf.gov/biblio/10591790</a></li>
+    <li id="S-LQ-6">[S-LQ-6] LLM-Foraging: Large Language Models for Decentralized Swarm Robot Foraging. 2026-05-02. 초록 페이지만. <a href="https://arxiv.org/abs/2605.01461">https://arxiv.org/abs/2605.01461</a></li>
+    <li id="S-LQ-7">[S-LQ-7] argos3-examples: loop_functions 폴더. 공식. <a href="https://github.com/ilpincy/argos3-examples/tree/master/loop_functions">https://github.com/ilpincy/argos3-examples/tree/master/loop_functions</a></li>
+    <li id="S-LQ-8">[S-LQ-8] argos3-examples: manualcontrol_qtuser_functions.cpp. 공식. 소스를 읽음. <a href="https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/manualcontrol_loop_functions/manualcontrol_qtuser_functions.cpp">https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/manualcontrol_loop_functions/manualcontrol_qtuser_functions.cpp</a></li>
+    <li id="S-LQ-9">[S-LQ-9] argos3-examples: foraging_loop_functions.cpp. 공식. 소스를 읽음. <a href="https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/foraging_loop_functions/foraging_loop_functions.cpp">https://raw.githubusercontent.com/ilpincy/argos3-examples/master/loop_functions/foraging_loop_functions/foraging_loop_functions.cpp</a></li>
+    <li id="S-LQ-10">[S-LQ-10] Solving the shepherding problem: heuristics for herding autonomous, interacting agents. 2014. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104">https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104</a></li>
+    <li id="S-LQ-11">[S-LQ-11] Steering herds away from dangers in dynamic environments. 2023. 기록 페이지. <a href="https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/">https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/</a></li>
+    <li id="S-LQ-12">[S-LQ-12] Shepherding control and herdability in complex multiagent systems. 2023-07-31. 초록, 사전 공개본. <a href="https://arxiv.org/abs/2307.16797">https://arxiv.org/abs/2307.16797</a></li>
+    <li id="S-LQ-13">[S-LQ-13] Task Partitioning in a Robot Swarm: A Study on the Effect of Communication (Supplementary material). 2012-11. <a href="https://iridia.ulb.ac.be/supp/IridiaSupp2012-015/index.html">https://iridia.ulb.ac.be/supp/IridiaSupp2012-015/index.html</a></li>
+    <li id="S-LQ-14">[S-LQ-14] Towards Autonomous Task Partitioning in Swarm Robotics: Experiments with Foraging Robots (Supplementary material). 2013-04. <a href="https://iridia.ulb.ac.be/supp/IridiaSupp2013-001/index.html">https://iridia.ulb.ac.be/supp/IridiaSupp2013-001/index.html</a></li>
+    <li id="S-LQ-15">[S-LQ-15] Segregation of heterogeneous units in a swarm of robotic agents. 2010. 기록 페이지. <a href="https://scholars.duke.edu/publication/730532">https://scholars.duke.edu/publication/730532</a></li>
+    <li id="S-LQ-16">[S-LQ-16] Minimalistic Collective Perception with Imperfect Sensors. 2022-09-26. 초록. <a href="https://arxiv.org/abs/2209.12858">https://arxiv.org/abs/2209.12858</a></li>
+    <li id="S-LQ-17">[S-LQ-17] SubCDM: Collective Decision-Making with a Swarm Subset. 2025-08-01. 사전 공개본. <a href="https://arxiv.org/abs/2508.00467">https://arxiv.org/abs/2508.00467</a></li>
+    <li id="S-LQ-18">[S-LQ-18] Graph-Based Multi-Robot Path Finding and Planning. 2022-06-22. 초록. <a href="https://arxiv.org/abs/2206.11319">https://arxiv.org/abs/2206.11319</a></li>
+    <li id="S-LQ-19">[S-LQ-19] Competitive Ant Coverage: The Value of Pursuit. 2023 (파일 이름 기준). 첫 쪽을 읽음. <a href="https://u.cs.biu.ac.il/~agmon/ShatsIROS23.pdf">https://u.cs.biu.ac.il/~agmon/ShatsIROS23.pdf</a></li>
+    <li id="S-LQ-20">[S-LQ-20] ARGoS forum: How to change gripper position on footbot? 일화 수준. 봇 차단으로 검색 요약만. [UNVERIFIED]. <a href="https://www.argos-sim.info/forum/viewtopic.php?p=428">https://www.argos-sim.info/forum/viewtopic.php?p=428</a></li>
+    <li id="S-LQ-21">[S-LQ-21] Robust Mitigation Strategy for Misleading Pheromone Trails in Foraging Robot Swarms. 2025, TAROS 2024 LNAI 15052 307쪽에서 319쪽. 첫 두 쪽을 읽음. <a href="https://par.nsf.gov/servlets/purl/10593555">https://par.nsf.gov/servlets/purl/10593555</a></li>
+    <li id="S-LQ-22">[S-LQ-22] ARGoS: a modular, parallel, multi-engine simulator for multi-robot systems. 2012. 첫 쪽을 읽음. <a href="https://www.argos-sim.info/stuff/Pinciroli:SI2012.pdf">https://www.argos-sim.info/stuff/Pinciroli:SI2012.pdf</a></li>
+    <li id="S-LQ-23">[S-LQ-23] Swarm robotics: From sources of inspiration to domains of application. 2005. 기록 페이지만, 초록 없음. <a href="https://avesis.metu.edu.tr/yayin/cc170663-a550-46af-bead-aa0acb20e95e/swarm-robotics-from-sources-of-inspiration-to-domains-of-application">https://avesis.metu.edu.tr/yayin/cc170663-a550-46af-bead-aa0acb20e95e/swarm-robotics-from-sources-of-inspiration-to-domains-of-application</a></li>
+    <li id="S-LQ-24">[S-LQ-24] Swarm robotics: A review from the swarm engineering perspective. 2013. <a href="https://research.vu.nl/en/publications/swarm-robotics-a-review-from-the-swarm-engineering-perspective/">https://research.vu.nl/en/publications/swarm-robotics-a-review-from-the-swarm-engineering-perspective/</a></li>
+    <li id="S-LQ-25">[S-LQ-25] SniffySquad: Patchiness-Aware Gas Source Localization with Multi-Robot Collaboration. 2024-11-09. 초록. <a href="https://arxiv.org/abs/2411.06121">https://arxiv.org/abs/2411.06121</a></li>
+    <li id="S-LQ-26">[S-LQ-26] The Swarmathon: An Autonomous Swarm Robotics Competition. 2018-05-21. 초록. <a href="https://arxiv.org/abs/1805.08320">https://arxiv.org/abs/1805.08320</a></li>
+    <li id="S-LQ-27">[S-LQ-27] subCULTron: Submarine Cultures Perform Long-Term Robotic Exploration of Unconventional Environmental Niches. 2015-04-01에서 2019-08-31. CORDIS 프로젝트 페이지. <a href="https://cordis.europa.eu/project/id/640967">https://cordis.europa.eu/project/id/640967</a></li>
+    <li id="S-LQ-28">[S-LQ-28] Adaptive swarm robotics could revolutionize smart agriculture. 2021-11-12. 대학 뉴스. <a href="https://engineering.tamu.edu/news/2021/11/ETID-MEEN-adaptive-swarm-robotics-could-revolutionize-smart-agriculture.html">https://engineering.tamu.edu/news/2021/11/ETID-MEEN-adaptive-swarm-robotics-could-revolutionize-smart-agriculture.html</a></li>
+    <li id="S-LQ-29">[S-LQ-29] MIT researchers develop autonomous oil-absorbing robot to clean up oil spills. 2010-08-27. 뉴스. <a href="https://newatlas.com/seaswarm-autonomous-oil-absorbing-robot/16153">https://newatlas.com/seaswarm-autonomous-oil-absorbing-robot/16153</a></li>
+    <li id="S-LQ-30">[S-LQ-30] Examining application-specific resiliency implementations in UAV swarm scenarios. 2023-09-25. <a href="https://www.oaepublish.com/articles/ir.2023.27">https://www.oaepublish.com/articles/ir.2023.27</a></li>
+    <li id="S-LQ-31">[S-LQ-31] Coordinating Hundreds of Cooperative, Autonomous Vehicles in Warehouses. 2008 (검색 요약 기준). 봇 차단. [UNVERIFIED]. <a href="https://ojs.aaai.org/index.php/aimagazine/article/view/2082">https://ojs.aaai.org/index.php/aimagazine/article/view/2082</a></li>
+    <li id="S-LQ-32">[S-LQ-32] Time-Dependent Surveillance-Evasion Games. 2019-03-04. 초록. <a href="https://arxiv.org/abs/1903.01332">https://arxiv.org/abs/1903.01332</a></li>
+    <li id="S-LQ-33">[S-LQ-33] RASS: Risk-Aware Swarm Storage. 2022-01-04. 초록. <a href="https://arxiv.org/abs/2201.01349">https://arxiv.org/abs/2201.01349</a></li>
+    <li id="S-LQ-34">[S-LQ-34] Fast Collective Evasion in Self-Localized Swarms of Unmanned Aerial Vehicles. 2021 저널, arXiv 2024-08-20. 초록. <a href="https://arxiv.org/abs/2408.10596">https://arxiv.org/abs/2408.10596</a></li>
+    <li id="S-LQ-35">[S-LQ-35] Multi-Agent Sensor Data Collection with Attrition Risk. 2016 (검색 요약 기준). 봇 차단. [UNVERIFIED]. <a href="https://ojs.aaai.org/index.php/ICAPS/article/view/13736">https://ojs.aaai.org/index.php/ICAPS/article/view/13736</a></li>
+    <li id="S-LQ-36">[S-LQ-36] Tews, Sukhatme, Mataric: multi-robot stealthy navigation. 2004 (검색 요약 기준). 인증서 만료. [UNVERIFIED]. <a href="https://robotics.usc.edu/resl/publications/363/">https://robotics.usc.edu/resl/publications/363/</a></li>
+    <li id="S-LQ-37">[S-LQ-37] A taxonomy for task allocation problems with temporal and ordering constraints. 2017. 기록 페이지. <a href="https://experts.umn.edu/en/publications/a-taxonomy-for-task-allocation-problems-with-temporal-and-orderin/">https://experts.umn.edu/en/publications/a-taxonomy-for-task-allocation-problems-with-temporal-and-orderin/</a></li>
+    <li id="S-LQ-38">[S-LQ-38] Consensus-Based Decentralized Auctions for Robust Task Allocation. 2009 (검색 요약 기준). HTTP 429. 부분 확인. <a href="https://dspace.mit.edu/handle/1721.1/52330">https://dspace.mit.edu/handle/1721.1/52330</a></li>
+  </ul>
+</section>
+
+<section class="tab" id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-swarm">군집 로봇공학(swarm robotics)</dt><dd>값싼 로봇 여러 대가 지역 규칙만으로 함께 일하는 방식을 연구하는 분야다.</dd>
+    <dt id="term-foraging">먹이 찾기(foraging)</dt><dd>먹이를 찾아 둥지로 가져오는 일이다.</dd>
+    <dt id="term-stigmergy">스티그머지(stigmergy)</dt><dd>환경에 남긴 흔적으로 서로 소통하는 방식이다.</dd>
+  </dl>
+  <p class="muted">이 사이트의 다른 용어는 각 프로젝트 페이지 끝의 용어 부록에 있다.</p>
+</section>
+
+</div>
+<script>
+(function () {
+  var tabs = document.querySelector(".tabs");
+  var secs = document.querySelectorAll("section.tab");
+  var links = tabs.querySelectorAll("a");
+  function show(scroll) {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id ? document.getElementById(id) : null;
+    var sec = el ? el.closest("section.tab") : null;
+    if (!sec) { sec = secs[0]; el = null; }
+    for (var i = 0; i < secs.length; i++) secs[i].classList.toggle("on", secs[i] === sec);
+    for (var j = 0; j < links.length; j++) {
+      var cur = links[j].getAttribute("href") === "#" + sec.id;
+      links[j].classList.toggle("on", cur);
+      if (cur) links[j].setAttribute("aria-current", "true"); else links[j].removeAttribute("aria-current");
+    }
+    if (el && el !== sec) el.scrollIntoView();
+    else if (scroll) tabs.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", function () { show(true); });
+  show(false);
+})();
+</script>
+</body>
+</html>

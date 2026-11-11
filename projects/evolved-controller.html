@@ -1,0 +1,212 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>3위 진화한 먹이 찾기 제어기 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav">
+  <a href="spiral-search.html">← 이전: 2위 나선 탐색</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="irrigation.html">다음: 4위 정밀 관개 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 3위 / 9개 (순위 순서)</div>
+  <h1>진화한 먹이 찾기 제어기<br><span class="muted" style="font-size:15px;font-weight:400">Evolved foraging controller</span></h1>
+  <div class="lead">
+    <p><strong>결론: 3위, 12점. 4개가 12점으로 동점이고, 적합도 3점으로 3위가 됐다.</strong></p>
+    <p>왜 3위인가: Lu 교수의 Scholar에 신경진화(NeuroEvolution) 먹이 찾기 논문이 있다. 주된 위험은 소유자가 직접 돌려야 하는 진화 실행이다.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 2</span>
+      <span class="chip">2주 구현 가능성(feasibility) 2</span>
+      <span class="chip">교수 연구와의 적합도(fit) 3</span>
+      <span class="chip">합계 = 곱 = 12 (추정, inference)</span>
+    </div>
+    <p class="muted">동점 처리 규칙(적합도 먼저, 그다음 연구 가능성)은 조사자의 선택이다 (추정, inference). 소유자가 바꿀 수 있다.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제</a></li>
+    <li><a href="#s2">2 목표</a></li>
+    <li><a href="#s3">3 ARGoS 작동</a></li>
+    <li><a href="#s4">4 알고리즘 단계</a></li>
+    <li><a href="#s5">5 측정</a></li>
+    <li><a href="#s6">6 연구 가능성</a></li>
+    <li><a href="#s7">7 관련 논문</a></li>
+    <li><a href="#s8">8 분담과 일정</a></li>
+    <li><a href="#s9">9 위험</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="세대별 적합도 차트의 빈 틀과, 처음 보는 장애물 지도에서 손으로 쓴 제어기와 진화한 제어기의 이동 경로">
+      <text class="b" x="40" y="22">그림 1 왼쪽: 세대별 적합도 (계획)</text>
+      <line x1="40" y1="38" x2="70" y2="38" stroke="var(--s1)" stroke-width="3"/><text class="m" x="76" y="42">최고(best)</text>
+      <line x1="220" y1="38" x2="250" y2="38" stroke="var(--s4)" stroke-width="3" stroke-dasharray="6 4"/><text class="m" x="256" y="42">평균(mean)</text>
+      <line class="gr" x1="70" y1="140" x2="460" y2="140"/><line class="gr" x1="70" y1="210" x2="460" y2="210"/><line class="gr" x1="70" y1="280" x2="460" y2="280"/>
+      <line class="ax" x1="70" y1="92" x2="70" y2="320"/>
+      <line class="ax" x1="70" y1="320" x2="460" y2="320"/>
+      <text class="b c" x="265" y="352">세대(generation)</text>
+      <text class="b c" transform="translate(32 206) rotate(-90)">적합도(fitness)</text>
+      <text class="m c" x="265" y="210">실측 전 빈 틀 (계획)</text>
+      <text class="m c" x="265" y="228">값은 아직 없다</text>
+
+      <text class="b" x="520" y="22">그림 1 오른쪽: 처음 보는 장애물 지도의 경로 (계획)</text>
+      <line x1="520" y1="38" x2="550" y2="38" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4"/><text class="m" x="556" y="42">손으로 쓴 제어기(hand-written)</text>
+      <line x1="780" y1="38" x2="810" y2="38" stroke="var(--s1)" stroke-width="3"/><text class="m" x="816" y="42">진화한 제어기(evolved)</text>
+      <rect x="520" y="56" width="14" height="10" fill="#bbb" stroke="#777"/><text class="m" x="540" y="65">장애물(obstacle)</text>
+      <circle cx="790" cy="61" r="6" fill="none" stroke="var(--s5)" stroke-width="2"/><text class="m" x="802" y="65">먹이(food)</text>
+
+      <text class="m" x="520" y="88">손으로 쓴 제어기</text>
+      <rect class="wall" x="520" y="94" width="210" height="210"/>
+      <rect x="550" y="134" width="50" height="20" fill="#bbb" stroke="#777"/><rect x="640" y="204" width="20" height="60" fill="#bbb" stroke="#777"/>
+      <rect x="526" y="272" width="24" height="24" fill="#d9d9d9" stroke="#666"/>
+      <circle cx="700" cy="114" r="12" fill="none" stroke="var(--s5)" stroke-width="2"/>
+      <path d="M540 272 L540 194 L580 194 L580 164 L610 164 L610 114 L690 114" fill="none" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4"/>
+
+      <text class="m" x="770" y="88">진화한 제어기</text>
+      <rect class="wall" x="770" y="94" width="210" height="210"/>
+      <rect x="800" y="134" width="50" height="20" fill="#bbb" stroke="#777"/><rect x="890" y="204" width="20" height="60" fill="#bbb" stroke="#777"/>
+      <rect x="776" y="272" width="24" height="24" fill="#d9d9d9" stroke="#666"/>
+      <circle cx="950" cy="114" r="12" fill="none" stroke="var(--s5)" stroke-width="2"/>
+      <path d="M790 272 C830 242 850 202 940 118" fill="none" stroke="var(--s1)" stroke-width="3"/>
+      <text class="m c" x="750" y="340">둥지(nest)는 왼쪽 아래 회색 칸</text>
+    </svg>
+    <figcaption>
+      그림 1. 왼쪽은 세대별 적합도 차트의 축을, 오른쪽은 같은 지도에서 두 제어기의 경로를 보인다. 왜: 진화한 제어기가 처음 보는 장애물 배치에서도 통하는지가 핵심 질문이다.
+      <span class="ab">약어: 없음. 출처: 원문 Suggested figure <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>. 경로 모양은 설명용 스케치이며 측정값이 아니다.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 문제</h2>
+  <ul>
+    <li>손으로 조정한 먹이 찾기 규칙은 장애물이 나타나면 깨진다.</li>
+    <li>Lu 교수의 Scholar 목록에 장애물 환경에서 신경진화(<a class="t" href="#term-neat">NeuroEvolution of Augmenting Topologies, NEAT</a>)로 먹이 찾기 군집을 진화시킨 논문이 있다 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>.</li>
+    <li><span class="mark">부분 확인(partial)</span> 저자 명단은 읽지 못했다.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 목표</h2>
+  <ul>
+    <li>장애물이 있는 먹이 찾기용 작은 신경망 또는 매개변수 제어기를 진화시킨다.</li>
+    <li>손으로 쓴 제어기와 비교한다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 ARGoS에서 작동하는 방식</h2>
+  <table class="t">
+    <caption>표 1. ARGoS 구성 (출처: 원문 How it works in ARGoS)</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>로봇</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>) 10대.</td></tr>
+      <tr><td>센서</td><td>근접 센서(proximity sensor) 입력 8개, 지면 센서(ground sensor), 둥지 쪽 빛 센서(light sensor). 둥지에 빛을 둔다.</td></tr>
+      <tr><td>행동 규칙</td><td>신경망이 센서 값을 두 바퀴 속도로 바꾼다.</td></tr>
+      <tr><td>루프 함수</td><td>argos3-examples에 유전 알고리즘(<a class="t" href="#term-ga">genetic algorithm</a>) 루프 함수가 있다. <code>galib_phototaxis_loop_functions</code>와 <code>mpga_loop_functions</code>가 템플릿이다 <a class="s" href="../index.html#S-LQ-7">[S-LQ-7]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 알고리즘 단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 틀 가져오기</a></li>
+    <li><a href="#a2">Step 2 유전자</a></li>
+    <li><a href="#a3">Step 3 적합도</a></li>
+    <li><a href="#a4">Step 4 진화</a></li>
+    <li><a href="#a5">Step 5 시험</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p><code>mpga</code> 예제의 구조에서 시작한다 <a class="s" href="../index.html#S-LQ-7">[S-LQ-7]</a>.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>유전자(<a class="t" href="#term-genome">genome</a>)는 고정된 작은 신경망의 가중치다. NEAT보다 단순하다.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>적합도(<a class="t" href="#term-fitness">fitness</a>)는 한 번의 시험에서 배달한 먹이 수다. 시드(seed) 3개로 평균한다.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>G 세대 동안 진화시킨다. 실행은 소유자가 한다.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>가장 좋은 유전자를 처음 보는 장애물 지도에서 시험한다.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 측정할 것</h2>
+  <ul>
+    <li>세대마다 최고 적합도와 평균 적합도를 잰다.</li>
+    <li>처음 보는 지도에서 모은 먹이를 진화한 제어기와 손으로 쓴 제어기로 비교한다.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 연구 가능성과 학회</h2>
+  <ul>
+    <li>열린 질문: 진화한 군집 제어기가 새 장애물 배치로 옮겨 가는가 (추정, inference).</li>
+    <li>데모를 넘는 점: 지도 종류를 가로지르는 전이 시험이다 (추정, inference).</li>
+    <li>학회 후보 (추정, inference): <a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-gecco">Genetic and Evolutionary Computation Conference (GECCO)</a> 워크숍, <a class="t" href="#term-alife">Artificial Life (ALIFE)</a>.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 관련 논문</h2>
+  <table class="t">
+    <caption>표 2. 관련 논문</caption>
+    <thead><tr><th>논문</th><th>핵심</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Qi Lu (Scholar 기준 공저). 장애물 환경의 NEAT 먹이 찾기, 2025 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a></td><td>이 프로젝트가 따르는 논문이다.</td><td>부분 확인(partial). 저자 명단 미확인</td></tr>
+      <tr><td>Qi Lu 외. 먹이 찾기용 다중 행위자 주의 비평가 강화학습(multi-actor-attention-critic reinforcement learning), 2021 <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a></td><td>같은 연구실의 학습 기반 먹이 찾기 연구다.</td><td>Scholar 목록만 확인</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 4인 분담과 2주 일정</h2>
+  <table class="t">
+    <caption>표 3. 4인 분담 (출처: 원문)</caption>
+    <thead><tr><th>사람</th><th>1주차</th><th>2주차</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>신경망 제어기</td><td>손으로 쓴 기준선</td></tr>
+      <tr><td class="c">B</td><td>유전 알고리즘 루프 함수, 적합도</td><td>시험 지도</td></tr>
+      <tr><td class="c">C</td><td>장애물 지도, 소유자용 실행 스크립트</td><td>그래프</td></tr>
+      <tr><td class="c">D</td><td>관련 연구, 슬라이드</td><td>발표</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 위험</h2>
+  <ul>
+    <li>계산량: 진화는 실행이 많이 필요하다. 저장소 규칙상 소유자가 손으로 돌린다. 시간 안에 끝나지 않으면 결과가 막힌다.</li>
+    <li>진화한 행동이 하찮을 수 있다. 예를 들어 둥지 근처에서 맴돈다. 적합도를 일찍 다듬는다.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="spiral-search.html">← 이전: 2위 나선 탐색</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="irrigation.html">다음: 4위 정밀 관개 →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-neat">신경진화(NeuroEvolution of Augmenting Topologies, NEAT)</dt><dd>신경망의 가중치와 구조를 진화로 함께 키우는 방법이다.</dd>
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+    <dt id="term-ga">유전 알고리즘(genetic algorithm)</dt><dd>좋은 해를 골라 섞고 바꾸며 세대를 거듭해 해를 찾는 방법이다.</dd>
+    <dt id="term-genome">유전자(genome)</dt><dd>진화가 바꾸는 값의 묶음이다. 여기서는 신경망 가중치다.</dd>
+    <dt id="term-fitness">적합도(fitness)</dt><dd>한 유전자가 얼마나 좋은지 매기는 점수다. 여기서는 배달한 먹이 수다.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-gecco">Genetic and Evolutionary Computation Conference (GECCO)</dt><dd>유전·진화 계산 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-alife">Artificial Life (ALIFE)</dt><dd>인공 생명 학회다. 후보 학회는 원문의 추정이다.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

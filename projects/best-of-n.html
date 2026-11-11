@@ -1,0 +1,207 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>8위 집단 결정 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav">
+  <a href="sorting-segregation.html">← 이전: 7위 분류와 분리</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="herding.html">다음: 9위 양 몰기 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 8위 / 9개 (순위 순서)</div>
+  <h1>집단 결정 (n개 중 최선 고르기)<br><span class="muted" style="font-size:15px;font-weight:400">Collective decision (best-of-n)</span></h1>
+  <div class="lead">
+    <p><strong>결론: 8위, 6점. 구현은 쉽지만 이미 많이 연구됐고 Lu 교수 논문과 겹치지 않는다.</strong></p>
+    <p>왜 8위인가: 2주 구현 가능성은 3점이다. 적합도가 1점이라 곱이 낮다.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 2</span>
+      <span class="chip">2주 구현 가능성(feasibility) 3</span>
+      <span class="chip">교수 연구와의 적합도(fit) 1</span>
+      <span class="chip">합계 = 곱 = 6 (추정, inference)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제</a></li>
+    <li><a href="#s2">2 목표</a></li>
+    <li><a href="#s3">3 ARGoS 작동</a></li>
+    <li><a href="#s4">4 알고리즘 단계</a></li>
+    <li><a href="#s5">5 측정</a></li>
+    <li><a href="#s6">6 연구 가능성</a></li>
+    <li><a href="#s7">7 관련 논문</a></li>
+    <li><a href="#s8">8 분담과 일정</a></li>
+    <li><a href="#s9">9 위험</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="검은 칸과 흰 칸 바닥 위에서 의견별로 색이 다른 로봇들, 그리고 시간에 따른 올바른 의견 비율 차트의 빈 틀">
+      <text class="b" x="40" y="22">그림 1 왼쪽: 바닥 칸 지도와 로봇의 의견 (설명용 스케치)</text>
+      <rect x="40" y="32" width="14" height="10" fill="#2a2a2a"/><text class="m" x="60" y="41">검은 칸(black tile)</text>
+      <rect x="220" y="32" width="14" height="10" fill="#fff" stroke="#999"/><text class="m" x="240" y="41">흰 칸(white tile)</text>
+      <circle cx="47" cy="58" r="6" fill="var(--s1)" stroke="#fff" stroke-width="2"/><text class="m" x="60" y="62">검정이 다수라는 의견(opinion)</text>
+      <circle cx="307" cy="58" r="6" fill="var(--s2)" stroke="#fff" stroke-width="2"/><text class="m" x="320" y="62">흰색이 다수라는 의견</text>
+      <rect x="40" y="72" width="416" height="280" fill="#fff"/>
+      <path fill="#2a2a2a" d="M40 72h52v56h-52z M144 72h52v56h-52z M196 72h52v56h-52z M300 72h52v56h-52z M404 72h52v56h-52z
+        M92 128h52v56h-52z M144 128h52v56h-52z M248 128h52v56h-52z M352 128h52v56h-52z M404 128h52v56h-52z
+        M40 184h52v56h-52z M92 184h52v56h-52z M196 184h52v56h-52z M248 184h52v56h-52z M300 184h52v56h-52z M404 184h52v56h-52z
+        M40 240h52v56h-52z M144 240h52v56h-52z M196 240h52v56h-52z M352 240h52v56h-52z M404 240h52v56h-52z
+        M92 296h52v56h-52z M144 296h52v56h-52z M248 296h52v56h-52z M300 296h52v56h-52z M352 296h52v56h-52z"/>
+      <g class="gr">
+        <line x1="40" y1="128" x2="456" y2="128"/><line x1="40" y1="184" x2="456" y2="184"/><line x1="40" y1="240" x2="456" y2="240"/><line x1="40" y1="296" x2="456" y2="296"/>
+        <line x1="92" y1="72" x2="92" y2="352"/><line x1="144" y1="72" x2="144" y2="352"/><line x1="196" y1="72" x2="196" y2="352"/><line x1="248" y1="72" x2="248" y2="352"/><line x1="300" y1="72" x2="300" y2="352"/><line x1="352" y1="72" x2="352" y2="352"/><line x1="404" y1="72" x2="404" y2="352"/>
+      </g>
+      <rect class="wall" x="40" y="72" width="416" height="280" style="fill:none"/>
+      <g stroke="#fff" stroke-width="2">
+        <circle cx="66" cy="100" r="9" fill="var(--s1)"/><circle cx="170" cy="156" r="9" fill="var(--s1)"/><circle cx="274" cy="100" r="9" fill="var(--s1)"/><circle cx="222" cy="212" r="9" fill="var(--s1)"/><circle cx="378" cy="268" r="9" fill="var(--s1)"/><circle cx="120" cy="268" r="9" fill="var(--s1)"/>
+        <circle cx="326" cy="156" r="9" fill="var(--s2)"/><circle cx="430" cy="214" r="9" fill="var(--s2)"/>
+      </g>
+
+      <text class="b" x="560" y="22">그림 1 오른쪽: 시간과 올바른 의견 비율 (계획)</text>
+      <line class="gr" x1="620" y1="120" x2="960" y2="120"/><line class="gr" x1="620" y1="200" x2="960" y2="200"/><line class="gr" x1="620" y1="270" x2="960" y2="270"/>
+      <line class="ax" x1="620" y1="88" x2="620" y2="320"/>
+      <line class="ax" x1="620" y1="320" x2="960" y2="320"/>
+      <text class="b c" x="790" y="352">시간(time)</text>
+      <text class="b c" transform="translate(556 204) rotate(-90)">올바른 의견을 가진 비율</text>
+      <text class="m c" x="790" y="210">실측 전 빈 틀 (계획)</text>
+      <text class="m c" x="790" y="228">값은 아직 없다</text>
+    </svg>
+    <figcaption>
+      그림 1. 왼쪽은 칸 색 비율과 로봇 의견을, 오른쪽은 올바른 의견 비율 곡선의 축을 보인다. 왜: 센서 잡음이 있을 때 군집이 얼마나 빨리 옳은 쪽에 모이는지가 핵심이다.
+      <span class="ab">약어: 없음. 출처: 원문 Suggested figure. 칸 배치와 의견 분포는 설명용 스케치이며 측정값이 아니다.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 문제</h2>
+  <ul>
+    <li>군집이 잡음 많은 지역 감지로 n개 선택지 중 더 나은 것을 골라야 한다.</li>
+    <li>예: 바닥에서 더 많은 쪽 색을 고른다.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 목표</h2>
+  <ul>
+    <li>풋봇이 우세한 바닥 색을 추정해 합의에 이르게 한다.</li>
+    <li>정확도와 걸리는 시간을 잰다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 ARGoS에서 작동하는 방식</h2>
+  <table class="t">
+    <caption>표 1. ARGoS 구성 (출처: 원문 How it works in ARGoS)</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>로봇</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>) 20대에서 50대.</td></tr>
+      <tr><td>센서</td><td>지면 센서(ground sensor)는 검은 칸과 흰 칸을 읽는다. 범위·방향 센서(<a class="t" href="#term-rab">range-and-bearing sensor</a>)는 의견을 나눈다.</td></tr>
+      <tr><td>행동 규칙</td><td>돌아다니며 표본을 얻고 투표한다. 규칙은 다수결 규칙(<a class="t" href="#term-majority">majority rule</a>)이나 투표자 모형(<a class="t" href="#term-voter">voter model</a>)이다.</td></tr>
+      <tr><td>루프 함수</td><td>루프 함수(<a class="t" href="#term-loop">loop functions</a>)가 정한 비율로 무작위 검정·흰 칸 바닥을 만든다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 알고리즘 단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 표본</a></li>
+    <li><a href="#a2">Step 2 의견</a></li>
+    <li><a href="#a3">Step 3 방송</a></li>
+    <li><a href="#a4">Step 4 갱신</a></li>
+    <li><a href="#a5">Step 5 멈춤</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>각 로봇이 일정 시간 동안 바닥 색을 표본으로 모은다.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>표본으로 의견을 만든다.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>자기 의견을 방송하고 이웃의 의견을 듣는다.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>이웃의 다수 의견으로 자기 의견을 갱신한다.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>90%가 같은 의견이 되면 멈춘다.</p></div>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 측정할 것</h2>
+  <ul>
+    <li>바닥 색 비율(0.52에서 0.7)과 센서 잡음에 따른 정확도와 합의 시간을 잰다.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 연구 가능성과 학회</h2>
+  <ul>
+    <li>열린 질문: 불완전한 센서로 하는 결정 <a class="s" href="../index.html#S-LQ-16">[S-LQ-16]</a>, 군집의 일부만으로 하는 결정 <a class="s" href="../index.html#S-LQ-17">[S-LQ-17]</a>.</li>
+    <li>데모를 넘는 점: 잡음 대 정확도 곡선이다 (추정, inference).</li>
+    <li>학회 후보 (추정, inference): <a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-swarm">International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM)</a>, <a class="t" href="#term-iros">International Conference on Intelligent Robots and Systems (IROS)</a> 워크숍.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 관련 논문</h2>
+  <table class="t">
+    <caption>표 2. 관련 논문</caption>
+    <thead><tr><th>논문</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Chin, Khaluf, Pinciroli. 불완전한 센서의 집단 지각. IROS 2023 <a class="s" href="../index.html#S-LQ-16">[S-LQ-16]</a></td><td>초록 확인. IROS 2023 채택</td></tr>
+      <tr><td>Fuady, Tarapore, Soorati. SubCDM: 군집 부분집합의 집단 의사결정. arXiv 2025 <a class="s" href="../index.html#S-LQ-17">[S-LQ-17]</a></td><td>초록 확인. 사전 공개본(preprint)</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 4인 분담과 2주 일정</h2>
+  <table class="t">
+    <caption>표 3. 4인 분담 (출처: 원문)</caption>
+    <thead><tr><th>사람</th><th>1주차</th><th>2주차</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>바닥 칸 루프 함수</td><td>잡음 모형</td></tr>
+      <tr><td class="c">B</td><td>표본 추출과 투표 제어기</td><td>두 번째 결정 규칙</td></tr>
+      <tr><td class="c">C</td><td>기록, 합의 감지기</td><td>그래프</td></tr>
+      <tr><td class="c">D</td><td>관련 연구, 슬라이드</td><td>발표</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 위험</h2>
+  <ul>
+    <li>이미 잘 연구된 주제다. 2주 안에 새로움을 만들기 어렵다.</li>
+    <li>Lu 교수 논문과 겹치지 않는다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a>.</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="sorting-segregation.html">← 이전: 7위 분류와 분리</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="herding.html">다음: 9위 양 몰기 →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+    <dt id="term-rab">범위·방향 센서(range-and-bearing sensor)</dt><dd>이웃 로봇의 거리와 방향을 알고 짧은 메시지를 주고받는 장치다.</dd>
+    <dt id="term-majority">다수결 규칙(majority rule)</dt><dd>이웃 중 더 많은 쪽 의견을 따르는 규칙이다.</dd>
+    <dt id="term-voter">투표자 모형(voter model)</dt><dd>무작위로 고른 이웃의 의견 하나를 그대로 따르는 규칙이다.</dd>
+    <dt id="term-loop">루프 함수(loop functions)</dt><dd>ARGoS 시뮬레이션 매 단계에 끼어드는 사용자 코드다. 바닥 칸 배치를 맡는다.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-swarm">International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM)</dt><dd>군집 행동과 생체 모방 로봇 심포지엄이다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-iros">International Conference on Intelligent Robots and Systems (IROS)</dt><dd>지능형 로봇 학회다. 논문 한 편이 이 학회에 채택됐다.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

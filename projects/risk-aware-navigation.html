@@ -1,0 +1,233 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>4위(공동) 위험 인지 집단 항법 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+
+<nav class="topnav">
+  <a href="irrigation.html">← 이전: 4위 정밀 관개</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="territory-game.html">다음: 6위 땅따먹기 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 4위 (공동) / 9개 (순위 순서)</div>
+  <h1>위험 인지 집단 항법: 모르는 위험 지대 건너기<br><span class="muted" style="font-size:15px;font-weight:400">Risk-aware collective navigation in an unknown hazardous field</span></h1>
+  <div class="lead">
+    <p><strong>결론: 4위 공동, 12점. 연구 가능성이 3점이다. Lu 교수와의 연결은 페로몬 보안 연구의 보호 쪽 짝이라는 추정이다.</strong></p>
+    <p>왜 이 순위인가: 위험 정보 공유가 생존율을 얼마나 올리는지가 새 질문이다. 그러나 A* 계획과 감시자 변형 때문에 구현이 2점이다.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 3</span>
+      <span class="chip">2주 구현 가능성(feasibility) 2</span>
+      <span class="chip">교수 연구와의 적합도(fit) 2</span>
+      <span class="chip">합계 = 곱 = 12 (추정, inference)</span>
+    </div>
+    <p class="muted">민간 용도로 본다: 불, 방사선, 화학 지대를 건너는 구조·점검 로봇이다.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제</a></li>
+    <li><a href="#s2">2 목표</a></li>
+    <li><a href="#s3">3 ARGoS 작동</a></li>
+    <li><a href="#s4">4 알고리즘 단계</a></li>
+    <li><a href="#s5">5 측정</a></li>
+    <li><a href="#s6">6 연구 가능성</a></li>
+    <li><a href="#s7">7 관련 논문</a></li>
+    <li><a href="#s8">8 분담과 일정</a></li>
+    <li><a href="#s9">9 위험</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="숨은 위험 구역과 로봇이 쓰러진 위험 표시, 위험을 피해 휘는 경로, 그리고 목표 도달 시간과 생존율 산점도의 빈 틀">
+      <text class="b" x="40" y="22">그림 1 왼쪽: 위험 구역과 경로 (설명용 스케치)</text>
+      <rect x="40" y="32" width="22" height="12" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/><text class="m" x="68" y="42">숨은 위험 구역(hazard zone)</text>
+      <path d="M262 34 l12 12 M274 34 l-12 12" stroke="var(--s2)" stroke-width="3"/><text class="m" x="282" y="42">쓰러진 곳(danger mark)</text>
+      <line x1="40" y1="58" x2="68" y2="58" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4"/><text class="m" x="74" y="62">최단 경로(shortest path)</text>
+      <line x1="262" y1="58" x2="290" y2="58" stroke="var(--s1)" stroke-width="3"/><text class="m" x="296" y="62">위험 공유 경로(sharing)</text>
+      <rect class="wall" x="40" y="72" width="420" height="280"/>
+      <rect x="40" y="72" width="40" height="280" fill="#eee" stroke="#333" stroke-width="2"/>
+      <rect x="420" y="72" width="40" height="280" fill="#eaf5ea" stroke="#333" stroke-width="2"/>
+      <text class="m" x="46" y="88">시작</text>
+      <text class="m e" x="454" y="88">목표</text>
+      <rect x="190" y="150" width="80" height="80" fill="none" stroke="#555" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <rect x="320" y="240" width="70" height="60" fill="none" stroke="#555" stroke-width="1.8" stroke-dasharray="6 4"/>
+      <path d="M90 190 L230 190" stroke="var(--base)" stroke-width="3" stroke-dasharray="6 4" fill="none"/>
+      <path d="M224 184 l12 12 M236 184 l-12 12" stroke="var(--s2)" stroke-width="3"/>
+      <path d="M200 164 l12 12 M212 164 l-12 12" stroke="var(--s2)" stroke-width="3"/>
+      <path d="M349 264 l12 12 M361 264 l-12 12" stroke="var(--s2)" stroke-width="3"/>
+      <path d="M90 190 C140 190 170 105 230 105 C290 105 340 190 420 190" stroke="var(--s1)" stroke-width="3" fill="none"/>
+      <circle cx="90" cy="190" r="5" fill="#222"/>
+
+      <text class="b" x="560" y="22">그림 1 오른쪽: 시간과 생존율 (계획)</text>
+      <circle cx="590" cy="38" r="5" fill="var(--base)"/><text class="m" x="602" y="42">최단 경로(shortest)</text>
+      <rect x="780" y="33" width="10" height="10" fill="var(--s4)"/><text class="m" x="796" y="42">떼 짓기(flocking)</text>
+      <path d="M590 56 l6 10 h-12 z" fill="var(--s1)"/><text class="m" x="602" y="64">위험 공유(sharing)</text>
+      <line class="gr" x1="580" y1="140" x2="960" y2="140"/><line class="gr" x1="580" y1="200" x2="960" y2="200"/><line class="gr" x1="580" y1="260" x2="960" y2="260"/>
+      <line class="ax" x1="580" y1="88" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <text class="b c" x="770" y="352">목표 도달 시간(time to goal)</text>
+      <text class="b c" transform="translate(540 204) rotate(-90)">생존율(survival fraction)</text>
+      <text class="m c" x="770" y="200">실측 전 빈 틀 (계획)</text>
+      <text class="m c" x="770" y="218">점 하나는 w 값 하나다</text>
+    </svg>
+    <figcaption>
+      그림 1. 왼쪽은 위험을 피해 휘는 경로를, 오른쪽은 시간과 생존율의 교환 곡선을 그릴 축을 보인다. 왜: 위험 정보 공유가 생존율을 올리는 대신 시간을 얼마나 쓰는지가 핵심 질문이다.
+      <span class="ab">약어: 없음. 출처: 원문 Suggested figure. 구역과 경로 위치는 설명용이다. w는 위험 가중치다.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 문제</h2>
+  <ul>
+    <li>군집이 경기장을 가로질러 목표 구역에 닿아야 한다.</li>
+    <li>밭의 일부는 로봇을 멈추게 한다.</li>
+    <li>시작할 때 위험이 어디 있는지 아무도 모른다. 군집은 로봇을 잃거나 감지하며 알아 간다.</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 목표</h2>
+  <ul>
+    <li>로봇이 위험을 찾는 대로 공유해 가장 많은 로봇이 살아서 목표에 닿게 한다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 ARGoS에서 작동하는 방식</h2>
+  <table class="t">
+    <caption>표 1. ARGoS 구성 (출처: 원문 How it works in ARGoS)</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>로봇</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>) 20대에서 40대. 시작 구역과 목표 구역을 바닥에 칠한다.</td></tr>
+      <tr><td>센서</td><td>위치 센서, 근접 센서, 범위·방향 센서(<a class="t" href="#term-rab">range-and-bearing sensor</a>)는 위험 메시지에 쓴다. 지면 센서는 선택이며 위험 힌트를 읽는다.</td></tr>
+      <tr><td>변형 (a) 위험 구역</td><td>숨은 구역이다. 루프 함수가 구역 안의 로봇을 단계마다 확률 p로 끈다.</td></tr>
+      <tr><td>변형 (b) 감시</td><td>시야 원뿔(view cone)을 가진 감시자(<a class="t" href="#term-sentry">sentry</a>)가 서 있거나 순찰한다. 원뿔 안에 든 로봇은 발각되어 사라지거나 임무가 실패한다.</td></tr>
+      <tr><td>루프 함수</td><td>루프 함수(<a class="t" href="#term-loop">loop functions</a>)가 위험과 감시 논리, 제거 목록을 맡는다. 공유 위험 격자를 "위험 페로몬(<a class="t" href="#term-danger">danger pheromone</a>)"으로 바닥에 그린다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 알고리즘 단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 A* 계획</a></li>
+    <li><a href="#a2">Step 2 쓰러진 곳</a></li>
+    <li><a href="#a3">Step 3 위험 공유</a></li>
+    <li><a href="#a4">Step 4 다시 계획</a></li>
+    <li><a href="#a5">Step 5 w 훑기</a></li>
+    <li><a href="#base">기준선</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div><p>각 로봇이 격자에서 A* 경로 탐색(<a class="t" href="#term-astar">A* path search</a>)으로 길을 짠다. 간선 비용은 거리에 w 곱하기 칸 위험을 더한 값이다.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div><p>로봇이 꺼지면 그 마지막 칸의 위험을 높인다. 이웃이 마지막 메시지를 들었기 때문이다.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div><p>살아남은 로봇이 범위·방향 신호로 위험 갱신을 방송한다. 또는 루프 함수가 줄어드는 위험 페로몬으로 칠한다.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div><p>경로가 위험이 오른 칸을 지나면 로봇이 다시 계획한다.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div><p>w를 0(최단 경로)에서 큰 값(가장 조심)까지 바꿔 본다.</p></div>
+  </div>
+  <div class="panel" id="base">
+    <p class="label">기준선(Baselines)</p>
+    <ul>
+      <li>개별 최단 경로 (w = 0, 공유 없음).</li>
+      <li>목표를 향한 단순 떼 짓기(<a class="t" href="#term-flock">flocking</a>).</li>
+      <li>위험을 공유하는 군집.</li>
+    </ul>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 측정할 것</h2>
+  <ul>
+    <li>생존율과 목표 도달 시간을 잰다.</li>
+    <li>교환 곡선을 그린다. w 값마다 점 하나이며 가로축은 시간, 세로축은 생존율이다.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 연구 가능성과 학회</h2>
+  <ul>
+    <li>열린 질문: 공유한 위험 정보가 생존을 얼마나 올리고 시간은 얼마나 드는가 (추정, inference).</li>
+    <li>관련 줄기: 소모 위험을 고려한 경로(routing with attrition risk) <span class="mark">[UNVERIFIED]</span> <a class="s" href="../index.html#S-LQ-35">[S-LQ-35]</a>, 군집의 공유 위험 지도 <a class="s" href="../index.html#S-LQ-33">[S-LQ-33]</a>, 침입자에 대한 집단 회피 <a class="s" href="../index.html#S-LQ-34">[S-LQ-34]</a>, 순찰하는 관찰자를 피하는 최소 노출 경로 <a class="s" href="../index.html#S-LQ-32">[S-LQ-32]</a>.</li>
+    <li>데모를 넘는 점: 스티그머지(stigmergy)식 위험 표시를 쓰는 군집의 생존·시간 교환 곡선이다 (추정, inference).</li>
+    <li>학회 후보 (추정, inference): <a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-dars">Distributed Autonomous Robotic Systems (DARS)</a>, International Conference on Intelligent Robots and Systems (IROS)나 International Conference on Robotics and Automation (ICRA)의 안전·복원력 워크숍.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 관련 논문</h2>
+  <table class="t">
+    <caption>표 2. 관련 논문</caption>
+    <thead><tr><th>논문</th><th>핵심</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Arseneault, Vielfaure, Beltrame. RASS: 위험 인지 군집 저장. arXiv 2022 <a class="s" href="../index.html#S-LQ-33">[S-LQ-33]</a></td><td>이웃 메시지로 만든 공유 위험 지도다.</td><td>초록 확인. 시뮬레이터 이름 없음</td></tr>
+      <tr><td>Novák 외. 자기 위치를 아는 무인기 군집의 빠른 집단 회피. Bioinspiration and Biomimetics 2021 (arXiv 2024) <a class="s" href="../index.html#S-LQ-34">[S-LQ-34]</a></td><td>집단 회피다.</td><td>초록 확인</td></tr>
+      <tr><td>Cartee 외. 시간 의존 감시·회피 게임. IEEE Conference on Decision and Control (CDC) 2019 <a class="s" href="../index.html#S-LQ-32">[S-LQ-32]</a></td><td>순찰자를 피하는 최소 노출 경로다.</td><td>초록 확인</td></tr>
+      <tr><td>Hudack, Oh. 소모 위험이 있는 다중 에이전트 센서 자료 수집. International Conference on Automated Planning and Scheduling (ICAPS) 2016 <a class="s" href="../index.html#S-LQ-35">[S-LQ-35]</a></td><td>소모 위험 경로다.</td><td>[UNVERIFIED]. 페이지 접속 차단</td></tr>
+      <tr><td>Tews, Sukhatme, Matarić. 다중 로봇 은밀 항법. International Conference on Robotics and Automation (ICRA) 2004 <a class="s" href="../index.html#S-LQ-36">[S-LQ-36]</a></td><td>은밀한 이동이다.</td><td>[UNVERIFIED]. 인증서 만료로 못 읽음</td></tr>
+    </tbody>
+  </table>
+  <div class="panel">
+    <p class="label">Qi Lu 관련 연구</p>
+    <ul>
+      <li>위험이나 감시자 항법 논문은 그의 페이지에서 찾지 못했다 <a class="s" href="../index.html#S-LQ-2">[S-LQ-2]</a> <a class="s" href="../index.html#S-LQ-3">[S-LQ-3]</a>.</li>
+      <li>가장 가까운 연결: 페로몬 보안 연구다. 방해 로봇이 거짓 흔적으로 먹이 찾기 로봇을 붙잡아 제거하므로, 로봇 손실이 그의 논문에서 이미 측정값이다 <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>.</li>
+      <li>위험 페로몬은 그 아이디어의 보호 쪽 짝이다 (추정, inference).</li>
+    </ul>
+  </div>
+</section>
+
+<section id="s8">
+  <h2>8 4인 분담과 2주 일정</h2>
+  <table class="t">
+    <caption>표 3. 4인 분담 (출처: 원문)</caption>
+    <thead><tr><th>사람</th><th>1주차</th><th>2주차</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>위험 구역과 제거 논리</td><td>감시자 시야 원뿔 (변형 b)</td></tr>
+      <tr><td class="c">B</td><td>위험 비용이 있는 격자 A*</td><td>위험 변화 시 다시 계획</td></tr>
+      <tr><td class="c">C</td><td>위험 공유 (메시지 또는 바닥 페로몬)</td><td>떼 짓기 기준선</td></tr>
+      <tr><td class="c">D</td><td>관련 연구, 슬라이드</td><td>w 훑기 그래프, 발표</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 위험</h2>
+  <ul>
+    <li>감시자 원뿔과 순찰은 일을 늘린다. 변형 (a)를 먼저 한다.</li>
+    <li>로봇 40대가 매 단계 A*를 돌리면 느릴 수 있다. 변화가 있을 때만 다시 계획한다 (추정, inference).</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="irrigation.html">← 이전: 4위 정밀 관개</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="territory-game.html">다음: 6위 땅따먹기 →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+    <dt id="term-rab">범위·방향 센서(range-and-bearing sensor)</dt><dd>이웃 로봇의 거리와 방향을 알고 짧은 메시지를 주고받는 장치다.</dd>
+    <dt id="term-sentry">감시자(sentry)</dt><dd>시야 원뿔 안의 로봇을 발견하는 고정 또는 순찰 장치다.</dd>
+    <dt id="term-loop">루프 함수(loop functions)</dt><dd>ARGoS 시뮬레이션 매 단계에 끼어드는 사용자 코드다. 위험 논리와 바닥 그림을 맡는다.</dd>
+    <dt id="term-danger">위험 페로몬(danger pheromone)</dt><dd>위험한 칸에 남겨 시간이 지나면 흐려지는 가상 표시다.</dd>
+    <dt id="term-astar">A* 경로 탐색(A* path search)</dt><dd>격자에서 비용이 가장 적은 길을 찾는 알고리즘이다.</dd>
+    <dt id="term-flock">떼 짓기(flocking)</dt><dd>이웃과 가까이 붙어 같은 쪽으로 움직이는 규칙이다.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-dars">Distributed Autonomous Robotic Systems (DARS)</dt><dd>분산 자율 로봇 시스템 학회다. 후보 학회는 원문의 추정이다.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>
