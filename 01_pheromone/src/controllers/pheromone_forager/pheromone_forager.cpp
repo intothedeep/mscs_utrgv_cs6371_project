@@ -1,6 +1,7 @@
 #include "pheromone_forager.h"
 #include <argos3/core/utility/configuration/argos_configuration.h>
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
+#include <argos3/core/utility/logging/argos_log.h>
 
 
 /****************************************/
@@ -80,6 +81,21 @@ void CPheromoneForager::Reset()
 /****************************************/
 
 void CPheromoneForager::ControlStep()
+{
+    /* Diagnostic: a def1 Qt run ends silently near tick 983. Name the robot, then rethrow. */
+    try
+    {
+        ControlStepBody();
+    }
+    catch (std::exception &ex)
+    {
+        LOGERR << "[diag] ControlStep " << GetId() << " state " << m_eState << " suspects "
+               << m_vecSuspects.size() << ": " << ex.what() << std::endl;
+        throw;
+    }
+}
+
+void CPheromoneForager::ControlStepBody()
 {
     m_ePeakEvent = PEAK_NONE;
     m_bFollowStart = false;

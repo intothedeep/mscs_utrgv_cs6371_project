@@ -86,6 +86,7 @@ void CPheromoneLoopFunctions::Reset()
 
 void CPheromoneLoopFunctions::Destroy()
 {
+    LOGERR << "[diag] Destroy at tick " << GetSpace().GetSimulationClock() << std::endl; /* shows when a silent Qt exit tears down */
     m_cLogger.Close(); /* idempotent: PostExperiment may have closed it already */
 }
 

@@ -22,3 +22,4 @@
 2026-11-11 decisions: D-023 M3 started before M2 gate closed, kept (DECISIONS.md)
 2026-11-11 decisions: D-024 robots rest at the nest boundary, kept as a limit (DECISIONS.md)
 2026-11-11 M3: v3 chain rerun, D-025. Sweep 80 of 80 runs, check 0 failed (results/real/check_sweep_log.txt, results/real/g2_stats.csv)
+2026-11-11 M3: demo capture d2 def0 21 frames, def1 22 frames. Earlier def1 stop at about tick 983 was frame capture only, sim reached tick 6000 ([diag] Destroy line) (results/real/mvp3/demo/)

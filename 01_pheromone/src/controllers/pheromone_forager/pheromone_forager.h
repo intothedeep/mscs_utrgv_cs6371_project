@@ -142,6 +142,7 @@ private:
     bool IsConeHit() const;
     void RequestDeposit();
     /* Motion (pheromone_forager.cpp) */
+    void ControlStepBody();
     void UpdatePose();
     bool IsInNest() const;
     CVector2 DiffusionVector(bool &b_collision);

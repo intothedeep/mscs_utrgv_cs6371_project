@@ -1,0 +1,96 @@
+<?xml version="1.0" ?>
+<argos-configuration>
+  <framework>
+    <system threads="0" />
+    <experiment length="600" ticks_per_second="10" random_seed="1" />
+  </framework>
+  <controllers>
+    <pheromone_forager_controller id="honest" library="build/controllers/pheromone_forager/libpheromone_forager">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds implementation="default" medium="leds" />
+      </actuators>
+      <sensors>
+        <footbot_proximity implementation="default" show_rays="false" />
+        <positioning implementation="default" />
+      </sensors>
+      <params role="honest">
+        <diffusion go_straight_angle_range="-5:5" delta="0.1" />
+        <wheel_turning hard_turn_angle_threshold="90" soft_turn_angle_threshold="70" no_turn_angle_threshold="10" max_speed="10" />
+        <pheromone a_max="1000" lambda_dep="0.077" theta_on="20" theta_off="5" delta_up="5" t_peak="1" t_follow_min="5" t_rest="5" t_search="120" t_end="15" end_radius="0.3" probe_radius_m="0.15" decoy_reach_m="0.2" t_wait="2" follow_enabled="true" />
+        <defense enabled="false" r_merge="0.3" n_mem="16" r_suspect="0.4" alpha_cone_deg="10" d_cone="1" />
+        <nest edge_x="-1.0" centre_x="-1.5" centre_y="0.0" />
+      </params>
+    </pheromone_forager_controller>
+    <pheromone_forager_controller id="detractor" library="build/controllers/pheromone_forager/libpheromone_forager">
+      <actuators>
+        <differential_steering implementation="default" />
+        <leds implementation="default" medium="leds" />
+      </actuators>
+      <sensors>
+        <footbot_proximity implementation="default" show_rays="false" />
+        <positioning implementation="default" />
+      </sensors>
+      <params role="detractor">
+        <diffusion go_straight_angle_range="-5:5" delta="0.1" />
+        <wheel_turning hard_turn_angle_threshold="90" soft_turn_angle_threshold="70" no_turn_angle_threshold="10" max_speed="10" />
+        <pheromone a_max="1000" lambda_dep="0.077" theta_on="20" theta_off="5" delta_up="5" t_peak="1" t_follow_min="5" t_rest="5" t_search="120" t_end="15" end_radius="0.3" probe_radius_m="0.15" decoy_reach_m="0.2" t_wait="2" follow_enabled="true" />
+        <defense enabled="false" r_merge="0.3" n_mem="16" r_suspect="0.4" alpha_cone_deg="10" d_cone="1" />
+        <nest edge_x="-1.0" centre_x="-1.5" centre_y="0.0" />
+      </params>
+    </pheromone_forager_controller>
+  </controllers>
+  <loop_functions library="build/loop_functions/pheromone_loop_functions/libpheromone_loop_functions" label="pheromone_loop_functions">
+    <pheromone n_det="2" defense="0" half_life_s="60" probe_radius_m="0.15" nest_edge_x="-1.0" repaint_every="10" />
+  </loop_functions>
+  <arena size="5, 5, 2" center="0,0,1">
+    <floor id="floor" source="loop_functions" pixels_per_meter="50" />
+    <box id="wall_north" size="4,0.1,0.5" movable="false">
+      <body position="0,2,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_south" size="4,0.1,0.5" movable="false">
+      <body position="0,-2,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_east" size="0.1,4,0.5" movable="false">
+      <body position="2,0,0" orientation="0,0,0" />
+    </box>
+    <box id="wall_west" size="0.1,4,0.5" movable="false">
+      <body position="-2,0,0" orientation="0,0,0" />
+    </box>
+    <distribute>
+      <position method="uniform" min="-2,-2,0" max="-1,2,0" />
+      <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      <entity quantity="20" max_trials="100">
+        <foot-bot id="hb_">
+          <controller config="honest" />
+        </foot-bot>
+      </entity>
+    </distribute>
+    <distribute>
+      <position method="uniform" min="-2,-2,0" max="-1,2,0" />
+      <orientation method="uniform" min="0,0,0" max="360,0,0" />
+      <entity quantity="2" max_trials="100">
+        <foot-bot id="dt_">
+          <controller config="detractor" />
+        </foot-bot>
+      </entity>
+    </distribute>
+  </arena>
+  <physics_engines>
+    <dynamics2d id="dyn2d" />
+  </physics_engines>
+  <media>
+    <led id="leds" />
+  </media>
+  <visualization>
+    <qt-opengl autoplay="true">
+      <camera>
+        <placements>
+          <placement index="0" position="0,0,4.34" look_at="0,0,0" up="1,0,0" lens_focal_length="20" />
+        </placements>
+      </camera>
+      <user_functions label="pheromone_qt_user_functions" />
+      <frame_grabbing directory="/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/01_pheromone/runs/demo/pheromone_qt_d2_def0" base_name="frame_" headless_grabbing="true" headless_frame_size="1000x1000" headless_frame_rate="300" />
+    </qt-opengl>
+  </visualization>
+</argos-configuration>
