@@ -1,0 +1,107 @@
+{
+  "verdict": "fail",
+  "if_fail": "report v2 as null (spec 11)",
+  "picked_t_lock": 10,
+  "n_seeds": 20,
+  "bootstrap": {
+    "resamples": 10000,
+    "interval": "95 % percentile, paired on seed"
+  },
+  "item_8_metric_G2": {
+    "G": 4.049999999999997,
+    "lo": 0.8499999999999943,
+    "hi": 7.25,
+    "F_off": 42.45,
+    "F_on": 46.5,
+    "n_seeds": 20
+  },
+  "item_9_threshold_pass": true,
+  "item_10_contrast": {
+    "main_v2_on_vs_off_G2": {
+      "G": 4.049999999999997,
+      "lo": 0.8499999999999943,
+      "hi": 7.25
+    },
+    "attribution_picked_vs_lock0_at_d2_on": {
+      "diff": 1.7,
+      "lo": -1.0,
+      "hi": 4.45,
+      "F_picked": 46.5,
+      "F_lock0": 44.8
+    },
+    "reported_only": {
+      "d1": {
+        "d": 1,
+        "n_seeds": 20,
+        "F_off": 58.9,
+        "F_on": 59.15,
+        "G": 0.25,
+        "G_lo": -3.1000000000000014,
+        "G_hi": 3.75
+      },
+      "d4": {
+        "d": 4,
+        "n_seeds": 20,
+        "F_off": 34.65,
+        "F_on": 41.85,
+        "G": 7.200000000000003,
+        "G_lo": 3.3999999999999986,
+        "G_hi": 10.800000000000004
+      }
+    },
+    "lock0_control_G": {
+      "d0": {
+        "d": 0,
+        "n_seeds": 20,
+        "F_off": 81.35,
+        "F_on": 75.2,
+        "G": -6.1499999999999915,
+        "G_lo": -8.25,
+        "G_hi": -4.049999999999997
+      },
+      "d1": {
+        "d": 1,
+        "n_seeds": 20,
+        "F_off": 58.9,
+        "F_on": 57.9,
+        "G": -1.0,
+        "G_lo": -4.25,
+        "G_hi": 2.1499999999999986
+      },
+      "d2": {
+        "d": 2,
+        "n_seeds": 20,
+        "F_off": 42.45,
+        "F_on": 44.8,
+        "G": 2.3499999999999943,
+        "G_lo": -1.8999999999999986,
+        "G_hi": 6.350000000000001
+      },
+      "d4": {
+        "d": 4,
+        "n_seeds": 20,
+        "F_off": 34.65,
+        "F_on": 38.6,
+        "G": 3.950000000000003,
+        "G_lo": 0.14999999999999858,
+        "G_hi": 7.549999999999997
+      }
+    }
+  },
+  "item_11_failure": {
+    "G2_interval_includes_0": false,
+    "d0_cost_interval_upper_below_0": true,
+    "d0_cost": {
+      "cost": -6.699999999999989,
+      "lo": -9.700000000000003,
+      "hi": -3.8499999999999943
+    },
+    "triggered": true
+  },
+  "criterion_file": "prereg/defense_v2_lockout.md",
+  "roots": [
+    "runs/sweep_v2",
+    "runs/sweep_v2_lock0"
+  ],
+  "judge_code_sha256": "f46dc99992ea293ac681d4b7964f2f6aa28773a9736ad501a2f186e2b342314a"
+}

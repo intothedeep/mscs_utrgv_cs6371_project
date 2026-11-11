@@ -1,0 +1,10 @@
+ANALYZE root=../runs/sweep_v2 runs=160 mock=0
+CELLS expected=160 present=160 missing=0 duplicates=0 incomplete=0 ignored=0
+DEFENSE_COST d=0 n_seeds=20 F_off=81.35 F_on=74.65 F_on_minus_F_off=-6.70 [-9.70, -3.85]
+G2 d=1 n_seeds=20 L=22.45 [18.55, 26.20] G=0.25 [-3.10, 3.75] R=0.01 [-0.15, 0.16]
+G2 d=2 n_seeds=20 L=38.90 [32.60, 44.65] G=4.05 [0.85, 7.25] R=0.10 [0.02, 0.17]
+G2 d=4 n_seeds=20 L=46.70 [38.90, 54.05] G=7.20 [3.40, 10.80] R=0.15 [0.08, 0.21]
+NOTE R10: the d detractors are added to the 20 honest robots (D-005). They also crowd the arena, so part of the loss at d > 0 is crowding, not deception.
+NOTE D-009: d = 1, 2, 4 use 1, 2, 2 decoys. Going from d = 2 to d = 4 raises the trail refresh rate, not the number of decoys.
+NOTE R11: the cells of one seed share the layout (sources and decoys). Robot starts can differ across cells because the robot count differs, so the bootstrap pairs cells on layout, not on every robot start.
+OUTPUT chart=../results/real/v2/g2_recovered_share.png summary=../results/real/v2/summary.csv stats=../results/real/v2/g2_stats.csv food_by_cell.png=../results/real/v2/food_by_cell.png wasted_by_cell.png=../results/real/v2/wasted_by_cell.png events_by_cell.csv=../results/real/v2/events_by_cell.csv
