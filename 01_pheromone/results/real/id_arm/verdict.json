@@ -1,0 +1,129 @@
+{
+  "verdict": "differs",
+  "best_no_id_arm": "k1t10",
+  "metric_delta2": {
+    "delta": 4.375,
+    "lo": 2.25,
+    "hi": 6.45,
+    "F_id": 52.7,
+    "F_best": 48.325,
+    "delta_per_seed": [
+      -6.0,
+      9.0,
+      -4.0,
+      -8.0,
+      6.0,
+      3.0,
+      7.0,
+      3.0,
+      9.0,
+      11.0,
+      3.0,
+      4.0,
+      10.0,
+      2.0,
+      5.0,
+      12.0,
+      1.0,
+      -6.0,
+      -6.0,
+      16.0,
+      14.0,
+      -7.0,
+      14.0,
+      15.0,
+      0.0,
+      -4.0,
+      -11.0,
+      5.0,
+      8.0,
+      11.0,
+      7.0,
+      6.0,
+      8.0,
+      -1.0,
+      5.0,
+      -1.0,
+      6.0,
+      9.0,
+      11.0,
+      9.0
+    ]
+  },
+  "bootstrap": {
+    "resamples": 10000,
+    "interval": "95 % percentile, paired on seed"
+  },
+  "failure": {
+    "rule": "D4: more than 20 of 40 seeds at d = 2 with 0 detractors isolated (event isolate)",
+    "seeds_with_no_detractor_isolated": 0,
+    "triggered": false
+  },
+  "n_seeds": 40,
+  "seeds": [
+    321,
+    360
+  ],
+  "frozen": {
+    "margin": 5.4,
+    "eps_m": 0.3,
+    "min_pts": 2
+  },
+  "contrast_F_mean": {
+    "off": {
+      "d0": 81.4,
+      "d1": 58.3,
+      "d2": 43.85,
+      "d4": 32.625
+    },
+    "v3": {
+      "d0": 75.15,
+      "d1": 57.875,
+      "d2": 45.875,
+      "d4": 37.3
+    },
+    "k1t10": {
+      "d0": 75.175,
+      "d1": 58.975,
+      "d2": 48.325,
+      "d4": 41.75
+    },
+    "v5": {
+      "d0": 80.375,
+      "d1": 60.625,
+      "d2": 46.575,
+      "d4": 38.15
+    },
+    "id": {
+      "d0": 77.775,
+      "d1": 63.975,
+      "d2": 52.7,
+      "d4": 45.275
+    }
+  },
+  "isolation_mean_per_run": {
+    "d0": {
+      "det_isolated": 0.0,
+      "honest_isolated": 9.05,
+      "det_isolated_at_end": 0.0
+    },
+    "d1": {
+      "det_isolated": 0.975,
+      "honest_isolated": 10.25,
+      "det_isolated_at_end": 0.75
+    },
+    "d2": {
+      "det_isolated": 2.0,
+      "honest_isolated": 15.925,
+      "det_isolated_at_end": 1.375
+    },
+    "d4": {
+      "det_isolated": 4.0,
+      "honest_isolated": 15.6,
+      "det_isolated_at_end": 2.05
+    }
+  },
+  "criterion_file": "prereg/defense_id_arm.md",
+  "root": "runs/m6_confirm",
+  "judge_code_sha256": "2397552daae98e6fed0abe0c328db1fa270fd556519f180b8b2f11ab2fb75b5e"
+}

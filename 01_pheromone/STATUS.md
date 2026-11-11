@@ -50,3 +50,4 @@
 2026-11-11 M5: invariance PASS (2 cells), mechanism check 40 runs, act_src d0 1.8 vs k1 11.9 (results/real/v5/mechanism.md)
 2026-11-11 M5: confirm 800 runs, check 0 failed, verdict PASS (k2t10), D-051, D-052 (results/real/v5/verdict.json)
 2026-11-11 M6: v6 invariance PASS (byte-equal), smoke seed 900 ran, prereg frozen: best no-ID arm k1t10, margin 5.4, eps 0.3 (prereg/defense_id_arm.md)
+2026-11-11 M6: confirm 800 runs, check 0 failed, verdict differs, D-054 (results/real/id_arm/verdict.json)
