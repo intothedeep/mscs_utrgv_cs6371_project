@@ -46,3 +46,4 @@
 2026-11-11 decisions: D-044 main session runs M5 to M7 locally (DECISIONS.md)
 2026-11-11 decisions: D-045 DBSCAN stays, e-means not used (DECISIONS.md)
 2026-11-11 plan: task list split to TASKS.md; M3-04, M3-06, M4-01..05 closed; M3-08, M4-07, M5-01..M8-04 opened (PLAN.md, TASKS.md)
+2026-11-11 M5: kill check PASS, proceed with A k=2, D-046 (results/real/v5_killcheck.csv)
