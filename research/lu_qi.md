@@ -3,14 +3,14 @@
 - Task tag: LQ
 - Accessed: 2026-11-10
 - Course: CSCI 6371 Robotics Programming, University of Texas Rio Grande Valley (UTRGV), Fall 2026
-- Status: complete (one pass, about 80 search and fetch calls over 5 scope additions)
+- Status: complete (one pass, about 110 search and fetch calls over 6 scope additions)
 
 ## Summary counts
 
 - Papers kept (Qi Lu): 13 rows (7 verified, 6 partial)
-- Ideas kept: 9 full sections, 6 brief, 5 merged, 1 dropped (21 candidates logged)
-- Sources: 38
-- Open questions: 19 (see open_questions)
+- Ideas kept: 9 full sections, 6 brief, 6 merged, 1 dropped (22 candidates logged)
+- Sources: 46
+- Open questions: 24 (see open_questions)
 
 ## Part 1: Prof. Lu Qi
 
@@ -99,15 +99,19 @@
 | 4 (tie) | Adaptive resource distribution (precision irrigation) | 3 | 2 | 2 | 12 |
 | 4 (tie) | Risk-aware collective navigation in an unknown hazardous field | 3 | 2 | 2 | 12 |
 | 6 | Territory capture game (owner's current favorite) | 2 | 3 | 2 | 12 |
-| 7 | Collective sorting and segregation | 2 | 2 | 2 | 8 |
-| 8 | Collective decision (best-of-n) | 2 | 3 | 1 | 6 |
-| 9 | Shepherding and herding | 2 | 2 | 1 | 4 |
+| 7 (tie) | Collective sorting and segregation | 2 | 2 | 2 | 8 |
+| 7 (tie) | Split-merge tracking swarm (tracking only; added 2026-11-10) | 2 | 2 | 2 | 8 |
+| 9 | Collective decision (best-of-n) | 2 | 3 | 1 | 6 |
+| 10 | Shepherding and herding | 2 | 2 | 1 | 4 |
 
 - Ranks 3 to 6 tie at 12. Fit puts the evolved controller first (Fit 3). Research potential (R) puts irrigation and risk-aware navigation (R3) above the territory game (R2).
 - The tie-break rule is the researcher's own choice (inference). The owner may change it.
 - Swing score: irrigation Fit. No Qi Lu paper covers irrigation. The link is "agriculture" on his CAHSI page [S-LQ-4] plus the inference that delivery is foraging in reverse. So Fit is 2, like the other inference-only links. At Fit 3 it would score 18 and take rank 2.
 - Section order below differs from rank order.
 - Nine full sections: the owner asked for herding, sorting and risk-aware navigation by name.
+- Split-merge tracking (2026-11-10): its full write-up lives in `research/split_merge_tracking/`, not here.
+- Its scores copy `survey.md` §9. The full pipeline in 2 weeks scores R2 F1 Fit3 = 6.
+- R becomes 3 only if a gap re-check confirms nobody measured the observation-ratio vs switch-frequency trade-off.
 
 ### 2.1 When is a swarm the right tool?
 
@@ -302,6 +306,67 @@ Baselines:
   - Response threshold: a robot takes a request when its stimulus exceeds its own threshold (inference, no source fetched).
   - Auction with consensus: consensus-based bundle algorithm (CBBA) [S-LQ-38]. Partial: record page rate-limited.
 - When a swarm wins: no infrastructure (disaster relief), robot failures, or large scale. Otherwise a central dispatcher wins (inference).
+
+### Variant: drone swarm crop spraying
+Owner request (2026-11-10): a user marks an area, and the drones spray it well.
+
+Problem:
+- A user marks a field area. Several drones spray it.
+- Each cell must get the right dose. No cell is missed. No cell is sprayed twice.
+- Key difference from irrigation: the need map is given (a prescription map). Robots do not sense it.
+- Tanks and batteries are small. Drones leave to refill, so the team changes during the job.
+
+Building blocks:
+
+| Block | Origin problem | Method | Source |
+| --- | --- | --- | --- |
+| Coverage path planning | One robot must pass over every point of an area and avoid obstacles | Split the area into cells, sweep each cell back and forth (boustrophedon). The sweep detail is inference: the survey body was not read | [S-LQ-39] [STALE] |
+| Multi-robot coverage, Voronoi partition | Spread many mobile sensors over an area by a sensing-quality cost | Gradient descent on a coverage cost. Robots converge to centroidal Voronoi configurations (a continuous Lloyd algorithm). Distributed and asynchronous. Voronoi detail: partial, from a search snippet of the paper text | [S-LQ-40] [STALE] |
+| Variable-rate application | A uniform dose wastes chemical where the crop needs less | A UAV maps canopy vigour. Software turns it into a prescription map. The sprayer changes pressure by position. Site-specific spraying cut the application rate by 45% vs conventional spraying. Note: the sprayer was a ground sprayer, not a drone | [S-LQ-41] [STALE] |
+| Tank and battery refill scheduling | Aerial vehicles need many refuels to cover a large area | Choose a minimal set of refuel sites, then route the UAV and a ground refuel vehicle together (mixed-integer linear programs and heuristics). Not spraying-specific | [S-LQ-42] [STALE] |
+
+Why a swarm (inference unless cited):
+- Area size: one drone's chemical load forces many landings to reload. That downtime motivates multi-UAV spraying [S-LQ-45].
+- Fault tolerance: one failed drone should not leave a hole in the field.
+- Core issue: dynamic re-partitioning. A drone leaves to refill or fails. Its neighbors must take over its cells with local information only, then hand them back on return.
+- A central planner is the baseline. It sees the whole map and replans on each refill (inference).
+
+Recent work (2023 to 2026):
+
+| Paper | What it does | Gap it leaves (inference) | Verification | Source |
+| --- | --- | --- | --- | --- |
+| Huang, Du, Zhang, Quan, Wang, Mu, IEEE Transactions on Aerospace and Electronic Systems 60(2), 2024 | Spraying mission allocation and path planning for cooperating multicopters over trees in hilly terrain. Single-depot multiple traveling salesman problem (mTSP). Grouping-TSP variants split the area into subregions | Centralized, offline plan. Refill churn not read in the record | verified (record page) | [S-LQ-43] |
+| Zhang, Liu, Du, Frontiers in Plant Science 15, 2024 | UAV spraying over several tea fields. K-means work zones, supply-point selection, sortie allocation by spray capacity and range, hybrid genetic and annealing route search (ACHAGA) | Centralized. Refill is planned up front, not repaired online | verified (abstract page) | [S-LQ-44] |
+| Seo, Lee, arXiv 2511.12492, 2025 (accepted manuscript for IEEE Transactions on Control Systems Technology) | Density-driven optimal control (D2OC). Optimal transport steers drones to high-infestation areas of a reference density map. Coverage weights are shared within communication range. Three drones, 100 m × 100 m farm | No depot or refill. Fixed fleet, no failures. Wind drift explicitly not modeled. Overlap appears under limited communication | verified (first 100000 characters read) | [S-LQ-45] |
+| Swarm coverage for irregular farmland, Preprints.org 202508.0382, 2025 | Per search snippet: artificial bee colony with Voronoi partitioning, aims to cut repeated spraying | Not read | unverifiable (HTTP 403) [UNVERIFIED] | [S-LQ-46] |
+
+Gap candidates (all inference; "gap" means "no source found in this survey", not "nobody did it"):
+1. Allocation weighted by an uneven need map. Not a clean gap: Seo and Lee already steer by a need-density map [S-LQ-45]. Narrowed candidate: weighted Voronoi partition by need, kept balanced while drones leave and return for refill.
+2. Missed area vs overlap under refill churn. Seo and Lee model no refill and no failures [S-LQ-45]. Huang et al. and Zhang et al. plan centrally and offline [S-LQ-43], [S-LQ-44]. Candidate: the trade-off curve as refill frequency rises.
+3. Drift-aware paths. Not surveyed: the search tool failed on this query. Seo and Lee assume negligible wind [S-LQ-45]. Do not call it a gap until surveyed.
+
+ARGoS mapping (inference, same floor painting as the base project [S-LQ-9]):
+
+| Real system | ARGoS stand-in |
+| --- | --- |
+| Need map (prescription map) | Floor color per cell. `GetFloorColor` shows remaining dose, `SetChanged()` repaints it |
+| Drone | Foot-bot. Spraying = loop function lowers the dose of the cell under the robot |
+| Tank level | Counter in the controller, drops per sprayed cell |
+| Refill depot | Nest area, like the gray nest of the foraging example [S-LQ-9] |
+| User-marked area | Rectangle on the floor. Cells outside it get no need |
+
+- MVP1: 6 to 10 foot-bots. Fixed equal strips, boustrophedon sweep per strip. Tank empty → go to nest, refill, return to the last cell. No re-partitioning.
+- Stretch: weighted Voronoi partition by remaining need, recomputed from range-and-bearing neighbors when a drone leaves for refill or is disabled. Compare with the MVP1 strips and a central planner.
+
+Metrics (variant):
+- Coverage %: share of need cells that reached their dose.
+- Dose error vs need map: mean absolute difference per cell.
+- Overlap %: share of sprayed cells sprayed more than once beyond their dose.
+- Idle time at refill: robot-seconds waiting at or traveling to the nest.
+
+Scoring effect:
+- No change to irrigation R3 F2 Fit2 = 12. The §2.0 table stays as is.
+- Reason: Fit stays inference-only. No Qi Lu paper covers coverage or spraying (1.2). R and F stay: the stretch adds research, but the MVP1 reuses the same floor grid.
 
 ### What to measure
 - Fraction of field cells above the moisture threshold, over time and averaged.
@@ -726,6 +791,7 @@ Course topics: swarm robotics, sensors.
 | Relay foraging (task partitioning) | kept, brief | demoted after the throwing reading was dropped |
 | Adaptive resource distribution (irrigation) | kept, full | owner asked, rank 4 (tie) |
 | Demand-driven delivery | merged into irrigation as a variant | owner asked |
+| Drone swarm crop spraying | merged into irrigation as a variant (2026-11-10) | owner asked. Score unchanged |
 | Risk-aware collective navigation | kept, full | owner asked, rank 4 (tie) |
 | Cooking swarm | kept, brief | owner asked. Centralized scheduling fits better |
 
@@ -750,6 +816,11 @@ Course topics: swarm robotics, sensors.
 - Robot soccer ball physics in ARGoS: not checked.
 - `flocking.argos` is named in the argos3-examples README listing only, not opened [S-LQ-7].
 - Venue suggestions are inference. No deadlines were checked.
+- Spraying variant: Galceran and Carreras 2013 survey body not read. The boustrophedon detail is inference [S-LQ-39].
+- Spraying variant: Cortés et al. Voronoi and Lloyd detail from a search snippet only [S-LQ-40].
+- Spraying variant: Preprints.org 202508.0382 blocked (HTTP 403). Title and method not read [S-LQ-46].
+- Spraying variant: drift-aware spray paths not surveyed (search tool failed). Gap candidate 3 is open.
+- Spraying variant: a 2026 multi-UAV spraying framework (International Journal of Micro Air Vehicles, doi 10.48130/mav-0026-0002) and a HEDAC swarm spraying record (irb.hr 1029379) seen in snippets only. Not read.
 
 ## Sources
 
@@ -791,3 +862,11 @@ Course topics: swarm robotics, sensors.
 [S-LQ-36] Tews, Sukhatme, Mataric: multi-robot stealthy navigation | https://robotics.usc.edu/resl/publications/363/ | published: 2004 per search snippet | accessed: 2026-11-10 | type: paper | note: certificate expired, not read, UNVERIFIED
 [S-LQ-37] A taxonomy for task allocation problems with temporal and ordering constraints | https://experts.umn.edu/en/publications/a-taxonomy-for-task-allocation-problems-with-temporal-and-orderin/ | published: 2017, Robotics and Autonomous Systems 90 pp. 55 to 70 | accessed: 2026-11-10 | type: paper | note: record page
 [S-LQ-38] Consensus-Based Decentralized Auctions for Robust Task Allocation | https://dspace.mit.edu/handle/1721.1/52330 | published: 2009, IEEE Transactions on Robotics 25(4) 912 to 926 per search snippet | accessed: 2026-11-10 | type: paper | note: page returned HTTP 429, details from search snippet only, partial
+[S-LQ-39] A survey on coverage path planning for robotics | https://doi.org/10.1016/j.robot.2013.09.004 | published: 2013-12-01, Robotics and Autonomous Systems 61(12) 1258 to 1276 per search snippet | accessed: 2026-11-10 | type: paper | note: Semantic Scholar record read (title, authors, year, venue), abstract and body not read, partial
+[S-LQ-40] Coverage control for mobile sensing networks | https://arxiv.org/abs/math/0212212 | published: 2004, IEEE Transactions on Robotics and Automation 20(2) 243 to 255 (arXiv 2002-12-16) | accessed: 2026-11-10 | type: paper | note: abstract page read, Voronoi and Lloyd detail from a search snippet of the PDF, partial
+[S-LQ-41] Development of canopy vigour maps using UAV for site-specific management during vineyard spraying process | https://agris.fao.org/search/en/records/65dec0477c7033e84beb9ee7 | published: 2019, Precision Agriculture 20(6) 1136 to 1156 | accessed: 2026-11-10 | type: paper | note: AGRIS record and abstract, DOI 10.1007/s11119-019-09643-z
+[S-LQ-42] Cooperative Planning for Fuel-constrained Aerial Vehicles and Ground-based Refueling Vehicles for Large-Scale Coverage | https://arxiv.org/abs/1805.04417 | published: 2018-05-11 | accessed: 2026-11-10 | type: paper | note: abstract page, preprint
+[S-LQ-43] A Pesticide Spraying Mission Allocation and Path Planning with Multicopters | https://buaa.globalimpact.cn/en/publications/a-pesticide-spraying-mission-allocation-and-path-planning-with-mu/ | published: 2024-04-01, IEEE Transactions on Aerospace and Electronic Systems 60(2) 2277 to 2291 | accessed: 2026-11-10 | type: paper | note: university record page and abstract, DOI 10.1109/TAES.2024.3355028
+[S-LQ-44] An integrated framework for UAV-based precision plant protection in complex terrain: the ACHAGA solution for multi-tea fields | https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2024.1440234/abstract | published: 2024-09-26, Frontiers in Plant Science 15 | accessed: 2026-11-10 | type: paper | note: first 100000 characters read, DOI 10.3389/fpls.2024.1440234
+[S-LQ-45] Density-Driven Multi-Agent Coordination for Efficient Farm Coverage and Management in Smart Agriculture | https://arxiv.org/html/2511.12492v1 | published: 2025-11-16 | accessed: 2026-11-10 | type: paper | note: HTML v1, first 100000 characters read, accepted manuscript for IEEE Transactions on Control Systems Technology per the page
+[S-LQ-46] Swarm coverage for irregular farmland (title not read) | https://www.preprints.org/manuscript/202508.0382/v1 | published: 2025-08 per URL | accessed: 2026-11-10 | type: paper | note: HTTP 403, content from search snippet only, UNVERIFIED

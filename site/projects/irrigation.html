@@ -1,0 +1,413 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>4위(공동) 적응형 자원 분배, 정밀 관개 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><b>한국어</b> | <a href="../en/projects/irrigation.html" hreflang="en">English</a></p>
+
+<nav class="topnav">
+  <a href="evolved-controller.html">← 이전: 3위 진화 제어기</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="risk-aware-navigation.html">다음: 4위 위험 인지 항법 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 4위 (공동) / 10개 (순위 순서)</div>
+  <h1>적응형 자원 분배 (정밀 관개)<br><span class="muted" style="font-size:15px;font-weight:400">Adaptive resource distribution (precision irrigation)</span></h1>
+  <div class="lead">
+    <p><strong>결론: 4위 공동, 12점. 연구 가능성은 3점이지만 Lu 교수 논문과 직접 겹치지 않는다.</strong></p>
+    <p>왜 흔들리는 점수인가: 적합도를 3점으로 올리면 18점이 되어 2위가 된다. 지금은 2점이다.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 3</span>
+      <span class="chip">2주 구현 가능성(feasibility) 2</span>
+      <span class="chip">교수 연구와의 적합도(fit) 2</span>
+      <span class="chip">합계 = 곱 = 12 (추정, inference)</span>
+    </div>
+    <p class="muted">Lu 교수의 논문 중 관개를 다룬 것은 없다. 연결은 CAHSI 소개 페이지의 "agriculture"와, 배달이 먹이 찾기의 반대라는 추정뿐이다 <a class="s" href="../index.html#S-LQ-4">[S-LQ-4]</a>.</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제</a></li>
+    <li><a href="#s2">2 목표</a></li>
+    <li><a href="#s3">3 ARGoS 작동</a></li>
+    <li><a href="#s4">4 알고리즘 단계</a></li>
+    <li><a href="#spray">4.1 드론 방제 변형</a></li>
+    <li><a href="#s5">5 측정</a></li>
+    <li><a href="#s6">6 연구 가능성</a></li>
+    <li><a href="#s7">7 관련 논문</a></li>
+    <li><a href="#s8">8 분담과 일정</a></li>
+    <li><a href="#s9">9 위험</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="fig">
+  <figure>
+    <svg viewBox="0 0 1000 390" role="img" aria-label="마른 칸이 어둡게 보이는 경기장 열지도와 로봇의 모집 화살표, 그리고 시간에 따른 적정 수분 칸 비율 차트의 빈 틀">
+      <defs>
+        <radialGradient id="dry" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#3a3a3a" stop-opacity=".85"/><stop offset="1" stop-color="#3a3a3a" stop-opacity="0"/></radialGradient>
+        <marker id="arr" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--s2)"/></marker>
+      </defs>
+      <text class="b" x="40" y="22">그림 1 왼쪽: 경기장의 수분 열지도</text>
+      <rect x="40" y="32" width="14" height="10" fill="#3a3a3a"/><text class="m" x="60" y="41">마른 칸(dry)</text>
+      <rect x="190" y="32" width="14" height="10" fill="#f2f2f2" stroke="#999"/><text class="m" x="210" y="41">젖은 칸(wet)</text>
+      <rect x="340" y="32" width="14" height="10" fill="var(--s4)"/><text class="m" x="360" y="41">물 공급원(source)</text>
+      <circle cx="47" cy="58" r="5" fill="#222"/><text class="m" x="60" y="62">로봇(robot)</text>
+      <line x1="190" y1="58" x2="216" y2="58" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/><text class="m" x="228" y="62">모집 신호(recruit message)</text>
+      <rect x="40" y="76" width="420" height="240" fill="#f2f2f2" stroke="#333" stroke-width="2"/>
+      <ellipse cx="130" cy="150" rx="75" ry="55" fill="url(#dry)"/>
+      <ellipse cx="330" cy="260" rx="85" ry="50" fill="url(#dry)"/>
+      <ellipse cx="270" cy="120" rx="45" ry="35" fill="url(#dry)"/>
+      <g class="gr">
+        <line x1="40" y1="106" x2="460" y2="106"/><line x1="40" y1="136" x2="460" y2="136"/><line x1="40" y1="166" x2="460" y2="166"/><line x1="40" y1="196" x2="460" y2="196"/><line x1="40" y1="226" x2="460" y2="226"/><line x1="40" y1="256" x2="460" y2="256"/><line x1="40" y1="286" x2="460" y2="286"/>
+        <line x1="70" y1="76" x2="70" y2="316"/><line x1="100" y1="76" x2="100" y2="316"/><line x1="130" y1="76" x2="130" y2="316"/><line x1="160" y1="76" x2="160" y2="316"/><line x1="190" y1="76" x2="190" y2="316"/><line x1="220" y1="76" x2="220" y2="316"/><line x1="250" y1="76" x2="250" y2="316"/><line x1="280" y1="76" x2="280" y2="316"/><line x1="310" y1="76" x2="310" y2="316"/><line x1="340" y1="76" x2="340" y2="316"/><line x1="370" y1="76" x2="370" y2="316"/><line x1="400" y1="76" x2="400" y2="316"/><line x1="430" y1="76" x2="430" y2="316"/>
+      </g>
+      <rect x="444" y="186" width="16" height="60" fill="var(--s4)"/>
+      <text class="b e" x="430" y="182">물 공급원(source)</text>
+      <circle cx="200" cy="200" r="5" fill="#222"/><circle cx="215" cy="130" r="5" fill="#222"/><circle cx="380" cy="210" r="5" fill="#222"/><circle cx="105" cy="260" r="5" fill="#222"/><circle cx="300" cy="170" r="5" fill="#222"/>
+      <line x1="215" y1="130" x2="155" y2="140" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/>
+      <line x1="200" y1="200" x2="140" y2="165" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/>
+      <line x1="380" y1="210" x2="350" y2="245" stroke="var(--s2)" stroke-width="2.5" marker-end="url(#arr)"/>
+
+      <text class="b" x="560" y="22">그림 1 오른쪽: 시간과 적정 수분 칸 비율 (계획)</text>
+      <line x1="580" y1="38" x2="610" y2="38" stroke="var(--base)" stroke-width="3"/><text class="m" x="616" y="42">무작위(random)</text>
+      <line x1="780" y1="38" x2="810" y2="38" stroke="var(--s4)" stroke-width="3"/><text class="m" x="816" y="42">중앙 계획기(centralized)</text>
+      <line x1="580" y1="56" x2="610" y2="56" stroke="var(--s1)" stroke-width="3"/><text class="m" x="616" y="60">군집(swarm)</text>
+      <line class="gr" x1="580" y1="140" x2="960" y2="140"/><line class="gr" x1="580" y1="200" x2="960" y2="200"/><line class="gr" x1="580" y1="260" x2="960" y2="260"/>
+      <line class="ax" x1="580" y1="88" x2="580" y2="320"/>
+      <line class="ax" x1="580" y1="320" x2="960" y2="320"/>
+      <line x1="790" y1="88" x2="790" y2="320" stroke="#666" stroke-width="1.5" stroke-dasharray="5 4"/>
+      <text class="m" x="796" y="104">로봇 고장(failures)</text>
+      <text class="b c" x="770" y="352">시간(time)</text>
+      <text class="b c" transform="translate(528 204) rotate(-90)">적정 수분 이상 칸 비율</text>
+      <text class="m c" x="680" y="210">실측 전 빈 틀 (계획)</text>
+    </svg>
+    <figcaption>
+      그림 1. 왼쪽은 마른 칸과 모집 신호를, 오른쪽은 세 방법을 비교할 차트의 축을 보인다. 왜: 지도 없이 마른 곳을 찾는 군집이 중앙 계획기와 얼마나 비슷한지, 고장 뒤에도 버티는지가 핵심이다.
+      <span class="ab">약어: 없음. 출처: 원문 Suggested figure. 수분 분포는 설명용 스케치이며 측정값이 아니다. 오른쪽 세로축 문구는 "적정 수분 이상 칸 비율(fraction above threshold)"이다.</span>
+    </figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 문제</h2>
+  <ul>
+    <li>밭은 고르지 않게 마른다. 어떤 칸은 지금 물이 필요하고, 어떤 칸은 나중에 필요하다.</li>
+    <li>필요한 곳의 지도는 없다. 로봇이 감지해야 한다.</li>
+    <li>Lu 교수의 먹이 찾기 군집은 용도 중 농업을 든다 <a class="s" href="../index.html#S-LQ-4">[S-LQ-4]</a>.</li>
+    <li>물 배달은 먹이 찾기의 반대다. 한 공급원에서 여러 목적지로 나른다 (추정, inference).</li>
+  </ul>
+</section>
+
+<section id="s2">
+  <h2>2 목표</h2>
+  <ul>
+    <li>지도도 중앙 계획기도 쓰지 않는다.</li>
+    <li>물을 가장 적게 낭비하면서 밭의 가장 큰 부분을 수분 기준선 위로 유지한다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 ARGoS에서 작동하는 방식</h2>
+  <table class="t">
+    <caption>표 1. ARGoS 구성 (출처: 원문 How it works in ARGoS)</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>로봇</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>) 10대에서 30대. 물 공급 구역은 하나다.</td></tr>
+      <tr><td>센서</td><td>지면 센서(ground sensor)는 마른 정도를 바닥 회색 농도로 읽는다. 위치 센서, 근접 센서, 범위·방향 센서(<a class="t" href="#term-rab">range-and-bearing sensor</a>)도 쓴다. 범위·방향 센서는 모집 메시지에 쓴다.</td></tr>
+      <tr><td>행동 규칙</td><td>마른 칸을 찾는다. 공급원으로 가서 채우고 돌아와 붓는다. "여기 말랐다"를 방송해 가까운 로봇을 부른다.</td></tr>
+      <tr><td>루프 함수</td><td>루프 함수(<a class="t" href="#term-loop">loop functions</a>)가 숨겨진 수분 격자를 만든다. 칸마다 마르는 속도가 다르다. 바닥 색은 <code>GetFloorColor</code>로 수분을 보이고 <code>SetChanged()</code>로 다시 칠한다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>. 붓기는 수분을 올린다. 젖은 칸에 부은 물은 낭비로 센다.</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s4">
+  <h2>4 알고리즘 단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 마름</a></li>
+    <li><a href="#a2">Step 2 탐색과 모집</a></li>
+    <li><a href="#a3">Step 3 채우기</a></li>
+    <li><a href="#a4">Step 4 붓기</a></li>
+    <li><a href="#a5">Step 5 방송</a></li>
+    <li><a href="#a6">Step 6 고장 시험</a></li>
+    <li><a href="#base">기준선</a></li>
+    <li><a href="#var">변형</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 6</div><p>매 단계 루프 함수가 칸마다 자기 속도로 수분을 줄인다.</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 6</div><p>빈 로봇은 무작위로 걷거나, 보고된 마른 곳을 향한 모집 메시지를 따른다.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 6</div><p>마른 칸에서 위치를 기록하고 공급원으로 가서 물 한 단위를 채운다.</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 6</div><p>기록한 곳으로 돌아와 손이 닿는 가장 마른 칸에 붓는다.</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 6</div><p>돌아오는 길에 범위·방향 신호로 "(x, y)가 말랐다"를 방송한다.</p></div>
+    <div class="step" id="a6"><div class="k">Step 6 of 6</div><p>고장 시험: 시각 t에 무작위 로봇 k대를 끈다.</p></div>
+  </div>
+  <div class="panel" id="base">
+    <p class="label">기준선(Baselines)</p>
+    <ul>
+      <li>무작위: 로봇이 물을 채우면 서 있는 자리에 붓는다.</li>
+      <li>중앙 계획기(<a class="t" href="#term-central">centralized planner</a>): 실제 수분 격자를 보고 각 로봇을 가장 마른 미배정 칸으로 보낸다. 길은 A* 경로 탐색(<a class="t" href="#term-astar">A* path search</a>)이다. 이것이 수업의 경로 계획 주제다.</li>
+    </ul>
+  </div>
+  <div class="panel" id="var">
+    <p class="label">변형: 수요 기반 배달(demand-driven delivery)</p>
+    <ul>
+      <li>공급품은 공급원에 쌓인다. 요청은 모르는 곳과 때에 나타난다.</li>
+      <li>핵심 차이: 배달은 수요가 나타날 때 알려진다. 관개는 수요가 숨어 있어 감지해야 한다.</li>
+      <li>로봇끼리 누가 어느 요청을 맡을지 정한다. 중앙 배차기는 없다.</li>
+      <li>군집이 이기는 때: 기반 시설이 없을 때(재난 구호), 로봇이 고장 날 때, 규모가 클 때다. 그 밖에는 중앙 배차기가 이긴다 (추정, inference).</li>
+    </ul>
+    <table class="t">
+      <caption>표 2. 분산 방법 세 가지</caption>
+      <thead><tr><th>방법</th><th>규칙</th><th>확인 상태</th></tr></thead>
+      <tbody>
+        <tr><td>가장 가까운 로봇 우선(greedy nearest)</td><td>가장 가까운 빈 로봇이 요청을 맡는다.</td><td>추정(inference)</td></tr>
+        <tr><td>반응 임계값(<a class="t" href="#term-threshold">response threshold</a>)</td><td>자극이 자기 임계값을 넘으면 요청을 맡는다.</td><td>추정(inference). 가져온 출처가 없다</td></tr>
+        <tr><td>합의 기반 경매(<a class="t" href="#term-cbba">consensus-based bundle algorithm, CBBA</a>)</td><td>로봇이 입찰하고 합의로 묶음을 정한다 <a class="s" href="../index.html#S-LQ-38">[S-LQ-38]</a>.</td><td>부분 확인(partial). 기록 페이지가 요청 제한에 걸렸다</td></tr>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<section id="spray">
+  <h2>4.1 변형: 드론 군집 작물 방제(drone swarm crop spraying)</h2>
+  <p class="muted">소유자 요청(2026-11-10): 사용자가 구역을 표시하면 드론이 그 구역에 잘 뿌린다.</p>
+
+  <div class="panel" id="sp-problem">
+    <p class="label">문제</p>
+    <ul>
+      <li>사용자가 밭 구역을 표시한다. 드론 여러 대가 뿌린다.</li>
+      <li>칸마다 알맞은 양을 받아야 한다. 빠진 칸이 없어야 한다. 두 번 뿌린 칸도 없어야 한다.</li>
+      <li>관개와의 핵심 차이: 필요 지도(처방 지도, <a class="t" href="#term-prescription">prescription map</a>)가 주어진다. 로봇이 감지하지 않는다.</li>
+      <li>물통과 배터리가 작다. 드론이 채우러 떠나므로 작업 중에 팀이 바뀐다.</li>
+    </ul>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 1000 170" role="img" aria-label="구역, 분할, 경로, 살포, 급유, 재분할의 여섯 단계를 화살표로 잇는 흐름도. 처음 다섯 단계는 MVP1이고 재분할은 확장 단계다">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#444"/></marker>
+      </defs>
+      <text class="b" x="20" y="22">그림 2: 방제 한 번의 흐름</text>
+      <rect x="20" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="87" y="68">구역</text><text class="m c" x="87" y="88">area</text>
+      <rect x="185" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="252" y="68">분할</text><text class="m c" x="252" y="88">partition</text>
+      <rect x="350" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="417" y="68">경로</text><text class="m c" x="417" y="88">paths</text>
+      <rect x="515" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="582" y="68">살포</text><text class="m c" x="582" y="88">spray</text>
+      <rect x="680" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="747" y="68">급유</text><text class="m c" x="747" y="88">refill</text>
+      <rect x="845" y="40" width="135" height="64" fill="#fafafa" stroke="var(--s2)" stroke-width="2.5" stroke-dasharray="7 4"/>
+      <text class="b c" x="912" y="68">재분할</text><text class="m c" x="912" y="88">re-partition</text>
+      <line x1="155" y1="72" x2="183" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="320" y1="72" x2="348" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="485" y1="72" x2="513" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="650" y1="72" x2="678" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="815" y1="72" x2="843" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <rect x="20" y="130" width="22" height="14" fill="#fafafa" stroke="#333" stroke-width="2"/><text class="m" x="50" y="142">MVP1: 고정 줄무늬 분할, 왕복 훑기, 탱크가 비면 둥지에서 급유</text>
+      <rect x="560" y="130" width="22" height="14" fill="#fafafa" stroke="var(--s2)" stroke-width="2.5" stroke-dasharray="5 3"/><text class="m" x="590" y="142">확장(stretch): 급유로 떠나거나 고장 날 때 다시 분할</text>
+    </svg>
+    <figcaption>
+      그림 2. 구역을 나눠 경로를 짜고 뿌리고 채우고 다시 나누는 여섯 단계를 보인다. 왜: 팀이 작업 중에 바뀌므로 급유 뒤 재분할이 이 변형의 핵심 단계다.
+      <span class="ab">약어: 없음. 출처: 원문 Variant: drone swarm crop spraying. 실선 칸은 MVP1이 만들고 점선 칸은 확장이다.</span>
+    </figcaption>
+  </figure>
+
+  <table class="t">
+    <caption>표 5. 구성 요소 네 가지 (출처: 원문 Building blocks). 왜: 각 요소가 원래 풀던 문제를 알아야 이 변형에 쓸 곳이 보인다.</caption>
+    <thead><tr><th>구성 요소</th><th>원래 풀던 문제</th><th>방법</th><th>출처와 상태</th></tr></thead>
+    <tbody>
+      <tr><td>커버리지 경로 계획(<a class="t" href="#term-cpp">coverage path planning</a>)</td><td>로봇 한 대가 구역의 모든 점을 지나야 한다. 장애물도 피해야 한다.</td><td>구역을 칸으로 나눈다. 칸마다 왕복으로 훑는다(<a class="t" href="#term-boustro">boustrophedon</a>). 훑기 세부는 추정(inference)이다. 서베이 본문을 읽지 않았다.</td><td><a class="s" href="#S-LQ-39">[S-LQ-39]</a> 오래됨 [STALE]</td></tr>
+      <tr><td>다중 로봇 커버리지, 보로노이 분할(<a class="t" href="#term-voronoi">Voronoi partition</a>)</td><td>감지 품질 비용으로 이동 센서 여러 대를 구역에 퍼뜨린다.</td><td>커버리지 비용에 경사 하강을 쓴다. 로봇이 무게중심 보로노이 배치(<a class="t" href="#term-centroidal">centroidal Voronoi configurations</a>)로 수렴한다. 이것은 연속 로이드 알고리즘(<a class="t" href="#term-lloyd">Lloyd algorithm</a>)이다. 분산 방식이고 비동기다. 보로노이 세부는 부분 확인(partial)이다. 논문 본문의 검색 요약에서 왔다.</td><td><a class="s" href="#S-LQ-40">[S-LQ-40]</a> 오래됨 [STALE]</td></tr>
+      <tr><td>가변 살포(<a class="t" href="#term-vra">variable-rate application</a>)</td><td>균일한 양은 작물이 덜 필요한 곳에 약제를 낭비한다.</td><td>무인기(<a class="t" href="#term-uav">unmanned aerial vehicle, UAV</a>)가 수관 활력(canopy vigour) 지도를 만든다. 소프트웨어가 그것을 처방 지도로 바꾼다. 살포기가 위치에 따라 압력을 바꾼다. 부위별 살포는 일반 살포보다 살포량을 45% 줄였다. 주의: 그 살포기는 지상 살포기였고 드론이 아니다.</td><td><a class="s" href="#S-LQ-41">[S-LQ-41]</a> 오래됨 [STALE]</td></tr>
+      <tr><td>탱크와 배터리 보충 일정</td><td>항공기가 넓은 구역을 덮으려면 급유를 많이 해야 한다.</td><td>최소 급유 지점 집합을 고른다. 그다음 UAV와 지상 급유 차량의 경로를 함께 짠다(혼합 정수 선형 계획(<a class="t" href="#term-milp">mixed-integer linear program, MILP</a>)과 휴리스틱). 살포 전용이 아니다.</td><td><a class="s" href="#S-LQ-42">[S-LQ-42]</a> 오래됨 [STALE]</td></tr>
+    </tbody>
+  </table>
+
+  <div class="panel" id="sp-swarm">
+    <p class="label">왜 군집인가 (인용이 없으면 추정, inference)</p>
+    <ul>
+      <li>구역 크기: 드론 한 대의 약제 적재량 때문에 다시 채우려고 여러 번 착륙해야 한다. 그 정지 시간이 다중 UAV 살포의 동기다 <a class="s" href="#S-LQ-45">[S-LQ-45]</a>.</li>
+      <li>고장 허용: 드론 한 대가 고장 나도 밭에 구멍이 남으면 안 된다 (추정, inference).</li>
+      <li>핵심 문제: 동적 재분할. 드론이 채우러 떠나거나 고장 난다. 이웃이 지역 정보만으로 그 칸을 넘겨받고, 돌아오면 돌려줘야 한다 (추정, inference).</li>
+      <li>중앙 계획기(<a class="t" href="#term-central">centralized planner</a>)가 기준선이다. 전체 지도를 보고 급유마다 다시 계획한다 (추정, inference).</li>
+    </ul>
+  </div>
+
+  <table class="t">
+    <caption>표 6. 최근 연구, 2023년부터 2026년 (출처: 원문 Recent work). 왜: 비슷한 일을 이미 한 논문과 그들이 남긴 틈을 보여야 후보 빈틈이 정직해진다.</caption>
+    <thead><tr><th>논문</th><th>하는 일</th><th>남기는 빈틈 (추정, inference)</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Huang, Du, Zhang, Quan, Wang, Mu. Institute of Electrical and Electronics Engineers (IEEE) Transactions on Aerospace and Electronic Systems 60(2), 2024 <a class="s" href="#S-LQ-43">[S-LQ-43]</a></td><td>언덕 지형의 나무 위에서 협동하는 멀티콥터의 살포 임무 배정과 경로 계획이다. 단일 기지 다중 외판원 문제(<a class="t" href="#term-mtsp">multiple traveling salesman problem, mTSP</a>)를 쓴다. 묶음 외판원(grouping-TSP) 변형이 구역을 하위 구역으로 나눈다.</td><td>중앙 집중 방식의 오프라인 계획이다. 보충 변동(refill churn)은 기록에서 읽지 않았다.</td><td>확인됨 (기록 페이지)</td></tr>
+      <tr><td>Zhang, Liu, Du. Frontiers in Plant Science 15, 2024 <a class="s" href="#S-LQ-44">[S-LQ-44]</a></td><td>여러 찻밭 위의 UAV 살포다. K-평균(<a class="t" href="#term-kmeans">K-means</a>)으로 작업 구역을 만든다. 보급 지점을 고른다. 살포 용량과 항속 거리로 출격을 배정한다. 유전과 담금질을 섞은 경로 탐색(<a class="t" href="#term-achaga">ACHAGA</a>)을 쓴다.</td><td>중앙 집중 방식이다. 보충을 미리 계획하고 온라인으로 고치지 않는다.</td><td>확인됨 (초록 페이지)</td></tr>
+      <tr><td>Seo, Lee. arXiv 2511.12492, 2025 (Institute of Electrical and Electronics Engineers (IEEE) Transactions on Control Systems Technology 게재 승인 원고) <a class="s" href="#S-LQ-45">[S-LQ-45]</a></td><td>밀도 기반 최적 제어(<a class="t" href="#term-d2oc">density-driven optimal control, D2OC</a>)다. 최적 수송(<a class="t" href="#term-ot">optimal transport</a>)이 기준 밀도 지도에서 감염이 심한 곳으로 드론을 이끈다. 커버리지 가중치를 통신 범위 안에서 공유한다. 드론 3대, 100 m × 100 m 농장이다.</td><td>기지(depot)도 보충도 없다. 편대가 고정이고 고장이 없다. 바람에 의한 흐름(wind drift)을 명시적으로 모델링하지 않았다. 통신이 제한되면 겹침이 생긴다.</td><td>확인됨 (첫 100000자를 읽었다)</td></tr>
+      <tr><td>불규칙 농지의 군집 커버리지(Swarm coverage for irregular farmland), Preprints.org 202508.0382, 2025. 제목은 읽지 않았다 <a class="s" href="#S-LQ-46">[S-LQ-46]</a></td><td>검색 요약 기준: 인공 벌 군집(<a class="t" href="#term-abc">artificial bee colony</a>)과 보로노이 분할을 쓴다. 반복 살포를 줄이는 것이 목표다.</td><td>읽지 않았다.</td><td>확인 불가 (HTTP 403) [UNVERIFIED]</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>표 7. 빈틈 후보와 실제 상태 (출처: 원문 Gap candidates). 왜: 빈틈은 "이 조사에서 출처를 못 찾음"이지 "아무도 안 했다"가 아니다.</caption>
+    <thead><tr><th class="c">번호</th><th>후보</th><th>상태</th><th>근거 (모두 추정, inference)</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td>불균일한 필요 지도로 가중한 배정. 좁힌 후보: 필요로 가중한 보로노이 분할을, 드론이 채우러 떠나고 돌아오는 동안 균형 있게 유지한다.</td><td>좁혀짐(narrowed)</td><td>깨끗한 빈틈이 아니다. Seo와 Lee가 이미 필요 밀도 지도로 이끈다 <a class="s" href="#S-LQ-45">[S-LQ-45]</a>.</td></tr>
+      <tr><td class="c">2</td><td>보충 변동 아래의 빠진 면적 대 겹침. 후보: 보충 빈도가 오를 때의 절충 곡선이다.</td><td>열림(open)</td><td>Seo와 Lee는 보충도 고장도 모델링하지 않았다 <a class="s" href="#S-LQ-45">[S-LQ-45]</a>. Huang 등과 Zhang 등은 중앙에서 오프라인으로 계획한다 <a class="s" href="#S-LQ-43">[S-LQ-43]</a>, <a class="s" href="#S-LQ-44">[S-LQ-44]</a>.</td></tr>
+      <tr><td class="c">3</td><td>바람 흐름을 고려한 경로(drift-aware paths).</td><td>조사 안 함(not researched)</td><td>검색 도구가 이 질의에서 실패했다. Seo와 Lee는 바람을 무시할 만하다고 가정한다 <a class="s" href="#S-LQ-45">[S-LQ-45]</a>. 조사하기 전에는 빈틈이라 부르지 않는다.</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>표 8. ARGoS 대응 (추정, inference. 기본 프로젝트와 같은 바닥 칠하기 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>). 왜: 실제 시스템의 각 부품을 이미 아는 ARGoS 부품으로 바꾸면 새로 만들 것이 줄어든다.</caption>
+    <thead><tr><th>실제 시스템</th><th>ARGoS 대역</th></tr></thead>
+    <tbody>
+      <tr><td>필요 지도(처방 지도)</td><td>칸마다 바닥 색이다. <code>GetFloorColor</code>가 남은 살포량을 보이고 <code>SetChanged()</code>가 다시 칠한다.</td></tr>
+      <tr><td>드론</td><td>풋봇(<a class="t" href="#term-footbot">foot-bot</a>)이다. 살포는 루프 함수(<a class="t" href="#term-loop">loop functions</a>)가 로봇 아래 칸의 남은 양을 낮추는 것이다.</td></tr>
+      <tr><td>탱크 수준</td><td>제어기 안의 카운터다. 뿌린 칸마다 줄어든다.</td></tr>
+      <tr><td>보충 기지</td><td>둥지 구역이다. 먹이 찾기 예제의 회색 둥지와 같다 <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>사용자가 표시한 구역</td><td>바닥의 직사각형이다. 밖의 칸은 필요가 없다.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="panel" id="sp-mvp1">
+    <p class="label">MVP1과 확장</p>
+    <ul>
+      <li>MVP1: 풋봇 6대에서 10대. 같은 폭의 고정 줄무늬로 나눈다. 줄무늬마다 왕복으로 훑는다. 탱크가 비면 둥지로 가서 채우고 마지막 칸으로 돌아온다. 재분할은 없다.</li>
+      <li>확장(stretch): 남은 필요로 가중한 보로노이 분할이다. 드론이 채우러 떠나거나 꺼질 때 범위·방향 이웃 정보로 다시 계산한다. MVP1 줄무늬와 중앙 계획기와 비교한다.</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="sp-metrics">
+    <p class="label">측정 지표 (변형)</p>
+    <ul>
+      <li>커버리지 %: 알맞은 양에 닿은 필요 칸의 비율이다.</li>
+      <li>필요 지도 대비 양 오차: 칸마다 평균 절대 차이다.</li>
+      <li>겹침 %: 뿌린 칸 중 알맞은 양을 넘어 두 번 이상 뿌린 칸의 비율이다.</li>
+      <li>급유 대기 시간: 둥지에서 기다리거나 둥지로 가는 로봇 초다.</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="sp-score">
+    <p class="label">점수는 바뀌지 않는다</p>
+    <ul>
+      <li>관개의 합계 12(연구 가능성 3, 구현 가능성 2, 적합도 2)는 그대로다. 연구 파일 §2.0의 표도 그대로다.</li>
+      <li>이유: 적합도는 추정만 근거다. Qi Lu의 논문 중 커버리지나 살포를 다룬 것이 없다 (연구 파일 1.2).</li>
+      <li>연구 가능성과 구현 가능성도 그대로다. 확장은 연구를 더하지만 MVP1은 같은 바닥 격자를 다시 쓴다.</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="sp-src">
+    <p class="label">이 절의 출처 (접근일 모두 2026-11-10)</p>
+    <ul class="src">
+      <li id="S-LQ-39">[S-LQ-39] A survey on coverage path planning for robotics. <a href="https://doi.org/10.1016/j.robot.2013.09.004">https://doi.org/10.1016/j.robot.2013.09.004</a>. 2013-12-01, Robotics and Autonomous Systems 61(12) 1258 to 1276 (검색 요약 기준). 논문. Semantic Scholar 기록(제목, 저자, 연도, 학술지)만 읽었다. 초록과 본문은 읽지 않았다. 부분 확인.</li>
+      <li id="S-LQ-40">[S-LQ-40] Coverage control for mobile sensing networks. <a href="https://arxiv.org/abs/math/0212212">https://arxiv.org/abs/math/0212212</a>. 2004, Institute of Electrical and Electronics Engineers (IEEE) Transactions on Robotics and Automation 20(2) 243 to 255 (arXiv 2002-12-16). 논문. 초록 페이지를 읽었다. 보로노이와 로이드 세부는 PDF의 검색 요약에서 왔다. 부분 확인.</li>
+      <li id="S-LQ-41">[S-LQ-41] Development of canopy vigour maps using UAV for site-specific management during vineyard spraying process. <a href="https://agris.fao.org/search/en/records/65dec0477c7033e84beb9ee7">https://agris.fao.org/search/en/records/65dec0477c7033e84beb9ee7</a>. 2019, Precision Agriculture 20(6) 1136 to 1156. 논문. AGRIS 기록과 초록. DOI 10.1007/s11119-019-09643-z.</li>
+      <li id="S-LQ-42">[S-LQ-42] Cooperative Planning for Fuel-constrained Aerial Vehicles and Ground-based Refueling Vehicles for Large-Scale Coverage. <a href="https://arxiv.org/abs/1805.04417">https://arxiv.org/abs/1805.04417</a>. 2018-05-11. 논문. 초록 페이지. 프리프린트.</li>
+      <li id="S-LQ-43">[S-LQ-43] A Pesticide Spraying Mission Allocation and Path Planning with Multicopters. <a href="https://buaa.globalimpact.cn/en/publications/a-pesticide-spraying-mission-allocation-and-path-planning-with-mu/">https://buaa.globalimpact.cn/en/publications/a-pesticide-spraying-mission-allocation-and-path-planning-with-mu/</a>. 2024-04-01, Institute of Electrical and Electronics Engineers (IEEE) Transactions on Aerospace and Electronic Systems 60(2) 2277 to 2291. 논문. 대학 기록 페이지와 초록. DOI 10.1109/TAES.2024.3355028.</li>
+      <li id="S-LQ-44">[S-LQ-44] An integrated framework for UAV-based precision plant protection in complex terrain: the ACHAGA solution for multi-tea fields. <a href="https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2024.1440234/abstract">https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2024.1440234/abstract</a>. 2024-09-26, Frontiers in Plant Science 15. 논문. 첫 100000자를 읽었다. DOI 10.3389/fpls.2024.1440234.</li>
+      <li id="S-LQ-45">[S-LQ-45] Density-Driven Multi-Agent Coordination for Efficient Farm Coverage and Management in Smart Agriculture. <a href="https://arxiv.org/html/2511.12492v1">https://arxiv.org/html/2511.12492v1</a>. 2025-11-16. 논문. HTML v1의 첫 100000자를 읽었다. 페이지에 따르면 Institute of Electrical and Electronics Engineers (IEEE) Transactions on Control Systems Technology 게재 승인 원고다.</li>
+      <li id="S-LQ-46">[S-LQ-46] Swarm coverage for irregular farmland (제목은 읽지 않았다). <a href="https://www.preprints.org/manuscript/202508.0382/v1">https://www.preprints.org/manuscript/202508.0382/v1</a>. URL 기준 2025-08. 논문. HTTP 403. 내용은 검색 요약뿐이다. 확인 불가 [UNVERIFIED].</li>
+    </ul>
+  </div>
+</section>
+
+<section id="s5">
+  <h2>5 측정할 것</h2>
+  <ul>
+    <li>수분 기준선 위에 있는 칸의 비율을 시간에 따라, 그리고 평균으로 잰다.</li>
+    <li>낭비한 물을 잰다. 이미 기준선 위인 칸에 부은 양이다.</li>
+    <li>견고함을 잰다. 로봇 k대가 고장 난 뒤 위 비율이 얼마나 떨어지는가.</li>
+    <li>배달 변형: 요청당 평균 대기 시간과 버린 요청 수를 잰다.</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 연구 가능성과 학회</h2>
+  <ul>
+    <li>열린 질문: 지도 없이 숨은 수요에 자원을 군집이 어떻게 나눌 것인가 (추정, inference).</li>
+    <li>데모를 넘는 점: 모집 규칙을 중앙 계획기와 비교하고 고장 시험을 더한다 (추정, inference).</li>
+    <li>학회 후보 (추정, inference): <a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-dars">Distributed Autonomous Robotic Systems (DARS)</a>, <a class="t" href="#term-aamas">International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</a> 워크숍, International Conference on Robotics and Automation (ICRA)와 International Conference on Intelligent Robots and Systems (IROS)의 농업 로봇 워크숍.</li>
+  </ul>
+</section>
+
+<section id="s7">
+  <h2>7 관련 논문</h2>
+  <table class="t">
+    <caption>표 3. 관련 논문</caption>
+    <thead><tr><th>논문</th><th>핵심</th><th>확인 상태</th></tr></thead>
+    <tbody>
+      <tr><td>Texas A&amp;M의 구성 가능하고 적응하며 확장되는 농업 군집, 2021 <a class="s" href="../index.html#S-LQ-28">[S-LQ-28]</a></td><td>응용 배경이다.</td><td>확인됨 (대학 뉴스)</td></tr>
+      <tr><td>Qi Lu. 이종 먹이 찾기 군집. 농업이 응용 분야로 적혀 있다 <a class="s" href="../index.html#S-LQ-4">[S-LQ-4]</a></td><td>Lu 교수와의 연결 고리다.</td><td>확인됨</td></tr>
+      <tr><td>Choi, Brunet, How. 강건한 과제 배정을 위한 합의 기반 분산 경매. IEEE Transactions on Robotics 2009 <a class="s" href="../index.html#S-LQ-38">[S-LQ-38]</a></td><td>CBBA의 출처다.</td><td>오래됨 [STALE]. 검색 요약 기준</td></tr>
+      <tr><td>2022년부터 2026년 사이의 군집 관개 논문</td><td>확인한 것이 없다.</td><td>[UNVERIFIED]</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s8">
+  <h2>8 4인 분담과 2주 일정</h2>
+  <table class="t">
+    <caption>표 4. 4인 분담 (출처: 원문)</caption>
+    <thead><tr><th>사람</th><th>1주차</th><th>2주차</th></tr></thead>
+    <tbody>
+      <tr><td class="c">A</td><td>수분 격자 루프 함수, 마름, 낭비 계산</td><td>고장 주입</td></tr>
+      <tr><td class="c">B</td><td>군집 제어기(탐색, 채우기, 붓기)</td><td>모집 메시지</td></tr>
+      <tr><td class="c">C</td><td>무작위와 중앙 기준선</td><td>배달 변형 (여유가 있을 때)</td></tr>
+      <tr><td class="c">D</td><td>관련 연구, 슬라이드</td><td>그래프, 발표</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s9">
+  <h2>9 위험</h2>
+  <ul>
+    <li>매개변수가 많다(마름 속도, 물통 크기). 1주차에 고정한다.</li>
+    <li>작은 경기장에서는 중앙 기준선이 쉽게 이길 수 있다. 이것은 실패가 아니라 정당한 발견이다 (추정, inference).</li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="evolved-controller.html">← 이전: 3위 진화 제어기</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="risk-aware-navigation.html">다음: 4위 위험 인지 항법 →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+    <dt id="term-rab">범위·방향 센서(range-and-bearing sensor)</dt><dd>이웃 로봇의 거리와 방향을 알고 짧은 메시지를 주고받는 장치다.</dd>
+    <dt id="term-loop">루프 함수(loop functions)</dt><dd>ARGoS 시뮬레이션 매 단계에 끼어드는 사용자 코드다. 바닥 색과 점수를 관리한다.</dd>
+    <dt id="term-central">중앙 계획기(centralized planner)</dt><dd>전체 상태를 알고 모든 로봇에게 명령하는 하나의 계획 프로그램이다.</dd>
+    <dt id="term-astar">A* 경로 탐색(A* path search)</dt><dd>격자에서 비용이 가장 적은 길을 찾는 알고리즘이다.</dd>
+    <dt id="term-threshold">반응 임계값(response threshold)</dt><dd>개체마다 정해진 문턱이다. 자극이 문턱을 넘으면 그 일을 한다.</dd>
+    <dt id="term-cbba">합의 기반 묶음 알고리즘(consensus-based bundle algorithm, CBBA)</dt><dd>로봇이 과제에 입찰하고 서로 합의해 과제를 나누는 분산 경매 방법이다.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-dars">Distributed Autonomous Robotic Systems (DARS)</dt><dd>분산 자율 로봇 시스템 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-aamas">International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</dt><dd>자율 에이전트와 다중 에이전트 학회다. 후보 학회는 원문의 추정이다.</dd>
+    <dt id="term-prescription">처방 지도(prescription map)</dt><dd>칸마다 필요한 약제 양을 적은 지도다. 이 변형에서는 주어진다.</dd>
+    <dt id="term-cpp">커버리지 경로 계획(coverage path planning)</dt><dd>로봇이 구역의 모든 점을 지나도록 경로를 짜는 문제다.</dd>
+    <dt id="term-boustro">왕복 훑기(boustrophedon)</dt><dd>칸을 줄마다 방향을 바꿔 오가며 훑는 방식이다.</dd>
+    <dt id="term-voronoi">보로노이 분할(Voronoi partition)</dt><dd>각 점을 가장 가까운 로봇에 배정해 구역을 나누는 방법이다.</dd>
+    <dt id="term-centroidal">무게중심 보로노이 배치(centroidal Voronoi configuration)</dt><dd>각 로봇이 자기 보로노이 칸의 무게중심에 서 있는 배치다.</dd>
+    <dt id="term-lloyd">로이드 알고리즘(Lloyd algorithm)</dt><dd>분할과 무게중심 이동을 되풀이해 무게중심 보로노이 배치를 찾는 알고리즘이다.</dd>
+    <dt id="term-vra">가변 살포(variable-rate application)</dt><dd>위치마다 필요한 양에 맞춰 뿌리는 양을 바꾸는 방법이다.</dd>
+    <dt id="term-uav">무인기(unmanned aerial vehicle, UAV)</dt><dd>사람이 타지 않는 항공기다. 여기서는 드론을 가리킨다.</dd>
+    <dt id="term-milp">혼합 정수 선형 계획(mixed-integer linear program, MILP)</dt><dd>일부 변수가 정수인 선형 최적화 문제다.</dd>
+    <dt id="term-mtsp">다중 외판원 문제(multiple traveling salesman problem, mTSP)</dt><dd>여러 외판원이 모든 도시를 나눠 돌 때 가장 짧은 경로를 찾는 문제다.</dd>
+    <dt id="term-kmeans">K-평균(K-means)</dt><dd>점들을 K개 무리로 묶는 방법이다. 여기서는 작업 구역을 만든다.</dd>
+    <dt id="term-achaga">ACHAGA</dt><dd>Zhang 등이 쓴 유전과 담금질을 섞은 경로 탐색의 이름이다. 약어의 전체 이름은 읽은 범위에서 확인하지 않았다.</dd>
+    <dt id="term-d2oc">밀도 기반 최적 제어(density-driven optimal control, D2OC)</dt><dd>기준 밀도 지도를 따라 드론을 이끄는 제어 방법이다.</dd>
+    <dt id="term-ot">최적 수송(optimal transport)</dt><dd>한 분포를 다른 분포로 옮기는 가장 싼 방법을 찾는 수학이다.</dd>
+    <dt id="term-abc">인공 벌 군집(artificial bee colony)</dt><dd>벌의 먹이 탐색을 본뜬 최적화 방법이다.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

@@ -19,7 +19,7 @@
 </nav>
 
 <header style="display:flex;flex-direction:column;gap:12px">
-  <div class="label">Project rank 4 (tie) of 9 (in rank order)</div>
+  <div class="label">Project rank 4 (tie) of 10 (in rank order)</div>
   <h1>Adaptive resource distribution (precision irrigation)</h1>
   <div class="lead">
     <p><strong>Result: rank 4 (tie), 12 points. Research potential is 3, but it does not overlap directly with Prof. Lu's papers.</strong></p>
@@ -37,6 +37,7 @@
     <li><a href="#s2">2 Goal</a></li>
     <li><a href="#s3">3 How it works in ARGoS</a></li>
     <li><a href="#s4">4 Algorithm steps</a></li>
+    <li><a href="#spray">4.1 Drone spraying variant</a></li>
     <li><a href="#s5">5 What to measure</a></li>
     <li><a href="#s6">6 Research potential</a></li>
     <li><a href="#s7">7 Related papers</a></li>
@@ -168,6 +169,148 @@
         <tr><td>Consensus-based bundle algorithm (CBBA, a distributed auction method)</td><td>Robots bid and agree on bundles by consensus <a class="s" href="../index.html#S-LQ-38">[S-LQ-38]</a>.</td><td>partial. The record page hit a request limit</td></tr>
       </tbody>
     </table>
+  </div>
+</section>
+
+<section id="spray">
+  <h2>4.1 Variant: drone swarm crop spraying</h2>
+  <p class="muted">Owner request (2026-11-10): a user marks an area, and the drones spray it well.</p>
+
+  <div class="panel" id="sp-problem">
+    <p class="label">Problem</p>
+    <ul>
+      <li>A user marks a field area. Several drones spray it.</li>
+      <li>Each cell must get the right dose. No cell is missed. No cell is sprayed twice.</li>
+      <li>Key difference from irrigation: the need map (a prescription map, a map of the dose each cell needs) is given. The robots do not sense it.</li>
+      <li>Tanks and batteries are small. Drones leave to refill, so the team changes during the job.</li>
+    </ul>
+  </div>
+
+  <figure>
+    <svg viewBox="0 0 1000 190" role="img" aria-label="Flow of six steps joined by arrows: area, partition, paths, spray, refill, re-partition. The first five steps are MVP1 and re-partition is a stretch step">
+      <defs>
+        <marker id="arr2" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#444"/></marker>
+      </defs>
+      <text class="b" x="20" y="22">Figure 2: flow of one spraying job</text>
+      <rect x="20" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="87" y="78">area</text>
+      <rect x="185" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="252" y="78">partition</text>
+      <rect x="350" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="417" y="78">paths</text>
+      <rect x="515" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="582" y="78">spray</text>
+      <rect x="680" y="40" width="135" height="64" fill="#fafafa" stroke="#333" stroke-width="2"/>
+      <text class="b c" x="747" y="78">refill</text>
+      <rect x="845" y="40" width="135" height="64" fill="#fafafa" stroke="var(--s2)" stroke-width="2.5" stroke-dasharray="7 4"/>
+      <text class="b c" x="912" y="78">re-partition</text>
+      <line x1="155" y1="72" x2="183" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="320" y1="72" x2="348" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="485" y1="72" x2="513" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="650" y1="72" x2="678" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <line x1="815" y1="72" x2="843" y2="72" stroke="#444" stroke-width="2" marker-end="url(#arr2)"/>
+      <rect x="20" y="130" width="22" height="14" fill="#fafafa" stroke="#333" stroke-width="2"/><text class="m" x="50" y="142">MVP1: fixed equal strips, back-and-forth sweep, refill at the nest when the tank is empty</text>
+      <rect x="20" y="156" width="22" height="14" fill="#fafafa" stroke="var(--s2)" stroke-width="2.5" stroke-dasharray="5 3"/><text class="m" x="50" y="168">Stretch: re-partition when a drone leaves or fails</text>
+    </svg>
+    <figcaption>
+      Figure 2. The six steps split the area, plan paths, spray, refill and split again. Why: the team changes during the job, so re-partitioning after a refill is the key step of this variant.
+      <span class="ab">Abbreviations: none. Source: original Variant: drone swarm crop spraying. Solid boxes are built in MVP1 and the dashed box is the stretch.</span>
+    </figcaption>
+  </figure>
+
+  <table class="t">
+    <caption>Table 5. Four building blocks (source: original Building blocks). Why: knowing the problem each block first solved shows where this variant can use it.</caption>
+    <thead><tr><th>Block</th><th>Origin problem</th><th>Method</th><th>Source and status</th></tr></thead>
+    <tbody>
+      <tr><td>Coverage path planning</td><td>One robot must pass over every point of an area and avoid obstacles.</td><td>Split the area into cells. Sweep each cell back and forth (boustrophedon). The sweep detail is inference. The survey body was not read.</td><td><a class="s" href="#S-LQ-39">[S-LQ-39]</a> old [STALE]</td></tr>
+      <tr><td>Multi-robot coverage, Voronoi partition (each point goes to its nearest robot)</td><td>Spread many mobile sensors over an area by a sensing-quality cost.</td><td>Gradient descent on a coverage cost. Robots converge to centroidal Voronoi configurations (a continuous Lloyd algorithm). It is distributed and asynchronous. The Voronoi detail is partial. It comes from a search snippet of the paper text.</td><td><a class="s" href="#S-LQ-40">[S-LQ-40]</a> old [STALE]</td></tr>
+      <tr><td>Variable-rate application (change the dose with the position)</td><td>A uniform dose wastes chemical where the crop needs less.</td><td>An unmanned aerial vehicle (UAV) maps canopy vigour. Software turns it into a prescription map. The sprayer changes pressure by position. Site-specific spraying cut the application rate by 45% versus conventional spraying. Note: the sprayer was a ground sprayer, not a drone.</td><td><a class="s" href="#S-LQ-41">[S-LQ-41]</a> old [STALE]</td></tr>
+      <tr><td>Tank and battery refill scheduling</td><td>Aerial vehicles need many refuels to cover a large area.</td><td>Choose a minimal set of refuel sites. Then route the UAV and a ground refuel vehicle together (mixed-integer linear programs and heuristics). It is not specific to spraying.</td><td><a class="s" href="#S-LQ-42">[S-LQ-42]</a> old [STALE]</td></tr>
+    </tbody>
+  </table>
+
+  <div class="panel" id="sp-swarm">
+    <p class="label">Why a swarm (inference unless cited)</p>
+    <ul>
+      <li>Area size: one drone's chemical load forces many landings to reload. That downtime motivates multi-UAV spraying <a class="s" href="#S-LQ-45">[S-LQ-45]</a>.</li>
+      <li>Fault tolerance: one failed drone should not leave a hole in the field (inference).</li>
+      <li>Core issue: dynamic re-partitioning. A drone leaves to refill or fails. Its neighbors must take over its cells with local information only, then hand them back on return (inference).</li>
+      <li>A central planner (one program that sees the whole map) is the baseline. It replans on each refill (inference).</li>
+    </ul>
+  </div>
+
+  <table class="t">
+    <caption>Table 6. Recent work, 2023 to 2026 (source: original Recent work). Why: papers that did similar work, and the gaps they leave, keep the gap candidates honest.</caption>
+    <thead><tr><th>Paper</th><th>What it does</th><th>Gap it leaves (inference)</th><th>Verification</th></tr></thead>
+    <tbody>
+      <tr><td>Huang, Du, Zhang, Quan, Wang, Mu. Institute of Electrical and Electronics Engineers (IEEE) Transactions on Aerospace and Electronic Systems 60(2), 2024 <a class="s" href="#S-LQ-43">[S-LQ-43]</a></td><td>Spraying mission allocation and path planning for cooperating multicopters over trees in hilly terrain. It uses the single-depot multiple traveling salesman problem (mTSP, several salesmen share the cities). Grouping-TSP variants split the area into subregions.</td><td>Centralized, offline plan. Refill churn was not read in the record.</td><td>verified (record page)</td></tr>
+      <tr><td>Zhang, Liu, Du. Frontiers in Plant Science 15, 2024 <a class="s" href="#S-LQ-44">[S-LQ-44]</a></td><td>UAV spraying over several tea fields. K-means (a clustering method) makes the work zones. It selects supply points. It allocates sorties by spray capacity and range. It uses a hybrid genetic and annealing route search (ACHAGA, the paper's name for the method).</td><td>Centralized. Refill is planned up front, not repaired online.</td><td>verified (abstract page)</td></tr>
+      <tr><td>Seo, Lee. arXiv 2511.12492, 2025 (accepted manuscript for Institute of Electrical and Electronics Engineers (IEEE) Transactions on Control Systems Technology) <a class="s" href="#S-LQ-45">[S-LQ-45]</a></td><td>Density-driven optimal control (D2OC). Optimal transport (the cheapest way to move one distribution onto another) steers drones to high-infestation areas of a reference density map. Coverage weights are shared within communication range. Three drones, 100 m × 100 m farm.</td><td>No depot or refill. Fixed fleet, no failures. Wind drift is explicitly not modeled. Overlap appears under limited communication.</td><td>verified (first 100000 characters read)</td></tr>
+      <tr><td>Swarm coverage for irregular farmland, Preprints.org 202508.0382, 2025. The title was not read <a class="s" href="#S-LQ-46">[S-LQ-46]</a></td><td>Per a search snippet: artificial bee colony (an optimization method modeled on bee foraging) with Voronoi partitioning. It aims to cut repeated spraying.</td><td>Not read.</td><td>unverifiable (HTTP 403) [UNVERIFIED]</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>Table 7. Gap candidates and their actual status (source: original Gap candidates). Why: "gap" means "no source found in this survey", not "nobody did it".</caption>
+    <thead><tr><th class="c">No.</th><th>Candidate</th><th>Status</th><th>Basis (all inference)</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td>Allocation weighted by an uneven need map. Narrowed candidate: a weighted Voronoi partition by need, kept balanced while drones leave and return for refill.</td><td>narrowed</td><td>Not a clean gap. Seo and Lee already steer by a need-density map <a class="s" href="#S-LQ-45">[S-LQ-45]</a>.</td></tr>
+      <tr><td class="c">2</td><td>Missed area versus overlap under refill churn. Candidate: the trade-off curve as refill frequency rises.</td><td>open</td><td>Seo and Lee model no refill and no failures <a class="s" href="#S-LQ-45">[S-LQ-45]</a>. Huang et al. and Zhang et al. plan centrally and offline <a class="s" href="#S-LQ-43">[S-LQ-43]</a>, <a class="s" href="#S-LQ-44">[S-LQ-44]</a>.</td></tr>
+      <tr><td class="c">3</td><td>Drift-aware paths.</td><td>not researched</td><td>The search tool failed on this query. Seo and Lee assume negligible wind <a class="s" href="#S-LQ-45">[S-LQ-45]</a>. Do not call it a gap until surveyed.</td></tr>
+    </tbody>
+  </table>
+
+  <table class="t">
+    <caption>Table 8. ARGoS mapping (inference, same floor painting as the base project <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>). Why: mapping each real part to an ARGoS part we already know cuts what must be built.</caption>
+    <thead><tr><th>Real system</th><th>ARGoS stand-in</th></tr></thead>
+    <tbody>
+      <tr><td>Need map (prescription map)</td><td>Floor color per cell. <code>GetFloorColor</code> shows the remaining dose and <code>SetChanged()</code> repaints it.</td></tr>
+      <tr><td>Drone</td><td>Foot-bot. Spraying means the loop function lowers the dose of the cell under the robot.</td></tr>
+      <tr><td>Tank level</td><td>Counter in the controller. It drops per sprayed cell.</td></tr>
+      <tr><td>Refill depot</td><td>Nest area, like the gray nest of the foraging example <a class="s" href="../index.html#S-LQ-9">[S-LQ-9]</a>.</td></tr>
+      <tr><td>User-marked area</td><td>Rectangle on the floor. Cells outside it get no need.</td></tr>
+    </tbody>
+  </table>
+
+  <div class="panel" id="sp-mvp1">
+    <p class="label">MVP1 and stretch</p>
+    <ul>
+      <li>MVP1: 6 to 10 foot-bots. Fixed equal strips. A back-and-forth sweep (boustrophedon) per strip. When the tank is empty, the robot goes to the nest, refills and returns to the last cell. No re-partitioning.</li>
+      <li>Stretch: a weighted Voronoi partition by remaining need. It is recomputed from range-and-bearing neighbors when a drone leaves for refill or is disabled. Compare it with the MVP1 strips and a central planner.</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="sp-metrics">
+    <p class="label">Metrics (variant)</p>
+    <ul>
+      <li>Coverage %: share of need cells that reached their dose.</li>
+      <li>Dose error versus need map: mean absolute difference per cell.</li>
+      <li>Overlap %: share of sprayed cells sprayed more than once beyond their dose.</li>
+      <li>Idle time at refill: robot-seconds waiting at or traveling to the nest.</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="sp-score">
+    <p class="label">The score is unchanged</p>
+    <ul>
+      <li>The irrigation total stays 12 (research potential 3, feasibility 2, fit 2). The §2.0 table of the research file stays as is.</li>
+      <li>Reason: fit stays inference-only. No Qi Lu paper covers coverage or spraying (research file 1.2).</li>
+      <li>Research potential and feasibility stay too. The stretch adds research, but MVP1 reuses the same floor grid.</li>
+    </ul>
+  </div>
+
+  <div class="panel" id="sp-src">
+    <p class="label">Sources for this section (all accessed 2026-11-10)</p>
+    <ul class="src">
+      <li id="S-LQ-39">[S-LQ-39] A survey on coverage path planning for robotics. <a href="https://doi.org/10.1016/j.robot.2013.09.004">https://doi.org/10.1016/j.robot.2013.09.004</a>. 2013-12-01, Robotics and Autonomous Systems 61(12) 1258 to 1276 per search snippet. Paper. Semantic Scholar record read (title, authors, year, venue). Abstract and body not read. Partial.</li>
+      <li id="S-LQ-40">[S-LQ-40] Coverage control for mobile sensing networks. <a href="https://arxiv.org/abs/math/0212212">https://arxiv.org/abs/math/0212212</a>. 2004, Institute of Electrical and Electronics Engineers (IEEE) Transactions on Robotics and Automation 20(2) 243 to 255 (arXiv 2002-12-16). Paper. Abstract page read. Voronoi and Lloyd detail from a search snippet of the PDF. Partial.</li>
+      <li id="S-LQ-41">[S-LQ-41] Development of canopy vigour maps using UAV for site-specific management during vineyard spraying process. <a href="https://agris.fao.org/search/en/records/65dec0477c7033e84beb9ee7">https://agris.fao.org/search/en/records/65dec0477c7033e84beb9ee7</a>. 2019, Precision Agriculture 20(6) 1136 to 1156. Paper. AGRIS record and abstract. DOI 10.1007/s11119-019-09643-z.</li>
+      <li id="S-LQ-42">[S-LQ-42] Cooperative Planning for Fuel-constrained Aerial Vehicles and Ground-based Refueling Vehicles for Large-Scale Coverage. <a href="https://arxiv.org/abs/1805.04417">https://arxiv.org/abs/1805.04417</a>. 2018-05-11. Paper. Abstract page. Preprint.</li>
+      <li id="S-LQ-43">[S-LQ-43] A Pesticide Spraying Mission Allocation and Path Planning with Multicopters. <a href="https://buaa.globalimpact.cn/en/publications/a-pesticide-spraying-mission-allocation-and-path-planning-with-mu/">https://buaa.globalimpact.cn/en/publications/a-pesticide-spraying-mission-allocation-and-path-planning-with-mu/</a>. 2024-04-01, Institute of Electrical and Electronics Engineers (IEEE) Transactions on Aerospace and Electronic Systems 60(2) 2277 to 2291. Paper. University record page and abstract. DOI 10.1109/TAES.2024.3355028.</li>
+      <li id="S-LQ-44">[S-LQ-44] An integrated framework for UAV-based precision plant protection in complex terrain: the ACHAGA solution for multi-tea fields. <a href="https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2024.1440234/abstract">https://www.frontiersin.org/journals/plant-science/articles/10.3389/fpls.2024.1440234/abstract</a>. 2024-09-26, Frontiers in Plant Science 15. Paper. First 100000 characters read. DOI 10.3389/fpls.2024.1440234.</li>
+      <li id="S-LQ-45">[S-LQ-45] Density-Driven Multi-Agent Coordination for Efficient Farm Coverage and Management in Smart Agriculture. <a href="https://arxiv.org/html/2511.12492v1">https://arxiv.org/html/2511.12492v1</a>. 2025-11-16. Paper. HTML v1, first 100000 characters read. Accepted manuscript for Institute of Electrical and Electronics Engineers (IEEE) Transactions on Control Systems Technology per the page.</li>
+      <li id="S-LQ-46">[S-LQ-46] Swarm coverage for irregular farmland (title not read). <a href="https://www.preprints.org/manuscript/202508.0382/v1">https://www.preprints.org/manuscript/202508.0382/v1</a>. 2025-08 per URL. Paper. HTTP 403, content from search snippet only. UNVERIFIED.</li>
+    </ul>
   </div>
 </section>
 
