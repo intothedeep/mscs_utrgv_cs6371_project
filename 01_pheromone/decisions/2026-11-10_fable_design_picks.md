@@ -1,0 +1,16 @@
+# Fable picks on DESIGN.md §9 open decisions (2026-11-10, owner-delegated)
+
+Q1 Detractors ADDED on top of 20 honest robots (totals 20,21,22,24). Report notes a small crowding effect. Why: G2, food_collected counts honest robots only, so L(d) is the deception loss. Rejected: replace some of 20 (mixes worker loss with deception loss; d=4 cuts workers 20%).
+Q2 Strategy A (floor grid, virtual sensor). B is the only fallback. C is a post-G2 stretch. Why: Vision (true and false trails visible in two colors); G1 fits (14.5 person-days of 40). Rejected: B (waypoints invisible on screen, repeats Luna and Lu), C (21-24 person-days, risks 2026-11-24, adds no G1/G2 measure).
+Q3 Keep half-life 60 s. Change lambda_dep start to 0.077/s (ln(10)/30 s). Why: G1, 0.115 tuned for 2 m (20 s) but source band reaches 2.7 m from nest; 0.115 leaves trail ~32-45 near nest, one half-life drops to theta_on 20; 0.077 gives ~100-125. Rejected: keep 0.115 (far-source trails weak), copy [S-PH-6] 0.01 linear (units/grid differ), tune on sweep seeds 1-10 (fits to results).
+  Tuning rule (fixed before running): d=0, defense off, seeds 101-103. Round 1 = start values. Rounds 2,3 change one value only; candidates half-life 30/60/120 s, lambda_dep 0.05/0.077/0.115. Metric: arm-1 mean food_collected; tie -> earlier round. Max 3 rounds. Picked values frozen as a D-row before defense tuning; never re-tuned with detractor runs.
+Q5 Nest detection by positioning sensor (x < -1.0). Floor color display only. Why: Vision, floor free for two pheromone colors; RETURN already uses position. Rejected: ground color (conflicts with pheromone paint, constrains colors).
+Q6 One decoy per detractor, max 2 (d=1,2,4 -> 1,2,2 decoys). n_sources = 3. Report notes d=2->4 raises trail refresh rate, not decoy count. Why: G2, all 8 cells share one layout so paired bootstrap holds; 1.5 m decoy-source spacing fits the band. Rejected: 4 decoys (spacing may not fit), 1 shared decoy (d=1 and 2 same attack shape), 1 source (no trail choice, weak demo), 2 sources (no numeric basis to change layout stream).
+Q7 Replace criterion procedure, keep 1.2x. Judged ONCE on held-out seeds 104-106 after Q3. 6 runs: arm 1 pheromone on, arm 2 theta_on = infinity. Pass = (arm1 mean >= 1.2 x arm2 mean) AND (arm1 > arm2 on all 3 seeds). Pass -> keep A, else switch to B with a D-row. No retry. Deadline 2026-11-17 (after it, 5 workdays = 20 person-days remain, B needs ~8). Why: G1, best-of-3 on tuning seeds is optimistic. Rejected: keep current (tunes and judges on same seeds, no deadline), statistical test (3 seeds no power), eyeball (post-hoc), 1.5x (no basis).
+
+Design corrections required:
+1. Table 1 column A says "3 probe values"; §2.1 says 8. Make it 8.
+2. §3.2: an invalid peak goes to SEARCH; a robot joining at a true trail end may miss the source. Change to "go to END_SEARCH but do not add a suspect". Add FOLLOW-pickup -> RETURN transition to Figure 2.
+3. With lambda_dep 0.077, here >= 2 x here_entry needs 9 s (0.9 m) follow vs 6 s at 0.115. Correction 2 covers the side effect.
+4. MVP3 defense tuning (d=2) needs a selection rule: seeds 101-103, max 3 rounds, metric mean F(2,on), result frozen by a D-row.
+5. PLAN.md must exist (product-manager) with the mission block; Q1-Q7 D-rows written before MVP1.

@@ -1,0 +1,225 @@
+> Completed items live in `_archive/` (cold storage, do not read unless
+> investigating history). Split detail, if any, is linked from stubs below;
+> a stub's state is the truth if it and the detail disagree.
+
+# Plan: 01_pheromone (pheromone foraging under misleading trails)
+
+## Mission block
+
+- Mission: Keep swarm foraging trustworthy when some robots lay false pheromone trails. (Fable, owner-delegated, 2026-11-10, D-004)
+- Vision: One chart and one demo show the defense winning back lost food. (Fable, owner-delegated, 2026-11-10, D-004)
+- Constraints: no local training. The main session builds and runs 1-seed smoke runs per gate. The owner runs multi-seed sweeps (D-002). Agents never build, run or commit.
+- G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (measure: logged runs out of 80 = 4 detractor counts x 2 defense states x 10 seeds). (Fable, owner-delegated, 2026-11-10, D-004)
+- G2: By 2026-11-28, report recovered loss share for 3 of 3 nonzero detractor counts (1, 2, 4) with 10-seed error bars. (Fable, owner-delegated, 2026-11-10, D-004)
+- S1 → G1, G2: A, floor grid with a virtual sensor (picked: A of A/B/C, Fable owner-delegated 2026-11-10, D-006). Listed alternatives: B (fallback, only if the D-010 judgement fails), C (stretch after G2 only).
+- M1 → S1: MVP1 shape, mock end-to-end, by 2026-11-13. Exit: see "M1 exit". cycle 0/2; recovery 0/2
+- M2 → S1: MVP2 real slice, 0 detractors, plus the D-010 keep-A judgement, by 2026-11-17. Exit: see "M2 exit". cycle 0/2; recovery 0/2
+- M3 → S1: MVP3 detractors, defense, 80-run sweep, figures from real logs. Sweep by 2026-11-24, report by 2026-11-28. Exit: see "M3 exit". cycle 0/2; recovery 0/2
+
+Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Progress: [STATUS.md](./STATUS.md).
+
+## How tasks close
+
+- Format: `[ ]` TODO, `[~]` IN PROGRESS, `[x]` DONE.
+- One task = one developer dispatch. Gate review only, at each milestone exit (no per-task review).
+- "Static AC": the developer checks it (file exists, grep, read). Developers never build or run.
+- "Gate AC": checked at the gate run. The runner is named: main session (1-seed smoke, D-002, D-012) or owner (multi-seed, Qt).
+- No `*.test.*` files. Behavior is checked by deliberate breakage at the gate. Breakage copies go to the session scratchpad, never into the repo.
+- Every gate run writes its stage reports (fields: `.claude/CLAUDE.md` "System build phasing").
+
+## Fixed paths (all tasks use these)
+
+| What | Path | Git |
+| --- | --- | --- |
+| Mock runs | `mock/runs/` | committed |
+| Smoke runs (1 seed) | `runs/smoke/` | ignored |
+| Pheromone tuning runs | `runs/tuning/` | ignored |
+| Keep-A judgement runs | `runs/judgement/` | ignored |
+| Defense tuning runs | `runs/defense_tuning/` | ignored |
+| 80-run sweep | `runs/sweep/` | ignored |
+| Pre-registrations | `prereg/` | committed |
+| Pheromone pick (D-007) | `results/real/tuning/tuning_pick.json` | committed |
+| Keep-A verdict (D-010) | `results/real/judgement/verdict.json` | committed |
+| Defense candidates (D-011) | `prereg/defense_candidates.json` | committed |
+| Defense pick (D-011) | `results/real/defense_tuning/defense_pick.json` | committed |
+| Stage reports and pages | `results/<mock\|real>/<phase>/` | committed |
+
+## M1: MVP1 shape (mock end-to-end, by 2026-11-13)
+
+### M1 exit (runnable, runner: main session under D-012)
+
+1. `tools/make_mock_runs.py` writes 80 run folders under `mock/runs/`. Every runid starts `MOCK_`.
+2. `tools/check_runs.py mock/runs` exits 0.
+3. `tools/analyze.py mock/runs` writes `results/mock/g2_recovered_share_MOCK.png` and `results/mock/summary.csv`.
+4. Breakage 1: a scratchpad copy of one run with one `ticks.csv` column renamed makes `check_runs.py` exit nonzero and name the column.
+5. Breakage 2: a scratchpad root with one `"mock": true` and one `"mock": false` manifest makes `analyze.py` exit nonzero.
+6. `tools/make_report.py --phase mvp1` writes 3 stage reports and `results/mock/mvp1/index.html`.
+- Form for each run: `OMP_NUM_THREADS=1 timeout 300 uv run python ...` (D-012).
+
+### Tactic: schema first, mock fills it (kill: a column the mock cannot fill without changing DESIGN §4)
+
+- [ ] M1-01 → M1: Python project files and `.gitignore`
+  - Static: `01_pheromone/pyproject.toml` per `rules/development/python.md`: `[tool.uv] python-downloads = "never"`, dependencies numpy and matplotlib only.
+  - Static: `.gitignore` ignores `01_pheromone/runs/` and `01_pheromone/src/experiments/generated/`. `mock/runs/`, `prereg/` and `results/` are not ignored.
+  - Gate: main session runs `uv sync` once before M1 exit 1.
+- [ ] M1-02 → M1: `tools/schema.py` and `tools/check_runs.py` (U1)
+  - Static: `schema.py` defines `SCHEMA_VERSION = 1` and the column lists of DESIGN Table 3 and Table 4, in that order.
+  - Static: `schema.py` lists the 7 event names of Table 4 and the `manifest.json` keys of DESIGN §4.
+  - Static: `check_runs.py <root>` checks per run: 4 files present, exact headers, `ticks.csv` 6000 rows when `complete` is true, `mock` column constant and equal to manifest `mock`.
+  - Static: it checks `metrics` equals the last `ticks.csv` row, and runid matches `<YYYYMMDD-HHMMSS>_d<k>_def<0|1>_s<seed>` with prefix `MOCK_` exactly when `mock` is true.
+  - Static: it exits nonzero on any failure and prints run, file and column. Column names live only in `schema.py` (grep: no column literal in `check_runs.py`).
+  - Gate: M1 exit 2 and 4.
+- [ ] M1-03 → M1: `tools/make_mock_runs.py` (U2)
+  - Static: writes only under `mock/runs/`. A different output path makes it exit nonzero before writing.
+  - Static: 80 runs = d in 0, 1, 2, 4 x defense 0, 1 x seeds 1 to 10. Runid prefix `MOCK_`. `mock` = 1 in `ticks.csv`, `"mock": true` in the manifest.
+  - Static: imports columns from `schema.py`. Fixed generator seed, so two runs give identical files.
+  - Static: `robots.csv` has one row per robot per second, with 20 + d robots (D-005).
+  - Static: `wasted_robot_seconds` is 0 in every d = 0 run (DESIGN §4.1). Mock means show a loss at d > 0 and a partial gain with defense on, so the chart is not empty.
+  - Gate: M1 exit 1 and 2.
+- [ ] M1-04 → M1: `tools/analyze.py` (U3, DESIGN §4.2)
+  - Static: computes `F(d, def)`, `L(d)`, `G(d)`, `R(d)` as ratio of means. Bootstrap: 10,000 resamples of the seed index, paired across cells, 95 % percentile.
+  - Static: writes "loss not resolved at d" and skips `R(d)` when the `L(d)` interval contains 0. Reports `F(0, on) - F(0, off)` as defense cost.
+  - Static: cell check lists missing cells and duplicates (keeps the latest complete run). Missing cells do not stop the script.
+  - Static: mixing guard stops on mixed `mock` values. Mock output goes to `results/mock/`, real to `results/real/`.
+  - Static: a mock chart has "MOCK DATA" in its title and a `_MOCK.png` file name. `summary.csv` has one row per run.
+  - Gate: M1 exit 3 and 5.
+- [ ] M1-05 → M1: `tools/make_report.py` (stage reports and summary page)
+  - Static: `--phase mvp1` reads saved outputs only (manifests, CSVs, check and analyze logs). No number is typed into the script.
+  - Static: one report per stage (generate, check, analyze) with the 8 fields of `.claude/CLAUDE.md` "System build phasing", one figure and one table.
+  - Static: `index.html` links every report and uses `skills/html-theme/theme.css`.
+  - Static: a stage with no saved output is reported as skipped with the reason, and the script continues.
+  - Gate: M1 exit 6.
+
+## M2: MVP2 real slice, 0 detractors (by 2026-11-17)
+
+### M2 exit (runnable)
+
+1. Main session builds `src/` (cmake, make) with no error.
+2. Main session smoke: `make_sweep.py --cell 0,0,1 --root runs/smoke` writes one `.argos`. One headless run writes `runs/smoke/<runid>/`.
+3. `check_runs.py runs/smoke` exits 0 with `check_runs.py` and `schema.py` unchanged since M1.
+4. That run has `food_collected` > 0, and `events.csv` has `pickup` and `drop` rows.
+5. `analyze.py runs/smoke` lists 79 missing cells and exits 0.
+6. Owner runs `pheromone_qt.argos`: green trails form and fade (two screenshots, saved under `results/real/mvp2/`).
+7. Owner ran the D-007 tuning rounds into `runs/tuning/`. `tuning_pick.json` exists. pm wrote the freeze D-row.
+8. Owner ran the 6 D-010 runs into `runs/judgement/`. `verdict.json` exists. pm wrote the keep-A or switch-B D-row by 2026-11-17.
+9. `make_report.py --phase mvp2` writes the stage reports and `results/real/mvp2/index.html`.
+- If exit 8 says switch to B: pm rewrites the M3 tasks for B before M3 opens.
+- A schema change needed by real code sends that slice back to M1 (DESIGN §5).
+
+### Tactic: copy hw5, then make two stages real (kill: build fails on hw5 tags after 2 fix cycles)
+
+- [ ] M2-01 → M2: `src/` skeleton and the controller interface (U4)
+  - Static: files of DESIGN §6 `src/` exist. Top `CMakeLists.txt` copies hw5 (C++17, `find_package(ARGoS)`).
+  - Static: targets `pheromone_forager` (controller) and `pheromone_loop_functions`. Qt user functions guarded by `ARGOS_QTOPENGL_FOUND`.
+  - Static: the controller header declares `SPheromoneReading { here, probe[8] }`, `SDepositRequest { active, amount }`, a food struct as hw5 `SFoodData`, and getters for state and carrying.
+  - Static: both `.argos` files set `ticks_per_second` 10, `length` 600, 5 x 5 x 2 m arena, 20 `hb_` robots.
+  - Static: `pheromone_headless.template.argos` has no `<visualization>`. `pheromone_qt.argos` has one.
+  - Gate: M2 exit 1.
+- [ ] M2-02 → M2: pure modules `pheromone_grid` and `food_field` (U5, part 1)
+  - Static: grid 40 x 40, cell 0.10 m, two layers (true, false). Functions `Evaporate`, `Deposit`, `Probe`.
+  - Static: evaporation factor is computed from the half-life parameter (60 s start, D-007). Deposit writes 3 x 3 cells with max-merge.
+  - Static: `food_field` draws 3 sources and 2 decoys, then uses the first `n_decoys` (D-009).
+  - Static: sources in x 0.5 to 1.7 m, radius 0.25 m. Each decoy at least 1.5 m from every source. Pickup inside a source never empties it.
+  - Static: neither module includes a simulator header (grep `argos3/core/simulator` returns nothing in both).
+- [ ] M2-03 → M2: loop functions, virtual sensor, floor paint, Qt drawing (U5, part 2)
+  - Static: `PreStep` evaporates, handles pickup and drop, writes `SPheromoneReading` per robot. Probe ring 8 points, 0.15 m, 45° steps from the heading.
+  - Static: `PostStep` applies `SDepositRequest` into the layer of the robot's role (`hb_` true, `dt_` false). No deposit inside the nest.
+  - Static: nest test is `x < -1.0` by position (D-008). The ground sensor is not read for nest or pheromone.
+  - Static: `GetFloorColor` paints nest grey, sources black, true layer pale green (200, 255, 200), false layer pale red (255, 200, 200). `SetChanged()` every `repaint_every` ticks in Qt only.
+  - Static: the `layout` stream uses `CRandom::CreateCategory` seeded with the run seed, passed to `food_field`.
+  - Static: `pheromone_qt_user_functions` draws a black cylinder on carrying robots, as hw5 `search_deliver_qt_user_functions.cpp`.
+  - Gate: M2 exit 1 and 2 (the `layout` category builds and runs).
+- [ ] M2-04 → M2: honest controller (U6, DESIGN §3.2 as corrected)
+  - Static: states REST, SEARCH, FOLLOW, END_SEARCH, RETURN. LEDs: REST off, SEARCH green, FOLLOW yellow, RETURN blue. END_SEARCH LED: open item below.
+  - Static: transitions to RETURN on pickup in SEARCH, FOLLOW or END_SEARCH, or on `t_search` over.
+  - Static: valid and invalid peaks both go to END_SEARCH. Only a valid peak may add a suspect (M3). A low-reading peak goes to SEARCH.
+  - Static: deposit `A_max · exp(-λ_dep · τ)` while carrying, outside the nest. `λ_dep` start 0.077 (D-007).
+  - Static: all Table 2 values are read from `<params>`. One named attribute disables FOLLOW entry (`θ_on` = ∞) for the D-010 arm 2.
+  - Static: the controller exposes its state, a peak flag (valid or invalid) and a follow-start flag through getters. It never reads layer split, creator or role of others.
+- [ ] M2-05 → M2: `RunLogger` and `CHANGELOG.md` (U7)
+  - Static: writes `manifest.json`, `ticks.csv`, `robots.csv`, `events.csv` with the exact headers of `schema.py`. `mock` = 0.
+  - Static: `ticks.csv` one row per tick with `n_rest` to `n_return` from controller states. `robots.csv` one row per robot per second with `false_share` from ground truth.
+  - Static: events `pickup`, `drop`, `follow_start`, `peak` are logged from the controller getters.
+  - Static: `wasted_robot_seconds` follows DESIGN §4.1. `metrics` copied from the last tick row. `complete` false if stopped early.
+  - Static: `code_version` constant in the loop functions. `CHANGELOG.md` is one table (`rules/measurement.md` §2.2) with a `v1` row.
+  - Static: manifest copies `git_commit`, `git_dirty`, `code_sha` and all params from the `.argos` attributes.
+  - Gate: M2 exit 3 and 4.
+- [ ] M2-06 → M2: `tools/make_sweep.py`, single-cell mode (U8)
+  - Static: `--cell d,def,seed --root <runs root>` writes one `.argos` into `src/experiments/generated/` from the headless template.
+  - Static: sets the run seed, runid, output folder `<root>/<runid>/`, `git_commit`, `git_dirty`, and sha256[:12] of both built libraries.
+  - Static: exits nonzero if a built library is missing (no stale hash).
+  - Gate: M2 exit 2.
+- [ ] M2-07 → M2: pheromone tuning scripts (D-007)
+  - Static: `prereg/pheromone_tuning.md` restates D-007 in the 4 lines of `rules/measurement.md` §1 (metric, threshold, contrast, failure condition).
+  - Static: `tools/make_tuning.py --round k` writes 3 `.argos` files (d = 0, defense off, seeds 101 to 103) into `runs/tuning/` and `run_tuning_r<k>.sh`.
+  - Static: round 1 uses start values. Rounds 2 and 3 refuse more than one change from the previous best, or a value outside the D-007 candidates.
+  - Static: `tools/tuning_pick.py` reads saved runs only, prints mean `food_collected` per round, picks by D-007 (tie to the earlier round), writes `tuning_pick.json`.
+  - Static: the shell script runs one run at a time, one core. Seeds 1 to 10 are refused.
+  - Gate: M2 exit 7 (owner runs).
+- [ ] M2-08 → M2: keep-A judgement scripts, seeds 104 to 106 (D-010)
+  - Static: `prereg/keep_a_judgement.md` restates D-010 in the 4 lines of `rules/measurement.md` §1. It is committed before the runs.
+  - Static: `tools/make_judgement.py` writes 6 `.argos` files (arm 1 and arm 2 x seeds 104 to 106) into `runs/judgement/` with values from `tuning_pick.json`, and `run_judgement.sh`. It exits nonzero if `tuning_pick.json` is missing.
+  - Static: `tools/judge_keep_a.py` reads saved runs only. Pass = arm 1 mean ≥ 1.2 x arm 2 mean AND arm 1 > arm 2 on all 3 seeds.
+  - Static: `verdict.json` holds per-seed values, both means, pass, the criterion file path and the sha256 of `judge_keep_a.py` (`rules/measurement.md` §4.1).
+  - Gate: M2 exit 8 (owner runs).
+- [ ] M2-09 → M2: `README.md` how to build and run
+  - Static: sections: build (cmake, make), Qt demo run, headless smoke run, tools (`check_runs.py`, `analyze.py`, `make_mock_runs.py`, `make_report.py`), tuning and judgement scripts.
+  - Static: every command names its folder and its runs root (Fixed paths table). The arm-2 attribute (M2-04) is named.
+- [ ] M2-10 → M2: `make_report.py --phase mvp2`
+  - Static: reports for build, generate, run, check, analyze, Qt view, tuning, judgement. Each with 8 fields, one figure, one table, from saved outputs.
+  - Static: `results/real/mvp2/index.html` links them, `tuning_pick.json` and `verdict.json`.
+  - Gate: M2 exit 9.
+
+## M3: MVP3 detractors, defense, sweep (sweep by 2026-11-24, report by 2026-11-28)
+
+### M3 exit (runnable)
+
+1. Main session smoke: one run at d = 2, defense on, seed 1 into `runs/smoke/` passes `check_runs.py`. Its `events.csv` has `decoy_reach` and `suspect_add` rows.
+2. Owner ran the D-011 defense tuning into `runs/defense_tuning/`. `defense_pick.json` exists. pm wrote the freeze D-row before the sweep.
+3. Owner ran `run_sweep.sh`. `check_runs.py runs/sweep` exits 0 on 80 complete runs (G1, by 2026-11-24).
+4. `analyze.py runs/sweep` writes `results/real/g2_recovered_share.png` with 95 % error bars for d = 1, 2, 4, or the "loss not resolved" line (G2, by 2026-11-28).
+5. Owner records the Qt demo at d = 2, defense off and on.
+6. `make_report.py --phase mvp3` writes the stage reports and `results/index.html`.
+
+### Tactic: attack, then defense, then freeze and sweep (kill: D-010 fails, then pm rewrites M3 for B)
+
+- [ ] M3-01 → M3: detractor controller (U9, DESIGN §3.3)
+  - Static: states REST, GO_DECOY, wait 2 s, RETURN_LAY. LED red. Never carries food. Same `t_rest`.
+  - Static: decoy assigned by the loop functions at `Init` (D-009 counts). Deposits go to the false layer.
+  - Static: `decoy_reach` event is logged. Detractors are added to 20 honest robots (D-005).
+- [ ] M3-02 → M3: defense rule (U10, DESIGN §3.4)
+  - Static: rules 1 to 5 run only when the defense param is 1. Only a valid peak with no food adds a suspect.
+  - Static: merge within `r_merge`, memory `n_mem`, ignore within `r_suspect`, cone `±α_cone` within `d_cone`.
+  - Static: `suspect_add` and `cone_abort` events logged. `suspects_total` filled in `ticks.csv`.
+  - Gate: M3 exit 1.
+- [ ] M3-03 → M3: defense tuning scripts (D-011)
+  - Static: `make_tuning.py --defense --round k` writes d = 2, defense on, seeds 101 to 103 into `runs/defense_tuning/`, with values from `tuning_pick.json`.
+  - Static: candidate values for `r_suspect`, `α_cone`, `d_cone`, `t_end` are read from `prereg/defense_candidates.json`. The script exits nonzero if that file has no git commit.
+  - Static: rounds 2 and 3 refuse more than one change. `tuning_pick.py --defense` picks by mean `F(2, on)`, tie to the earlier round, writes `defense_pick.json`.
+  - Gate: M3 exit 2 (owner runs).
+- [ ] M3-04 → M3: 80-run sweep script (U11)
+  - Static: `make_sweep.py --sweep` writes 80 `.argos` files (d 0, 1, 2, 4 x defense 0, 1 x seeds 1 to 10) into `runs/sweep/` and `run_sweep.sh`.
+  - Static: it exits nonzero unless `tuning_pick.json` and `defense_pick.json` exist. All 80 files carry the same frozen values.
+  - Static: `run_sweep.sh` runs one at a time, one core. It skips a run only if its manifest is complete AND has the same cell, `git_commit` and params.
+  - Static: README gets a sweep section.
+  - Gate: M3 exit 3.
+- [ ] M3-05 → M3: analysis and figures from real logs (U12, part 1)
+  - Static: `analyze.py runs/sweep` writes `results/real/g2_recovered_share.png`, a food bar chart and a wasted robot-seconds bar chart per cell, and `summary.csv`.
+  - Static: the report table states the crowding note (R10), the decoy-count note (D-009) and the pairing limit (R11).
+  - Static: counts of `suspect_add` and `cone_abort` per cell are tabled.
+  - Gate: M3 exit 4.
+- [ ] M3-06 → M3: demo `.argos` files (U12, part 2)
+  - Static: `pheromone_qt_d2_def0.argos` and `pheromone_qt_d2_def1.argos` with the frozen values. README demo section.
+  - Gate: M3 exit 5.
+- [ ] M3-07 → M3: `make_report.py --phase mvp3` and the results page
+  - Static: reports for detractor smoke, defense tuning, sweep, check, analyze, demo. Each with 8 fields, one figure, one table.
+  - Static: `results/index.html` opens with G1 (logged runs out of 80) and G2 (`R(d)` with intervals), read from `summary.csv`.
+  - Static: it links the G2 chart, all stage reports, the demo, and the M1 and M2 pages. `results/README.md` lists every file in `results/`.
+  - Gate: M3 exit 6.
+
+## Open items for the architect
+
+- Source and decoy centres have no field in DESIGN §4. Two checks need them: the R5 false-positive count, and the cross-cell `layout` check (DESIGN §3.1). Each gets a task and an M3 exit line once the schema names the field.
+- DESIGN Table 5 says MVP2 by 2026-11-18. This plan uses 2026-11-17 (D-010 deadline).
+- DESIGN Table 5 gives the MVP2 Qt run to the main session. The repo-root `CLAUDE.md` allows it headless smoke runs only, so the owner runs it here.
+- DESIGN §3.2 gives no LED color for END_SEARCH. M2-04 needs one.

@@ -1,17 +1,18 @@
 # Pheromone foraging under misleading trails: Design
 
-- Author: system-architect, 2026-11-10. Status: draft, strategy pick open (Fable picks, `DECISIONS.md` owner rule).
+- Author: system-architect, 2026-11-10. Status: strategy A picked (Fable, owner-delegated, D-006). Picks: `decisions/2026-11-10_fable_design_picks.md`.
 - Sources: `research/pheromone_research.md` (S-PH-n IDs), `../site/en/projects/pheromone-misleading-trails.html`, `../DESIGN.md` §2 (floor painting, cited not restated).
 - Build pattern: `hw5_ARGoS_02/src/` (CMake, controller, loop functions, `.argos`). ARGoS 3.0.0-beta59, C++17.
 
-## 0. Mission block (quoted from the dispatch. `PLAN.md` pending)
+## 0. Mission block (quoted from `PLAN.md`)
 
 > - Mission: Keep swarm foraging trustworthy when some robots lay false pheromone trails.
 > - Vision: One chart and one demo show the defense winning back lost food.
 > - G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (4 detractor counts 0/1/2/4 x 2 defense states x 10 seeds).
 > - G2: By 2026-11-28, report recovered loss share for detractor counts 1, 2, 4 with 10-seed error bars.
 
-- `DECISIONS.md` D-004 cites a `PLAN.md` mission block. No `PLAN.md` exists in `01_pheromone/` yet. `product-manager` creates it.
+- Source: the mission block of `PLAN.md` (D-004). `product-manager` writes `PLAN.md`. If the two differ, `PLAN.md` wins.
+- S1 → G1, G2: strategy A (D-006). Listed alternative: B only. C is a post-G2 stretch.
 - Constraints: no local training. The owner runs builds and simulations by hand (repo-root `CLAUDE.md` Execution).
 - Exception (D-002): the main session builds and runs one 1-seed smoke run per gate, on the owner's order.
 
@@ -19,10 +20,10 @@
 
 Table 1. Pheromone substrate and defense options
 
-| | A: floor grid, virtual sensor (recommended) | B: waypoint pheromone (Luna and Lu style) | C: hybrid, grid plus waypoint defense |
+| | A: floor grid, virtual sensor (picked, D-006) | B: waypoint pheromone (Luna and Lu style) | C: hybrid, grid plus waypoint defense |
 | --- | --- | --- | --- |
 | Substrate | 2-layer grid (true, false) in loop functions. Exponential evaporation | List of waypoints (x, y, strength, creator id). `w = e^(-t·λ_pd)` [S-PH-1] | Grid of A for following. Each deposit also tags a creator id |
-| Sensing | Loop functions write 3 probe values per robot into a controller struct | Robot in the nest receives the strongest waypoint, then drives to it by position | As A |
+| Sensing | Loop functions write 8 probe values per robot into a controller struct | Robot in the nest receives the strongest waypoint, then drives to it by position | As A |
 | Attack | Detractor lays the same deposit profile from a decoy point to the nest | Detractor reports a waypoint near a decoy | As A |
 | Defense | Private suspect-end list, no communication (page Step 5, Aswale-style [S-PH-6]) | Travel-time check plus strikes per creator [S-PH-1] | A's rule plus density-based spatial clustering of applications with noise (DBSCAN) on suspect ends, creator graph |
 | Cost, all units incl. tools (person-days, inference) | 14.5 (Table 7 sum) | 14 | 21 to 24 |
@@ -31,9 +32,9 @@ Table 1. Pheromone substrate and defense options
 | Fit to G2 | Good. Loss and recovery are measured on ground-truth layers | Good, but the result restates Prof. Lu's paper | Best evidence, latest date |
 | Fit to Vision (demo) | Best. True and false trails are painted in two tints | Weak. Waypoints are invisible without extra Qt drawing | As A |
 
-- Recommendation: **A**. It matches the page and the Vision demo. Its defense is the novelty angle in the research file (Implications 9).
+- Picked: **A** (D-006). It matches the page and the Vision demo. Its defense is the novelty angle in the research file (Implications 9).
 - Budget: 4 people × 10 working days = 40 person-days. A and B fit. C fits only with no slack.
-- Fallback: B, if the MVP2 tuning runs show grid following does not deliver food (risk R1, criterion in §5).
+- Fallback: B, only if the Q7 judgement in §5 fails (risk R1, D-010).
 - C is a stretch goal after G2 only. It adds no G1 or G2 measure.
 
 ## 2. Components and data flow (option A)
@@ -81,7 +82,7 @@ Figure 1. Components and one simulation tick
 ### 2.2 Floor paint and the nest test
 
 - The ground sensor gives one grey value (`../DESIGN.md` §2.2). Grey 0.25 to 0.75 means "in nest" in hw5 (`search_deliver.cpp:229-232`).
-- Decision in this design: the nest test uses the **positioning sensor** (`x < -1.0`). The ground sensor is not used for nest or pheromone.
+- Decision (D-008): the nest test uses the **positioning sensor** (`x < -1.0`). The ground sensor is not used for nest or pheromone.
 - Floor paint is display only: nest grey, food sources black, true pheromone green tint, false red tint.
 - Tints keep grey value above 0.80 at full strength. Pale green (200, 255, 200) gives 0.91. Pale red (255, 200, 200) gives 0.85 (`ToGrayScale` weights, `../DESIGN.md` §2.2).
 - So a stale ground-sensor nest test would still not fire on pheromone.
@@ -98,6 +99,8 @@ Figure 1. Components and one simulation tick
 - Each decoy is at least 1.5 m from every source.
 - Layout stream: a dedicated random category `layout`, seeded with the run seed.
 - It always draws 3 sources and 2 decoys, then uses the first `n_decoys`. So all 8 cells of a seed share sources and decoy spots.
+- Decoys per detractor count (D-009): d = 1, 2, 4 use 1, 2, 2 decoys.
+- So d = 2 to 4 raises the trail refresh rate, not the decoy count. The report states this.
 - Robot start poses use the `argos` stream through `<distribute>`. They differ across cells because the robot count differs.
 - So the bootstrap pairs cells on layout, not on robot starts.
 - `CRandom::CreateCategory` for the `layout` stream is not verified on beta59. MVP2 checks it.
@@ -107,24 +110,32 @@ Figure 1. Components and one simulation tick
 ```
 Figure 2. Honest forager states
 
- REST --t>=t_rest--> SEARCH --probe>θ_on, not suppressed--> FOLLOW
-   ^                  |  ^                                    |
-   |      pickup or   |  | t_end over, no food                | peak or trail lost
-   |      t_search    v  | (defense on: add suspect)          v
-   +------drop------ RETURN <------------pickup------------ END_SEARCH
-                    (deposit if carrying)
+ REST --t>=t_rest--> SEARCH <----------trail lost (low)---------- FOLLOW
+   ^                  | ^  |                                      ^  |  |
+   |                  | |  +--probe>θ_on, uphill, not suppressed--+  |  | peak
+   |     pickup or    | |                                            |  | (valid or
+   |     t_search     | +--t_end over, no food----------+            |  |  invalid)
+   |                  v    (suspect only if valid peak   |            |  v
+   +------drop------ RETURN    and defense on)           +------- END_SEARCH
+                    (deposit  ^  ^                                    |
+                    if carry) |  +-------------pickup-----------------+
+                              +----------------pickup in FOLLOW------+
 ```
 
 - Caption: Figure 2 shows the honest state machine. Why: END_SEARCH is the only place a false trail can be detected.
+- Transitions to RETURN: pickup in SEARCH, pickup in FOLLOW, pickup in END_SEARCH, or `t_search` over.
 - REST: in nest, at least `t_rest`. LED off.
 - SEARCH: correlated random walk with obstacle avoidance (hw5 `DiffusionVector`). LED green.
 - FOLLOW entry: the largest probe > `θ_on` and > `here` + `δ_up`. A flat ridge does not start a follow.
-- FOLLOW: steer to the largest probe. LED yellow. Record `here_entry` and the entry time.
+- FOLLOW: steer to the largest probe. LED yellow. Record `here_entry` and the entry time. Pickup leads to RETURN.
 - Peak test: all 8 probes ≤ `here` for `t_peak`, or all probes < `θ_off` for `t_peak`.
 - Peak by a low reading ("trail lost") goes to SEARCH, not END_SEARCH.
 - END_SEARCH: random walk inside 0.3 m of the peak for `t_end`. Pickup leads to RETURN.
 - A peak is "valid" only after `t_follow_min` in FOLLOW and `here` ≥ 2 × `here_entry`.
-- An invalid peak goes to SEARCH and adds no suspect. Why: it stops suspects on honest trails after a short or flat follow.
+- An invalid peak also goes to END_SEARCH, but it never adds a suspect.
+- Why END_SEARCH: a robot that joins near a true trail end must still search for the source.
+- Why no suspect: it stops suspects on honest trails after a short or flat follow.
+- With `λ_dep` 0.077, the 2 × rise needs about 9 s (0.9 m) of follow. A shorter follow is invalid but still searches.
 - RETURN: drive to nest centre by position. LED blue.
 - Deposit: while carrying, outside the nest, `amount = A_max · exp(-λ_dep · τ)`. τ = seconds since pickup.
 - Why decay with τ: the trail is strongest at the food. Uphill means toward the food [S-PH-6].
@@ -169,10 +180,10 @@ Table 2. Starting parameters. "inference" = no direct source
 | Arena, walls | 5 × 5 × 2 m, inner faces ±2 m | [S-PH-4], hw5 |
 | Nest | x < -1.0 m | [S-PH-2], hw5 |
 | Honest robots `n_honest` | 20 | [S-PH-4] |
-| Detractors `n_det` | 0, 1, 2, 4, added to the 20 | page. Added vs taken: open decision Q1 |
+| Detractors `n_det` | 0, 1, 2, 4, added to the 20 (totals 20, 21, 22, 24) | page. Added: D-005 |
 | `max_speed` | 10 cm/s | hw5 |
 | Grid cell | 0.10 m, 40 × 40 = 1600 cells, 5 px per cell at 50 px/m | inference. Whole pixels per cell (`../DESIGN.md` §2.1) |
-| `n_sources`, `n_decoys` | 3, 1 per detractor (max 2 decoys shared) | inference |
+| `n_sources`, `n_decoys` | 3, 1 per detractor, max 2 (d = 1, 2, 4 → 1, 2, 2) | inference. D-009 |
 | Source and decoy radius | 0.25 m | inference |
 | Decoy to source gap | ≥ 1.5 m | inference, from the cone check in §3.4 |
 | Source band | x in [0.5, 1.7] m | inference, inside [S-PH-2] range |
@@ -185,17 +196,32 @@ Table 2. Starting parameters. "inference" = no direct source
 | Wasted-time decoy radius | 0.5 m | inference (decoy radius + 0.25 m) |
 | `repaint_every` | 10 ticks, Qt runs only | inference |
 | `A_max` | 1000 | [S-PH-6] |
-| `λ_dep` | 0.115 per s | inference: trail end-to-start ratio 0.1 over a 20 s trip, ln(10)/20 |
-| Evaporation | half-life 60 s, factor 0.5^(1/600) = 0.99885 per tick | inference: one-way trip 2 m / 0.10 m/s = 20 s. A trail must last about 3 trips |
+| `λ_dep` | 0.077 per s | inference: end-to-start ratio 0.1 over a 30 s trip, ln(10)/30. The source band reaches 2.7 m from the nest. D-007 |
+| Evaporation | half-life 60 s, factor 0.5^(1/600) = 0.99885 per tick | inference: one-way trip 2 m / 0.10 m/s = 20 s. A trail must last about 3 trips. D-007 |
 | `θ_on`, `θ_off` | 20, 5 | inference |
 | `t_rest`, `t_search`, `t_end` | 5 s, 120 s, 15 s | inference. hw5 min rest is 50 ticks |
 | `r_merge`, `r_suspect`, `d_cone` | 0.3 m, 0.4 m, 1.0 m | inference |
 | Sweep seeds | 1 to 10, same in all 8 cells | page (10 seeds). Values: inference |
 | Tuning seeds | 101 to 103, never used in the sweep | inference. Why: tuning on sweep seeds would fit the result |
+| Judgement seeds (Q7) | 104 to 106, used once | D-010 |
 
-- Pheromone values (evaporation, `λ_dep`, `θ_on`, `δ_up`) are tuned at MVP2 on tuning seeds, d = 0.
-- Defense values (`r_suspect`, `α_cone`, `d_cone`, `t_end`) are tuned at the start of MVP3 on tuning seeds, d = 2.
-- All values freeze in a D-row before the 80-run sweep (`rules/measurement.md` §1).
+Pheromone tuning rule (D-007, fixed before running):
+
+1. Runs: d = 0, defense off, seeds 101 to 103.
+2. Round 1 uses the start values.
+3. Rounds 2 and 3 change one value only.
+4. Candidates: half-life 30, 60 or 120 s. `λ_dep` 0.05, 0.077 or 0.115.
+5. Metric: mean `food_collected` with pheromone on. A tie goes to the earlier round.
+6. At most 3 rounds. The picked values freeze in a D-row before defense tuning.
+7. They are never re-tuned with detractor runs.
+
+Defense tuning rule (D-011, fixed before running, start of MVP3):
+
+1. Runs: d = 2, defense on, seeds 101 to 103.
+2. Round 1 uses the start values. Rounds 2 and 3 change one value only.
+3. Values in scope: `r_suspect`, `α_cone`, `d_cone`, `t_end`.
+4. Metric: mean `F(2, on)`. A tie goes to the earlier round.
+5. At most 3 rounds. The picked values freeze in a D-row before the 80-run sweep (`rules/measurement.md` §1).
 
 ## 4. Log schema (the single contract)
 
@@ -280,17 +306,20 @@ Table 5. Phases, end-to-end cycle and exit
 
 | Phase | End-to-end cycle | Exit criterion (runnable) | Who runs |
 | --- | --- | --- | --- |
-| MVP1 shape (by 2026-11-13) | `make_mock_runs.py` writes 80 runs to `mock/runs/` → `check_runs.py` passes → `analyze.py` draws the G2 chart and the summary table | 80 mock runs pass the check. Chart `results/mock/g2_recovered_share_MOCK.png` exists. Deliberate breakage: a renamed column in one run fails the check. A mixed root stops `analyze.py` | Owner, or main session on owner order (Q4) |
+| MVP1 shape (by 2026-11-13) | `make_mock_runs.py` writes 80 runs to `mock/runs/` → `check_runs.py` passes → `analyze.py` draws the G2 chart and the summary table | 80 mock runs pass the check. Chart `results/mock/g2_recovered_share_MOCK.png` exists. Deliberate breakage: a renamed column in one run fails the check. A mixed root stops `analyze.py` | Main session (D-012) |
 | MVP2 real slice (by 2026-11-18) | Build `src/` → `make_sweep.py` writes one `.argos` (d = 0, defense off, seed 1) → 1 headless run → `check_runs.py` → `analyze.py` on that root | Real run passes the same check unchanged. `food_collected` > 0. `analyze.py` lists 79 missing cells and does not crash. Qt run shows green trails forming and fading | Main session 1-seed smoke (D-002) |
 | MVP3 core (sweep by 2026-11-24, report by 2026-11-28) | Detractors + defense → defense tuning runs → freeze → `make_sweep.py` writes 80 `.argos` files and `run_sweep.sh` → owner runs → check → G2 chart from real logs | 80 complete real runs pass the check (G1). Real G2 chart with error bars (G2). Qt demo at d = 2, defense off vs on | Owner runs tuning and sweep. Main session 1-seed smoke first |
 
-R1 fallback criterion, written before the runs (MVP2 tuning):
+Q7 judgement: keep A or switch to B (D-010, written before the runs):
 
-- Runs: d = 0, defense off, tuning seeds 101 to 103. Arm 1 pheromone on. Arm 2 `θ_on` = ∞ (no following). 6 runs.
+- When: once, after the pheromone tuning freeze (D-007). Deadline 2026-11-17.
+- Runs: d = 0, defense off, held-out seeds 104 to 106. Arm 1 pheromone on. Arm 2 `θ_on` = ∞ (no following). 6 runs.
 - Runner: the owner, or the main session on the owner's order.
-- Keep A if mean `food_collected` of arm 1 ≥ 1.2 × arm 2 after at most 3 tuning rounds.
-- Otherwise switch to B. pm logs the switch as a D-row.
-- 1.2 is a planning threshold, not derived from noise. The 3 seeds give the first noise estimate.
+- Pass: arm 1 mean `food_collected` ≥ 1.2 × arm 2 mean, AND arm 1 > arm 2 on all 3 seeds.
+- Pass keeps A. Fail switches to B with a D-row. No retry.
+- Why held-out seeds: best of 3 rounds on the tuning seeds is optimistic.
+- Why the deadline: after it, 5 workdays (20 person-days) remain. B needs about 8.
+- 1.2 is a planning threshold, not derived from noise.
 
 - MVP2 makes real two tasks: (1) the pheromone grid with evaporation and deposits, (2) the honest forager writing the real schema.
 - Everything else stays mock in MVP2. The mock stays as the schema's reference after MVP3.
@@ -338,7 +367,7 @@ Table 6. Risks and responses
 
 | ID | Risk | Response |
 | --- | --- | --- |
-| R1 | Grid gradient following does not lead robots to food. No source tested it on foot-bots | R1 fallback criterion in §5. Switch to B if it fails |
+| R1 | Grid gradient following does not lead robots to food. No source tested it on foot-bots | Q7 judgement in §5 (D-010). Switch to B if it fails |
 | R2 | Loss at d = 1 is inside seed noise | §4.2 writes "loss not resolved". Do not widen criteria after the result |
 | R3 | Defense never pays off. A false trail is re-laid faster than robots learn | Cone rule 5. Log `cone_abort` events to see it |
 | R4 | Max-merge near the nest mixes layers, so `false_share` is ambiguous there | Deposits stop inside the nest. Metric counts FOLLOW only, outside the nest |
@@ -348,7 +377,7 @@ Table 6. Risks and responses
 | R7 | XML tag spellings and class names unverified (research open questions) | Copy hw5 `.argos` tags. MVP2 build catches the rest |
 | R8 | No seed flag on the command line (`../DESIGN.md` §3.4, not verified) | One generated `.argos` per run |
 | R9 | 4 people edit the same loop functions | Pure modules split by file. One owner per file (§8) |
-| R10 | Detractors added vs taken changes the meaning of loss | Pick before MVP1 (Q1). Log it as a D-row |
+| R10 | Added detractors (D-005) add slight crowding, so loss is not purely deception | The report notes the crowding effect |
 
 ## 8. Design units for `product-manager`
 
@@ -371,11 +400,19 @@ Table 7. Units, size and order. pm phases and allocates them
 
 - Sum: 14.5 person-days. Table 1 uses this sum for A.
 
-## 9. Open decisions (need a pick)
+## 9. Resolved decisions (Fable, owner-delegated, 2026-11-10)
 
-- Q1: detractors added to the 20 honest robots (recommended, loss is pure deception) or taken from them.
-- Q2: strategy A, B or C (recommended A).
-- Q3: evaporation half-life 60 s and `λ_dep` 0.115 per s as start values, tuned once at the MVP2 gate.
-- Q4: who runs `make_mock_runs.py`. It is light (80 small files, no raw data, no model). But `~/.claude/CLAUDE.md` names "data generation" as never local. Owner rule needed.
-- Q5: nest test by positioning sensor (recommended) instead of the hw5 ground-sensor grey band.
-- Q6: number of decoys per detractor count (1 per detractor, at most 2), and `n_sources` = 3.
+Detail: `decisions/2026-11-10_fable_design_picks.md`. Rows: `DECISIONS.md`.
+
+Table 8. Picks
+
+| Q | Pick | D-row | Section |
+| --- | --- | --- | --- |
+| Q1 | Detractors added to the 20 honest robots | D-005 | §3.5 |
+| Q2 | Strategy A. B is the only fallback. C is a post-G2 stretch | D-006 | §1 |
+| Q3 | Half-life 60 s. `λ_dep` start 0.077 per s. Pheromone tuning rule | D-007 | §3.5 |
+| Q4 | Main session runs `make_mock_runs.py` | D-012 | §5 |
+| Q5 | Nest test by positioning sensor. Floor color is display only | D-008 | §2.2 |
+| Q6 | 1 decoy per detractor, max 2. `n_sources` = 3 | D-009 | §3.1 |
+| Q7 | One judgement on seeds 104 to 106, 1.2 × and all 3 seeds, by 2026-11-17 | D-010 | §5 |
+| (new) | Defense tuning rule, d = 2, seeds 101 to 103 | D-011 | §3.5 |
