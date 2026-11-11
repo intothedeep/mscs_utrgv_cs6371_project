@@ -383,7 +383,7 @@ Q7 judgement: keep A or switch to B (D-010, written before the runs):
     check_runs.py      validates a runs root against schema.py
     make_sweep.py      writes 80 .argos files + run_sweep.sh, stamps git_commit
     analyze.py         §4.2, writes results/<real|mock>/
-  mock/runs/           committed, small, every runid starts MOCK_
+  mock/runs/           gitignored (D-014), regenerated, every runid starts MOCK_
   runs/                gitignored (80 runs, about 50 to 100 MB, inference)
   results/             committed: summary.csv (one row per run), figures, README
 ```

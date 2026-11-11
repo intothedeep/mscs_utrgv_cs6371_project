@@ -1,0 +1,2 @@
+refused: --out must be /Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/01_pheromone/mock/runs, got /Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/01_pheromone/runs/x
+exit=1

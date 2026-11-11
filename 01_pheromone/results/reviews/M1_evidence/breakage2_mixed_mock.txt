@@ -1,0 +1,2 @@
+stop: mixed mock flags under one root: ['False', 'True']
+exit=1

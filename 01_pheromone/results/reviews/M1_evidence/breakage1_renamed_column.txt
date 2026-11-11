@@ -1,0 +1,4 @@
+FAIL run=MOCK_20261110-000000_d0_def0_s1 file=ticks.csv column=food_collected: expected column is missing
+FAIL run=MOCK_20261110-000000_d0_def0_s1 file=ticks.csv column=food_colected: unexpected column
+SUMMARY runs=1 failed=1 problems=2
+exit=1
