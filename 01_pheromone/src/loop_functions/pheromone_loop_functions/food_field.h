@@ -23,6 +23,8 @@ namespace pheromone
     constexpr double SOURCE_X_MIN = 0.5, SOURCE_X_MAX = 1.7;
     constexpr double SPOT_Y_LIMIT = 1.6;      /* keeps a disc clear of the +-1.95 m wall faces */
     constexpr double MIN_DECOY_GAP_M = 1.5;   /* decoy centre to every source centre */
+    /* Two decoys within 0.5 m would act as one, so d = 2 and d = 4 would use one decoy (D-009, D-020). */
+    constexpr double MIN_DECOY_DECOY_GAP_M = 1.0;
     /* Decoy distance band from the nest edge point (-1, 0): the source band
        x 0.5..1.7 at y = 0 is 1.5..2.7 m from it (DESIGN Table 2, inference).
        Decoys also stay in x >= DECOY_X_MIN, outside the nest. */

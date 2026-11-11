@@ -165,13 +165,15 @@ def analyze_stage() -> Stage:
 
 def qt_stage() -> Stage:
     key, title = "qt_view", "Stage 6: Qt view"
-    what = "The owner runs pheromone_qt.argos and saves two screenshots: trails forming and fading."
+    what = ("The main session captures frames from pheromone_qt.argos with headless frame grabbing (D-013): "
+            "trails forming and fading.")
     why = "The Vision demo shows true trails in a green tint. M2 must show them on screen."
     shots = sorted(OUT.glob("qt_*.png")) if OUT.is_dir() else []
     if not shots:
         return skipped(key, title, what, why, "no qt_*.png screenshot in results/real/mvp2/")
-    rows = [[p.name, f"{p.stat().st_size / 1024:.0f}"] for p in shots]
-    return Stage(key, title, what, why, "Live Qt run (owner), no saved data.", f"{len(shots)} screenshot(s).",
+    rows = [[p.name, f"{p.stat().st_size / 1024:.0f}"] for p in shots]  # size of the file on disk, read now
+    return Stage(key, title, what, why, "Qt run with headless frame grabbing (main session), no saved run data.",
+                 f"{len(shots)} screenshot(s).",
                  f"{len(shots)} screenshot(s): " + ", ".join(p.name for p in shots) + ".",
                  "Good: two or more screenshots." if len(shots) >= 2 else "Bad: M2 exit 6 needs two screenshots.",
                  "ran", "".join(img(p.name, p.stem) for p in shots), table(["file", "size (KB)"], rows))

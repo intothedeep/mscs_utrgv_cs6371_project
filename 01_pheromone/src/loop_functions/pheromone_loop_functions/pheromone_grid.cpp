@@ -33,7 +33,7 @@ namespace pheromone
         return (nCell < 0 || nCell >= GRID_SIZE) ? -1 : nCell;
     }
 
-    void CPheromoneGrid::Deposit(ELayer e_layer, double f_x, double f_y, double f_amount)
+    void CPheromoneGrid::Deposit(ELayer e_layer, double f_x, double f_y, double f_amount, double f_min_x)
     {
         int nCx = CellOf(f_x), nCy = CellOf(f_y);
         if (nCx < 0 || nCy < 0)
@@ -44,6 +44,8 @@ namespace pheromone
                 int nX = nCx + nDx, nY = nCy + nDy;
                 if (nX < 0 || nX >= GRID_SIZE || nY < 0 || nY >= GRID_SIZE)
                     continue;
+                if (ARENA_MIN + (nX + 0.5) * CELL_M < f_min_x)
+                    continue; /* cell centre inside the nest */
                 double &fCell = m_aLayers[e_layer][nY * GRID_SIZE + nX];
                 fCell = std::max(fCell, f_amount);
             }

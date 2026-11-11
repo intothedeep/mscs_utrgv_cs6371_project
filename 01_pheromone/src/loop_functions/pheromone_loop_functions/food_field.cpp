@@ -41,6 +41,8 @@ namespace pheromone
                 bool bClear = fBand >= DECOY_BAND_MIN && fBand <= DECOY_BAND_MAX;
                 for (const SPoint &sSource : m_vecSources)
                     bClear = bClear && Distance(sCandidate, sSource) >= MIN_DECOY_GAP_M;
+                for (const SPoint &sPlaced : m_vecDecoys)
+                    bClear = bClear && Distance(sCandidate, sPlaced) >= MIN_DECOY_DECOY_GAP_M;
                 if (bClear)
                 {
                     m_vecDecoys.push_back(sCandidate);

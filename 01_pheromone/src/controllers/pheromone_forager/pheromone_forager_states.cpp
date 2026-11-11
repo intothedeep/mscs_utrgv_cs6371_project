@@ -1,5 +1,6 @@
 #include "pheromone_forager.h"
 #include <argos3/core/simulator/physics_engine/physics_engine.h>
+#include <algorithm>
 #include <cmath>
 
 /*
@@ -110,7 +111,7 @@ void CPheromoneForager::Follow()
     if (m_unFlatTicks >= m_sParams.PeakTicks)
     {
         m_bPeakValid = m_unStateTicks >= m_sParams.FollowMinTicks &&
-                       m_sSeen.here >= 2.0f * m_fHereEntry;
+                       m_sSeen.here >= 2.0f * std::max(m_fHereEntry, m_sParams.ThetaOn);
         m_ePeakEvent = m_bPeakValid ? PEAK_VALID : PEAK_INVALID;
         m_cPeakPos = m_cPos;
         Enter(STATE_END_SEARCH);

@@ -77,6 +77,8 @@ void CPheromoneLoopFunctions::Init(TConfigurationNode &t_node)
 /* The layout stays: a GUI reset replays the same sources and decoys. */
 void CPheromoneLoopFunctions::Reset()
 {
+    /* A GUI reset would append to the open run files, so close the log first (manifest: complete false). */
+    m_cLogger.Close();
     m_pcGrid->Clear();
     m_unCollectedFood = 0;
     m_unWastedRobotTicks = 0;
@@ -191,7 +193,7 @@ void CPheromoneLoopFunctions::PostStep()
         /* hb_ writes the true layer, dt_ the false layer. No deposit in the nest. */
         if (sRequest.active && cPos.GetX() >= m_fNestEdgeX)
             m_pcGrid->Deposit(IsHonest(c_robot.GetId()) ? pheromone::LAYER_TRUE : pheromone::LAYER_FALSE,
-                              cPos.GetX(), cPos.GetY(), sRequest.amount);
+                              cPos.GetX(), cPos.GetY(), sRequest.amount, m_fNestEdgeX);
         sRequest.active = false; });
     LogStep(); /* after every deposit, so the layer sums are final for this tick */
     if (m_unRepaintEvery > 0 && GetSpace().GetSimulationClock() % m_unRepaintEvery == 0)
