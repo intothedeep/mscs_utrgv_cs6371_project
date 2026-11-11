@@ -19,7 +19,9 @@ from g2_stats import BOOT_SEED, N_BOOT  # noqa: E402
 
 __all__ = ["boot_mean_interval", "fig_m6_food", "fig_cost_vs_gain", "fig_honest_isolation", "fig_scale"]
 
-COLORS = {"off": "#7f7f7f", "v3": "#4c78a8", "k1t10": "#f58518", "v5": "#54a24b", "id": "#b279a2"}
+COLORS = {"off": "#7f7f7f", "v3": "#4c78a8", "k1t10": "#f58518", "v5": "#54a24b", "id": "#b279a2", "k2t0": "#9c755f"}
+# One name per rule across blocks (project-end review N6): M5 labels k1t0 and k2t10 are the same rules as v3 and v5.
+ALIAS = {"k1t0": "v3", "k2t10": "v5"}
 MARKERS = {"M5": "o", "M6": "s"}
 plt.rcParams.update({"font.size": 9, "axes.grid": True, "grid.alpha": 0.3, "axes.axisbelow": True})
 
@@ -63,6 +65,7 @@ def fig_cost_vs_gain(rows: list[dict], out: Path) -> Path:
         if d != 0:
             continue
         r2 = by[(block, arm, 2)]
+        arm = ALIAS.get(arm, arm)
         color = COLORS.get(arm, "#333333")
         ax.errorbar(r0["G"], r2["G"], xerr=[[r0["G"] - r0["G_lo"]], [r0["G_hi"] - r0["G"]]],
                     yerr=[[r2["G"] - r2["G_lo"]], [r2["G_hi"] - r2["G"]]], marker=MARKERS[block],
@@ -72,9 +75,10 @@ def fig_cost_vs_gain(rows: list[dict], out: Path) -> Path:
     ax.axvline(0, color="k", lw=0.6)
     ax.set_xlabel("d = 0 cost G(0) = F(on) - F(off) (food items per run)")
     ax.set_ylabel("d = 2 gain G(2) = F(on) - F(off) (food items per run)")
-    fig.suptitle("Cost at d = 0 against gain at d = 2")
-    handles = [plt.Line2D([], [], ls="", marker=m, color="#555555", label=f"{b} confirm") for b, m in MARKERS.items()]
-    fig.legend(handles=handles, loc="outside lower center", ncol=len(handles))
+    fig.suptitle("Cost at d = 0 against gain at d = 2 (shape = seed block, colour = rule)")
+    handles = [plt.Line2D([], [], ls="", marker=m, color="#555555", label=f"{b} confirm (own seeds)") for b, m in MARKERS.items()]
+    handles += [plt.Line2D([], [], ls="", marker="o", color=c, label=a) for a, c in COLORS.items() if a != "off"]
+    fig.legend(handles=handles, loc="outside lower center", ncol=4)
     return _save(fig, out)
 
 
