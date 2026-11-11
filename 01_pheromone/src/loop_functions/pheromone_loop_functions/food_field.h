@@ -40,6 +40,7 @@ namespace pheromone
            shares one layout (D-009). Throws std::runtime_error when no decoy
            spot meets the gap after many tries. */
         void Draw(const TUniform &f_uniform);
+        bool TryDraw(const TUniform &f_uniform);
 
         /* True inside a source disc. A pickup never empties a source. */
         bool IsOnSource(double f_x, double f_y) const;

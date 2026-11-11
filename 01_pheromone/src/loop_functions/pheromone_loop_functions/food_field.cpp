@@ -10,9 +10,21 @@ namespace pheromone
         return std::hypot(s_a.x - s_b.x, s_a.y - s_b.y);
     }
 
+    /* Some source draws leave no decoy spot 1.5 m from every source (seed 6,
+       2026-11-11). Redraw the whole layout from the same stream (D-019).
+       A seed that placed on the first draw keeps the same layout. */
     void CFoodField::Draw(const TUniform &f_uniform)
     {
-        static const int MAX_TRIES = 10000;
+        static const int MAX_LAYOUT_DRAWS = 100;
+        for (int nDraw = 0; nDraw < MAX_LAYOUT_DRAWS; ++nDraw)
+            if (TryDraw(f_uniform))
+                return;
+        throw std::runtime_error("food_field: no layout meets the 1.5 m decoy gap");
+    }
+
+    bool CFoodField::TryDraw(const TUniform &f_uniform)
+    {
+        const int MAX_TRIES = 10000;
         m_vecSources.clear();
         m_vecDecoys.clear();
         for (int i = 0; i < NUM_SOURCES; ++i)
@@ -36,8 +48,9 @@ namespace pheromone
                 }
             }
             if (!bPlaced)
-                throw std::runtime_error("food_field: no decoy spot meets the 1.5 m gap");
+                return false;
         }
+        return true;
     }
 
     std::vector<SPoint> CFoodField::ActiveDecoys(unsigned n_det) const
