@@ -1,0 +1,833 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Rank 7 (tie) Split-merge tracking | Final project candidates</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+<script>document.documentElement.className += " js";</script>
+</head>
+<body>
+<div class="wrap">
+
+<p class="lang-switch"><a href="../../projects/split-merge-tracking.html">한국어</a> | <strong>English</strong></p>
+
+<nav class="topnav">
+  <a href="sorting-segregation.html">← Previous: Rank 7 (tie) Sorting and segregation</a>
+  <a href="../index.html">Index</a>
+  <a href="best-of-n.html">Next: Rank 9 Collective decision →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Project rank 7 (tie) / 10 projects (in rank order)</div>
+  <h1>A swarm that tracks groups that split and merge<br><span class="muted" style="font-size:15px;font-weight:400">Split-merge tracking</span></h1>
+  <div class="lead">
+    <p><strong>Result: rank 7 (tie), score 8 (tracking only). Prior work exists for every part. No source was found that measured the trade-off between observation ratio and switch frequency under repeated splits and merges.</strong></p>
+    <p>Why rank 7: the score ties with sorting and segregation (8). The gap means "no source found". It is not proof that nobody did it.</p>
+    <div class="chips">
+      <span class="chip">research potential 2</span>
+      <span class="chip">2-week feasibility 2</span>
+      <span class="chip">fit with the professor's work 2</span>
+      <span class="chip">total = product = 8 (inference)</span>
+      <span class="chip">full pipeline, 2-week basis: 2 · 1 · 3 = 6</span>
+    </div>
+  </div>
+  <ol class="toc tabs">
+    <li><a href="#summary">1 Summary</a></li>
+    <li><a href="#pipeline">2 Pipeline</a></li>
+    <li><a href="#study">3 Study guide</a></li>
+    <li><a href="#recent">4 Recent work</a></li>
+    <li><a href="#lineage">5 Lineage chart</a></li>
+    <li><a href="#rq">6 RQs and roadmap</a></li>
+    <li><a href="#sources">7 Sources</a></li>
+  </ol>
+</header>
+
+<section class="tab" id="summary">
+  <h2>1 Summary</h2>
+  <p class="muted">Source: research/split_merge_tracking/proposal.md and survey.md. Scores and source IDs are copied as they are. Nothing is recomputed.</p>
+
+  <h3>1.1 The problem</h3>
+  <figure>
+    <svg viewBox="0 0 1000 270" role="img" aria-label="When the target group splits in two and merges again, the ring of the swarm changes from one ring of 12 robots to two rings of 6 and back to one ring of 12">
+  <defs><marker id="arrp" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+  <circle cx="30" cy="32" r="4" fill="#222"/><text class="m" x="42" y="36">one target of the group</text>
+  <rect x="330" y="27" width="9" height="9" fill="var(--s2)"/><text class="m" x="344" y="36">robot</text>
+  <circle cx="438" cy="32" r="7" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/><text class="m" x="452" y="36">formation (ring)</text>
+  <text class="m" x="990" y="36" style="text-anchor:end">illustrative sketch</text>
+  <circle cx="170" cy="130" r="52" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="183.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="176.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="163.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="157.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="163.5" cy="118.7" r="5" fill="#222"/>
+  <circle cx="176.5" cy="118.7" r="5" fill="#222"/>
+  <rect x="215.2" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="201.8" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="178.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="151.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="128.2" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="114.8" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="114.8" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="128.2" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="151.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="178.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="201.8" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="215.2" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <circle cx="430" cy="130" r="36" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="439.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="425.5" cy="137.8" r="5" fill="#222"/>
+  <circle cx="425.5" cy="122.2" r="5" fill="#222"/>
+  <rect x="456.2" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="425.0" y="161.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="393.8" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="393.8" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="425.0" y="89.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="456.2" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <circle cx="570" cy="130" r="36" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="579.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="565.5" cy="137.8" r="5" fill="#222"/>
+  <circle cx="565.5" cy="122.2" r="5" fill="#222"/>
+  <rect x="596.2" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="565.0" y="161.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="533.8" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="533.8" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="565.0" y="89.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="596.2" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <circle cx="830" cy="130" r="52" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="843.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="836.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="823.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="817.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="823.5" cy="118.7" r="5" fill="#222"/>
+  <circle cx="836.5" cy="118.7" r="5" fill="#222"/>
+  <rect x="875.2" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="861.8" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="838.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="811.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="788.2" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="774.8" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="774.8" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="788.2" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="811.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="838.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="861.8" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="875.2" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <line x1="262" y1="130" x2="336" y2="130" stroke="#555" stroke-width="2.5" marker-end="url(#arrp)"/><text class="m c" x="299" y="118">split</text>
+  <line x1="664" y1="130" x2="738" y2="130" stroke="#555" stroke-width="2.5" marker-end="url(#arrp)"/><text class="m c" x="701" y="118">merge</text>
+  <text class="b c" x="170" y="214">t1 one target group</text><text class="m c" x="170" y="232">one ring · 12 robots</text>
+  <text class="b c" x="500" y="214">t2 splits in two</text><text class="m c" x="500" y="232">two rings · 6 robots each</text>
+  <text class="b c" x="830" y="214">t3 merges again</text><text class="m c" x="830" y="232">one ring · 12 robots</text>
+</svg>
+    <figcaption>
+      Figure 1. A swarm splits and merges together with a target group. Why: the formation must resize by itself to match the robot count and the group size.
+      <span class="ab">Abbreviations: none. Source: proposal.md section 1.1. Positions of dots and squares are an illustrative sketch.</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>Table 1. Mission and vision</caption>
+    <thead><tr><th>Item</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Mission</td><td>A swarm follows and observes groups that split and merge.</td></tr>
+      <tr><td>Vision</td><td>The swarm finds a group and moves it in a wanted direction.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Why a swarm (inference): nobody knows when a group splits or into how many parts.</li>
+    <li>Each robot decides from local information only. A central controller would remove the reason to use a swarm.</li>
+    <li>There are two candidate novelties: stage 4 (split and allocate) and stage 6 (herding). One paper places its contribution at one stage only.</li>
+  </ul>
+
+  <h3>1.2 Score and rank</h3>
+  <table class="t">
+    <caption>Table 2. Scores for two scopes (research potential R, 2-week feasibility F, fit with the professor's research Fit, each 1 to 3, total is the product). Why: the value used in the ranking is 8, for tracking only.</caption>
+    <thead><tr><th>Scope</th><th class="c">R</th><th class="c">F</th><th class="c">Fit</th><th class="c">Total</th><th>Reason</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td>Tracking only (ranking value)</td><td class="c">2</td><td class="c">2</td><td class="c">2</td><td class="c">8</td><td>Prior work exists for three parts. The link to his tracking papers is only an inference <a class="s" href="#S-SMT-6">[S-SMT-6]</a>, <a class="s" href="#S-SMT-7">[S-SMT-7]</a>, <a class="s" href="#S-SMT-8">[S-SMT-8]</a>, <a class="s" href="#S-SMT-15">[S-SMT-15]</a>.</td></tr>
+      <tr><td>Full pipeline, 2-week course basis</td><td class="c">2</td><td class="c">1</td><td class="c">3</td><td class="c">6</td><td>Stage 2 overlaps Prof. Lu's paper directly. Building stage 6 in 2 weeks is hard.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Rank: 8 points ties with collective sorting and segregation (8), so both are rank 7 (tie). Collective decision moves from rank 8 to 9. Herding moves from 9 to 10.</li>
+    <li>R × F = 4. It is in the same group as the rank 7 (tie) group of the R × F table.</li>
+    <li>R would become 3 only if the gap re-check confirms again that nobody measured the trade-off. Two search rounds found no source. That is not proof.</li>
+    <li>Where the chat estimate (course high, workshop medium-high, conference medium) is more optimistic than the survey, the survey score wins. Scores are comparison estimates (inference).</li>
+  </ul>
+
+  <h3>1.3 Applications in layers</h3>
+  <figure>
+    <svg viewBox="0 0 1000 250" role="img" aria-label="Three application layers. From the bottom: main application cattle on pasture, bridge experiment, vision cell groups in the body">
+  <defs><marker id="arrl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+  <rect x="40" y="20" width="700" height="52" fill="#fff" stroke="var(--s3)" stroke-width="2.5"/>
+  <text class="b" x="56" y="42">Vision (research stage)</text><text class="m" x="56" y="61">Microrobots in the body track cell groups</text>
+  <rect x="40" y="100" width="700" height="52" fill="#fff" stroke="var(--s4)" stroke-width="2.5"/>
+  <text class="b" x="56" y="122">Bridge experiment</text><text class="m" x="56" y="141">Cut sensing and communication range and measure the drop</text>
+  <rect x="40" y="180" width="700" height="52" fill="#fff" stroke="var(--s1)" stroke-width="2.5"/>
+  <text class="b" x="56" y="202">Main application (partly commercial)</text><text class="m" x="56" y="221">Track and herd cattle on pasture</text>
+  <line x1="390" y1="178" x2="390" y2="154" stroke="#555" stroke-width="2.5" marker-end="url(#arrl)"/>
+  <line x1="390" y1="98" x2="390" y2="74" stroke="#555" stroke-width="2.5" marker-end="url(#arrl)"/>
+</svg>
+    <figcaption>
+      Figure 2. Three application layers, stacked by maturity. Why: cattle are the main application and cell groups serve only as motivation.
+      <span class="ab">Abbreviations: none. Source: proposal.md section 2.</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>Table 3. Application layers (source: proposal.md section 2)</caption>
+    <thead><tr><th>Layer</th><th>Application</th><th>ARGoS counterpart</th><th>Maturity</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Main application</td><td>Cattle on pasture</td><td>Nearly 1:1 with the default foot-bot (inference)</td><td>virtual fencing collars and drone livestock detection already exist</td><td><a class="s" href="#S-SMT-22">[S-SMT-22]</a>, <a class="s" href="#S-SMT-24">[S-SMT-24]</a></td></tr>
+      <tr><td>Bridge experiment</td><td>Foot-bots with reduced sensing and communication</td><td>Turn off the range-and-bearing sensor and the positioning sensor (inference)</td><td>Simulation</td><td><a class="s" href="#S-SMT-20">[S-SMT-20]</a></td></tr>
+      <tr><td>Vision</td><td>microrobot tracking cell groups</td><td>Foot-bots with reduced sensing (inference)</td><td>Research stage</td><td><a class="s" href="#S-SMT-20">[S-SMT-20]</a>, <a class="s" href="#S-SMT-21">[S-SMT-21]</a></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Cattle: plains bison split into small groups and merge into large groups <a class="s" href="#S-SMT-23">[S-SMT-23]</a>. Two or more animals leaving or joining count as a split or a merge. This definition can serve as the judging rule of a robot experiment (inference).</li>
+    <li>The position accuracy of virtual fencing collars is reported as within 2 m <a class="s" href="#S-SMT-22">[S-SMT-22]</a>.</li>
+    <li>This survey found no system where several robots split to follow a splitting herd, and no field study that herds cattle with drones or robots.</li>
+    <li>Cell groups: circulating tumor cell clusters are 2% to 5% of circulating tumor cells. They contributed to about half of the lung metastases in an animal model <a class="s" href="#S-SMT-19">[S-SMT-19]</a>. The source is a news page. The original paper was not read.</li>
+    <li>Microrobots can hardly carry sensors and actuators <a class="s" href="#S-SMT-20">[S-SMT-20]</a>. This application motivates a simulation question. It makes no medical claim (inference).</li>
+    <li>Question of the bridge experiment: "How much does tracking break when sensing is almost gone?" (inference). The optional baseline gives all robots the same global signal.</li>
+    <li><strong>Tracking people is not an application frame.</strong> The reason is ethics. The owner decided the same (2026-11-10).</li>
+  </ul>
+
+  <h3>1.4 Prior work and the gap</h3>
+  <table class="t">
+    <caption>Table 4. Prior-work lines and the remaining gap (source: proposal.md section 4.1). Why: seeing what already exists for each part narrows down where the new contribution is.</caption>
+    <thead><tr><th>Line</th><th>What exists</th><th>Remaining gap (inference)</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>cooperative multi-robot observation of multiple moving targets (CMOMMT)</td><td>Parker defined the problem.</td><td>It is not confirmed whether it treats the structure of target groups. Only a search summary was read.</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a></td></tr>
+      <tr><td>Split-merge tracking</td><td>La and Sheng: sensors split to follow a new target and merge when the target disappears.</td><td>They measured the cost of one split only. The trade-off under repeated split-merge is not on pages 1 to 2.</td><td><a class="s" href="#S-SMT-6">[S-SMT-6]</a></td></tr>
+      <tr><td>Placement in proportion to target count</td><td>Low, Leow, Ang: robots per zone follow the target count.</td><td>The zones are fixed.</td><td><a class="s" href="#S-SMT-7">[S-SMT-7]</a></td></tr>
+      <tr><td>Multi-target trapping from local density</td><td>Lei et al.: single-ring, multi-ring and multi-subgroup encirclement emerge without communication.</td><td>Repeated split-merge is not in the abstract.</td><td><a class="s" href="#S-SMT-8">[S-SMT-8]</a></td></tr>
+      <tr><td>Learned multi-target encirclement</td><td>Transformer-Enhanced Reinforcement Learning (TERL): trained with 15 pursuers and 4 targets.</td><td>It is a learned policy. Training must run on the cluster.</td><td><a class="s" href="#S-SMT-9">[S-SMT-9]</a></td></tr>
+      <tr><td>fission-fusion control of a swarm</td><td>A 2022 paper covers unmanned aerial vehicle (UAV) swarm fission-fusion control.</td><td>The full text could not be opened [UNVERIFIED].</td><td><a class="s" href="#S-SMT-5">[S-SMT-5]</a></td></tr>
+      <tr><td>Fission-fusion in animals</td><td>Couzin and Laidre.</td><td>It is biology. There is no robot rule [UNVERIFIED].</td><td><a class="s" href="#S-SMT-3">[S-SMT-3]</a></td></tr>
+      <tr><td>Search and tracking</td><td>Dames: find and track an unknown number of targets.</td><td>Split-merge of target groups and herding are not on page 1.</td><td><a class="s" href="#S-SMT-29">[S-SMT-29]</a></td></tr>
+      <tr><td>shepherding</td><td>Collect and drive by Strömbom et al. A survey by Long et al.</td><td>The multi-shepherd section was not checked in the full text.</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a>, <a class="s" href="#S-SMT-26">[S-SMT-26]</a></td></tr>
+      <tr><td>Herding a dispersed group</td><td>Liu et al.: cluster into sub-flocks and order them with a traveling salesman problem.</td><td>It plans the order for one shepherd. The search stage is not in the abstract.</td><td><a class="s" href="#S-SMT-27">[S-SMT-27]</a></td></tr>
+      <tr><td>Sheep herding and welfare</td><td>Yaxley et al.: 12 sheep, stop above a peak heart rate of 200 beats per minute (bpm), 20 m safe zone.</td><td>One farm, 12 sheep. It cannot be moved to cattle (inference).</td><td><a class="s" href="#S-SMT-28">[S-SMT-28]</a></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Three parts have prior work: placement in proportion to target count <a class="s" href="#S-SMT-7">[S-SMT-7]</a>, the cost of one split <a class="s" href="#S-SMT-6">[S-SMT-6]</a> and multi-subgroup rings <a class="s" href="#S-SMT-8">[S-SMT-8]</a>.</li>
+    <li>Not found: the trade-off between observation ratio and churn under repeated split-merge. If robots move, the ratio is right but they cannot observe while moving. If they stay, observation continues but the ratio is wrong (inference).</li>
+    <li><strong>This is not proof that nobody did it.</strong> A personal research line needs one more gap re-check.</li>
+  </ul>
+</section>
+
+<section class="tab" id="pipeline">
+  <h2>2 Pipeline</h2>
+  <p class="muted">The owner's flow is split into 6 stages. Source: proposal.md section 3. The heavy orange boxes are the candidate novelties (stages 4 and 6).</p>
+  <figure>
+    <svg viewBox="0 0 1000 250" role="img" aria-label="Flowchart of six stages: deploy, search, detect and cluster, split and allocate, track, herd. Stages 4 and 6 are candidate novel contributions. An arrow returns from stage 4 to search">
+  <defs><marker id="arrf" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+  <rect x="24" y="14" width="22" height="12" fill="#fff" stroke="#555" stroke-width="1.5"/><text class="m" x="54" y="24">reuse existing method</text>
+  <rect x="290" y="14" width="22" height="12" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/><text class="m" x="320" y="24">candidate novel contribution</text>
+  <text class="m" x="990" y="24" style="text-anchor:end">No stage is built yet (planned)</text>
+  <rect x="8" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="81" y="82">1 Deploy</text>
+  <text class="m c" x="81" y="108">random spread</text><text class="m c" x="81" y="126">or zone split</text>
+  <text class="b c" x="81" y="162" style="fill:#555">existing method</text>
+  <line x1="154" y1="115" x2="170" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="172" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="245" y="82">2 Search</text>
+  <text class="m c" x="245" y="108">bidirectional spiral</text><text class="m c" x="245" y="126">random-walk foraging</text>
+  <text class="b c" x="245" y="162" style="fill:#555">existing method</text>
+  <line x1="318" y1="115" x2="334" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="336" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="409" y="82">3 Detect, cluster</text>
+  <text class="m c" x="409" y="108">distance-based</text><text class="m c" x="409" y="126">clustering</text>
+  <text class="b c" x="409" y="162" style="fill:#555">existing method</text>
+  <line x1="482" y1="115" x2="498" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="500" y="56" width="146" height="118" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="573" y="82">4 Split, allocate</text>
+  <text class="m c" x="573" y="108">proportional rule</text><text class="m c" x="573" y="126">hysteresis</text>
+  <text class="b c" x="573" y="162" style="fill:var(--s2)">candidate novelty</text>
+  <line x1="646" y1="115" x2="662" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="664" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="737" y="82">5 Track</text>
+  <text class="m c" x="737" y="104">cooperative</text><text class="m c" x="737" y="120">observation,</text><text class="m c" x="737" y="136">density encirclement</text>
+  <text class="b c" x="737" y="162" style="fill:#555">existing method</text>
+  <line x1="810" y1="115" x2="826" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="828" y="56" width="146" height="118" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="901" y="82">6 Herd</text>
+  <text class="m c" x="901" y="108">collect and drive</text><text class="m c" x="901" y="126">order planning</text>
+  <text class="b c" x="901" y="162" style="fill:var(--s2)">existing + novelty</text>
+  <path d="M573,176 L573,200 L245,200 L245,178" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrf)"/>
+  <text class="m c" x="409" y="218">search again when a new group appears</text>
+</svg>
+    <figcaption>
+      Figure 3. Six stages from deploy to herd, with two candidate novelties. Why: one paper places its contribution at one stage only, so the novel stage must be visible first.
+      <span class="ab">Abbreviations: none. Source: proposal.md section 3. No stage is built yet (planned).</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>Table 5. Stage table (source: proposal.md section 3). Why: it shows, stage by stage, how much existing work is reused and how the stage links to Prof. Lu's research.</caption>
+    <thead><tr><th>Stage</th><th>Reuse an existing method?</th><th>Link to Prof. Lu</th><th>Novelty</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td style="white-space:nowrap">1 Deploy</td><td>Yes. Random spread or zone split (inference)</td><td>Not checked</td><td>None</td><td>None</td></tr>
+      <tr><td style="white-space:nowrap">2 Search</td><td>Yes. Bidirectional spiral search, random-walk foraging</td><td><strong>Strong fit.</strong> It is his spiral search paper.</td><td>None</td><td><a class="s" href="#S-SMT-30">[S-SMT-30]</a>, <a class="s" href="#S-SMT-15">[S-SMT-15]</a></td></tr>
+      <tr><td style="white-space:nowrap">3 Detect, cluster</td><td>Yes. Distance-based clustering</td><td>His lab used density-based spatial clustering of applications with noise (DBSCAN) in a defense.</td><td>None</td><td><a class="s" href="#S-SMT-31">[S-SMT-31]</a></td></tr>
+      <tr class="rowflag"><td style="white-space:nowrap">4 Split, allocate</td><td>Partly. Proportional rule and hysteresis</td><td>No direct overlap</td><td><strong>Candidate novelty.</strong> Local proportional allocation under repeated split-merge</td><td><a class="s" href="#S-SMT-6">[S-SMT-6]</a>, <a class="s" href="#S-SMT-7">[S-SMT-7]</a></td></tr>
+      <tr><td style="white-space:nowrap">5 Track</td><td>Yes. Cooperative observation, density-based encirclement</td><td>No direct paper</td><td>None</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a>, <a class="s" href="#S-SMT-8">[S-SMT-8]</a>, <a class="s" href="#S-SMT-15">[S-SMT-15]</a></td></tr>
+      <tr class="rowflag"><td style="white-space:nowrap">6 Herd</td><td>Partly. Collect and drive, planning the collect order</td><td>No direct overlap</td><td><strong>Candidate novelty.</strong> Herding groups that keep splitting, splitting the roles of observing and steering</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a>, <a class="s" href="#S-SMT-27">[S-SMT-27]</a></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Stage 2 overlaps Prof. Lu's research most directly.</li>
+    <li>Allocating many shepherds in stage 6 is the problem of reusing the stage 4 allocation rule (inference).</li>
+  </ul>
+  <h3>2.1 Experiment frame and algorithm draft (inference)</h3>
+  <ol>
+    <li>loop functions split and merge the target group on a fixed schedule. The targets are 8 to 16 foot-bots.</li>
+    <li>Each target sends "I am a target" with the range-and-bearing sensor <a class="s" href="#S-SMT-10">[S-SMT-10]</a>. The tracking foot-bots number 12 to 30.</li>
+    <li>A tracking robot clusters the sensed targets by distance. A gap larger than d means a different group.</li>
+    <li>It joins the nearest group. When two groups are farther apart than d, the robots on the far side follow the far group.</li>
+    <li>The side with more robots per target hands robots to the side with fewer. A robot moves only if the imbalance lasts T seconds (hysteresis time T).</li>
+    <li>Each sub-swarm builds a ring around its center. When two centers come closer than d, the rings merge into one.</li>
+  </ol>
+  <table class="t">
+    <caption>Table 6. Baselines and metrics (inference). Why: the curve that answers RQ2 comes from two axes, switch frequency and observation ratio.</caption>
+    <thead><tr><th>Name</th><th>Content or definition</th></tr></thead>
+    <tbody>
+      <tr><td>Baseline: fixed formation</td><td>One ring around the center of all targets.</td></tr>
+      <tr><td>Baseline: follow the nearest target</td><td>Similar to the cooperative multi-robot observation of multiple moving targets (CMOMMT) approach <a class="s" href="#S-SMT-1">[S-SMT-1]</a>.</td></tr>
+      <tr><td>Baseline: global assignment</td><td>global assignment (oracle). The loop functions assign robots in proportion to the true group size.</td></tr>
+      <tr><td>Metric: observation ratio</td><td>Share of targets observed at each time. A target counts as observed if a tracking robot is within sensing range. Question it answers: does the surveillance work.</td></tr>
+      <tr><td>Metric: robots per group</td><td>Robots per target in each sub-swarm, compared with the proportional ideal. Question it answers: is the placement right.</td></tr>
+      <tr><td>Metric: churn</td><td>Number of times one robot changed sub-swarm in 1 minute. Question it answers: how much does it wobble.</td></tr>
+      <tr><td>Metric: trade-off curve</td><td>x is switch frequency, y is mean observation ratio. One point per T. It answers RQ2.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>New metrics for the herding stage (inference): share of animals that reached the goal, time taken, and a stress proxy (minimum distance to a robot). The welfare limit goes into the rules <a class="s" href="#S-SMT-28">[S-SMT-28]</a>.</li>
+    <li>The version is ARGoS 3.0.0-beta59, set by the course. The material read is not specific to beta59 (inference). The default range of the foot-bot range-and-bearing sensor in ARGoS was not confirmed.</li>
+  </ul>
+</section>
+
+<section class="tab" id="study">
+  <h2>3 Study guide</h2>
+  <p class="muted">Source: research/split_merge_tracking/study_guide.md (chat answer of the main session, 2026-11-10, background knowledge). Paper records and check status follow the lineage table (Table 13).</p>
+  <figure>
+    <svg viewBox="0 0 1000 150" role="img" aria-label="Figure that shows where the eight study topics sit among the pipeline stages">
+      <defs><marker id="arrg" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+      <g stroke="#555" stroke-width="1.5" fill="#fff">
+        <rect x="10" y="30" width="150" height="56"/><rect x="200" y="30" width="150" height="56"/><rect x="390" y="30" width="190" height="56"/><rect x="620" y="30" width="190" height="56"/><rect x="850" y="30" width="140" height="56"/>
+      </g>
+      <g stroke="#555" stroke-width="2.5"><line x1="162" y1="58" x2="196" y2="58" marker-end="url(#arrg)"/><line x1="352" y1="58" x2="386" y2="58" marker-end="url(#arrg)"/><line x1="582" y1="58" x2="616" y2="58" marker-end="url(#arrg)"/><line x1="812" y1="58" x2="846" y2="58" marker-end="url(#arrg)"/></g>
+      <g class="b c"><text x="85" y="54">Search</text><text x="275" y="54">Cluster</text><text x="485" y="54">Split, allocate</text><text x="715" y="54">Track, formation</text><text x="920" y="54">Herd</text></g>
+      <g class="m c"><text x="85" y="74">topic 7</text><text x="275" y="74">(no topic)</text><text x="485" y="74">topics 3, 4</text><text x="715" y="74">topics 1, 2, 5</text><text x="920" y="74">topic 6</text></g>
+      <text class="m" x="10" y="124">Topic 8 (learning-based) applies to every stage. Training runs on the Cradle cluster.</text>
+    </svg>
+    <figcaption>
+      Figure 4. Where the eight study topics touch the pipeline. Why: the reading order can follow the stages.
+      <span class="ab">Abbreviations: none. Source: the figure at the top of study_guide.md.</span>
+    </figcaption>
+  </figure>
+  <p><strong>Suggested study order: 1 → 2 → 4 → 3 → 5 → 7 → 6 → 8.</strong> It goes from the basics to the core (observation, allocation), then to the extensions (herding, learning).</p>
+  <table class="t">
+    <caption>Table 7. The 8 main topics (source: study_guide.md). Why: knowing which problem each topic came from, and where it fits in this research, gives a reason to study it.</caption>
+    <thead><tr><th class="c">#</th><th>Topic</th><th>Problem it tried to solve</th><th>How it solves it</th><th>Why it matters</th><th>Why study it (place in this research)</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td>flocking: Reynolds 1987, Vicsek 1995, Olfati-Saber 2006</td><td>How do birds or fish move together without a leader</td><td>Three local rules: separation, alignment, cohesion</td><td>The starting point of swarm robotics: local rules alone create global order. Olfati-Saber proved it with control theory</td><td>The base for each piece moving as one after a split (stage 5)</td></tr>
+      <tr><td class="c">2</td><td>cooperative multi-robot observation of multiple moving targets (CMOMMT): Parker 1999, 2002</td><td>How to observe as long as possible when targets outnumber robots</td><td>A force that adds attraction to nearby targets and repulsion from other robots</td><td>The base problem that first set the "observation ratio" metric</td><td>The direct ancestor. CMOMMT watches targets one by one. This research watches groups that split (stage 5)</td></tr>
+      <tr><td class="c">3</td><td>fission-fusion: Couzin 2009, Mergeable Nervous Systems 2017</td><td>Why and how do animal groups split and merge. Can robots do the same</td><td>Biology: split models driven by food or danger. Robots: systems that physically merge and separate</td><td>Evidence that a swarm can change its size to fit the situation</td><td>The real movement of a herd. A model of target motion and of the swarm's split rule (stage 4)</td></tr>
+      <tr><td class="c">4</td><td>Task allocation: response threshold, auction, consensus-based bundle algorithm (CBBA)</td><td>N robots and M jobs. Who does what</td><td>Threshold: take a job when the stimulus passes a level (ant model). Auction, CBBA: decide by bids</td><td>The standard way to split work without central control</td><td>"How many robots to each group" is an allocation problem. Core of stage 4</td></tr>
+      <tr><td class="c">5</td><td>encirclement and formation control</td><td>How to keep a fixed shape (a ring) around a target</td><td>Control the distance to the target and the angle gap to neighbors. Re-divide the gaps when the robot count changes</td><td>Common to surveillance, escort and capture</td><td>The part where "the formation adjusts automatically to the count" (stage 5)</td></tr>
+      <tr><td class="c">6</td><td>shepherding: Strömbom 2014</td><td>How does one dog herd dozens of sheep</td><td>Two behaviors: collect outer sheep when spread, drive from behind when gathered</td><td>Two simple rules make herding work. The baseline of robot and drone herding</td><td>Stage 6. Existing work assumes one group. This research herds a group that splits</td></tr>
+      <tr><td class="c">7</td><td>Search: random walk, Lévy flight, spiral search</td><td>How to find something fast when its place is unknown</td><td>Random walk, a Lévy flight with occasional long jumps, a systematic spiral path (Prof. Lu 2023)</td><td>The core of foraging research. Search efficiency sets the total performance</td><td>Stage 2. It links directly to the professor's research</td></tr>
+      <tr><td class="c">8</td><td>Learning-based swarms: multi-agent reinforcement learning (MARL), graph neural network (GNN)</td><td>Hand-made rules are not optimal in complex situations</td><td>Learn a policy from rewards in simulation. A GNN gathers neighbor information to decide</td><td>The mainstream of the last 3 years. The same policy works when the robot count changes</td><td>The next paper stage, which compares against a rule-based baseline. Training runs on the Cradle cluster</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="recent">
+  <h2>4 Recent work (2023 to 2026)</h2>
+  <p class="muted">Source: research/split_merge_tracking/recent_review.md. Survey date 2026-11-10. "Not in the abstract" in a cell does not mean the paper did not do it. It means only the abstract was read.</p>
+  <ul>
+    <li><strong>Result: more prior work exists on multi-shepherd allocation and on tracking target groups. Proportional reallocation when a target group repeatedly splits and merges, and its trade-off, still has no source.</strong></li>
+    <li>Recent-paper table: 22 papers. Verified 17, partial 4, unverifiable 1.</li>
+    <li>Of the 32 new sources (S-RR) of this review, this page cites the ones used in the table and the milestones in the lineage chart.</li>
+  </ul>
+
+  <h3>4.1 Recent-paper table</h3>
+  <table class="t">
+    <caption>Table 8. 22 recent papers, one row each. Why: it shows, paper by paper, what is studied now and what is still empty.</caption>
+    <thead><tr><th>ID · year · venue</th><th>Title</th><th>Problem and method</th><th>Result, claim (limits on the line below)</th><th>Check</th></tr></thead>
+    <tbody>
+      <tr><td><a class="s" href="#S-RR-1">[S-RR-1]</a><br>2024<br>IEEE Transactions on Robotics 40</td><td>Heterogeneous Targets Trapping With Swarm Robots by Using Adaptive Density-Based Interaction</td><td>Trap targets of different strength (weak, strong, group movement). Density-based local interaction, adaptive allocation and a deformation mechanism.</td><td>The encirclement thickness and group size follow target strength. Real-robot experiments with up to 50 robots.<br><span class="muted">Limits: not in the abstract</span></td><td>verified: abstract (OpenAlex)</td></tr>
+      <tr><td><a class="s" href="#S-RR-2">[S-RR-2]</a><br>2023 (v2 2024)<br>arXiv</td><td>Distributed Multi-Robot Multi-Target Tracking Using Heterogeneous Limited-Range Sensors</td><td>Tracking accuracy of a heterogeneous sensor network. Distributed coverage control with a "normalized unused sensing capacity" metric.</td><td>In Robot Operating System (ROS) and MATLAB simulation it beats methods that ignore heterogeneity.<br><span class="muted">Limits: not in the abstract</span></td><td>verified: abstract</td></tr>
+      <tr><td><a class="s" href="#S-RR-3">[S-RR-3]</a><br>2024<br>arXiv (a related DOI points to the European Control Conference 2025, inference)</td><td>Emergent Cooperative Strategies for Multi-Agent Shepherding via Reinforcement Learning</td><td>Multi-shepherd herding of non-cohesive targets. Two layers of distributed reinforcement learning: the lower layer traps one target, the upper layer picks the target.</td><td>Shepherds pick different targets by themselves. A policy trained with few agents is used at a large scale.<br><span class="muted">Limits: not in the abstract, no numbers</span></td><td>verified: abstract</td></tr>
+      <tr><td><a class="s" href="#S-RR-4">[S-RR-4]</a><br>2025<br>arXiv</td><td>Decentralized Shepherding of Non-Cohesive Swarms Through Cluttered Environments via Deep Reinforcement Learning</td><td>Herd a dispersing target group through obstacles. An upper-layer allocation rule + a lower-layer proximal policy optimization (PPO) policy. Trained with 1 shepherd and 1 obstacle.</td><td>Without retraining, targets gather at the goal with many shepherds and many obstacles.<br><span class="muted">Limits: simulation only (inference, from the abstract)</span></td><td>verified: abstract</td></tr>
+      <tr><td><a class="s" href="#S-RR-5">[S-RR-5]</a><br>2024<br>Science Robotics 9, eadl5161 (arXiv 2401.13103)</td><td>Self-organizing Nervous Systems for Robot Swarms</td><td>Limit of fixed structures: distributed ones are hard to design, central ones have a single point of failure. Robots build and rebuild a temporary self-organized hierarchy.</td><td>A swarm of n robots becomes one hierarchy of n, then splits into several small independent hierarchies. A real air-ground heterogeneous swarm, simulation up to 250 robots.<br><span class="muted">Limits: not in the abstract</span></td><td>verified: abstract (arXiv). Journal data from a search summary</td></tr>
+      <tr><td><a class="s" href="#S-RR-6">[S-RR-6]</a><br>2025<br>arXiv</td><td>Cooperative Search and Track of Rogue Drones using Multiagent Reinforcement Learning</td><td>Find and track several rogue drones over a facility (the application differs from the owner's topic. Only the method is a reference). multi-agent reinforcement learning (MARL) sets the movement of pursuing drones.</td><td>Simulation showed performance and scalability for varying agent counts. Numbers are not in the abstract.<br><span class="muted">Limits: simulation only (inference)</span></td><td>verified: abstract</td></tr>
+      <tr><td><a class="s" href="#S-RR-7">[S-RR-7]</a><br>2024<br>arXiv</td><td>Swarm Algorithms for Dynamic Task Allocation in Unknown Environments</td><td>Swarm allocation when tasks keep appearing in unknown places. Information spread, division of labor (some use Lévy walks) and a mix of both.</td><td>When tasks appear slowly or at a medium rate, division of labor and the mix are better. When fast, the Lévy walk is equal or better.<br><span class="muted">Limits: discrete model (from the abstract)</span></td><td>verified: abstract</td></tr>
+      <tr><td><a class="s" href="#S-RR-8">[S-RR-8]</a><br>2022 (IEEE International Conference on Robotics and Automation 2023)<br>arXiv, submitted to that conference</td><td>Graph Neural Networks for Multi-Robot Active Information Acquisition</td><td>Active information gathering by a robot team over a communication graph, including target tracking. A graph neural network (GNN) called I-GBNet. Imitation learning from a central expert solution.</td><td>It generalizes to larger graphs and new environments than in training. Shown on dynamic target tracking.<br><span class="muted">Limits: not in the abstract. Depends on a central expert (inference)</span></td><td>partial: abstract. Publication and award only from a search summary</td></tr>
+      <tr><td><a class="s" href="#S-RR-9">[S-RR-9]</a><br>2025<br>Autonomous Robots 49(2)</td><td>Effective tracking of unknown clustered targets using a distributed team of mobile robots</td><td>Find and track clustered targets (for example animal groups). Two estimators: the current target state and a long-term map of group positions. A power diagram splits the search area.</td><td>Tracking accuracy on clustered targets is higher than other methods. It also works on evenly spread targets.<br><span class="muted">Limits: not in the abstract. Simulation (from the abstract)</span></td><td>verified: abstract (Crossref)</td></tr>
+      <tr><td><a class="s" href="#S-RR-10">[S-RR-10]</a><br>2023 (v2 2024)<br>arXiv (Physical Review Research 2024 per a search summary)</td><td>Shepherding control and herdability in complex multiagent systems</td><td>Non-cohesive targets and shepherds with local sensing. The number of shepherds needed per target count. A scaling law, percolation of a "herdability graph", a 1-dimensional partial differential equation (PDE).</td><td>Below a critical target density, the number of shepherds needed grows sharply.<br><span class="muted">Limits: the analysis covers only the simple 1-dimensional case (inference, from the abstract)</span></td><td>verified: abstract. Journal from a search summary</td></tr>
+      <tr><td><a class="s" href="#S-RR-11">[S-RR-11]</a><br>2026<br>IEEE International Conference on Robotics and Automation 2026 (arXiv 2604.22327)</td><td>Multi-robot obstacle-aware shepherding of non-cohesive target agents</td><td>Herd non-cooperative targets among obstacles. A mixed policy: steer straight toward the goal + circle along an obstacle tangent.</td><td>In simulation the trapping ratio beats earlier herding methods. Indoor experiment with TurtleBot4 shepherds and real target robots.<br><span class="muted">Limits: not in the abstract</span></td><td>verified: abstract (publication per the comments field)</td></tr>
+      <tr><td><a class="s" href="#S-RR-12">[S-RR-12]</a><br>2023<br>arXiv</td><td>Dynamic UAV Swarm Collaboration for Multi-Targets Tracking under Malicious Jamming: Joint Power, Path and Target Association Optimization</td><td>Multi-target tracking under jamming. Split into three sub-problems. cluster-evolutionary target association (CETA) splits the swarm into sub-swarms and pairs them with targets. Artificial potential field paths, mean-field game power control.</td><td>Versus the baseline: mean interference 28%, tracking phases 33%, target switches 48% lower. Text: number of sub-swarms = number of targets. Re-pairing happens only when the nearest target to the center changes (event-based).<br><span class="muted">Limits: targets fly straight in different directions and do not split or merge. Flight energy is ignored. Simulation only</span></td><td>verified: first 100000 characters of the text</td></tr>
+      <tr><td><a class="s" href="#S-RR-13">[S-RR-13]</a><br>2024<br>IEEE Robotics and Automation Letters 9(10)</td><td>Automatic Navigation of a Microrobotic Swarm for Tracking Multiple Mobile Targets</td><td>Track several moving targets with a magnetically driven microrobot swarm. An optimized rapidly-exploring random tree star (ORRT*) path + shortest-path choice + sliding mode control.</td><td>Simulation and experiment in a virtual maze showed tracking of several moving targets.<br><span class="muted">Limits: the paper says microswarms have almost no onboard sensors or actuators. One swarm follows the targets in turn (inference)</span></td><td>verified: page 1</td></tr>
+      <tr><td><a class="s" href="#S-RR-14">[S-RR-14]</a><br>2025 or later (inference)<br>not confirmed (UTS repository)</td><td>Emergent Herding Behaviour Through Decentralised Reinforcement Learning</td><td>Herd livestock with a drone team. Distributed reinforcement learning. Repulsion-attraction reward and staged learning (spacing, encirclement, guidance in order).</td><td>Scalable herding with local observation and minimal communication. Success in simulation under several behavior conditions.<br><span class="muted">Limits: not in the abstract. Simulation only (inference)</span></td><td>partial: page 1. Venue and year not confirmed</td></tr>
+      <tr><td><a class="s" href="#S-RR-15">[S-RR-15]</a><br>2023<br>IEEE International Conference on Robotics and Automation 2023 (arXiv 2303.01799)</td><td>Multi-Target Pursuit by a Decentralized Heterogeneous UAV Swarm using Deep Multi-Agent Reinforcement Learning</td><td>Pursue several fast-fleeing targets in an unknown environment. Role-based multi-agent deep deterministic policy gradient (MADDPG). Some search, some pursue. A Voronoi-based search reward.</td><td>It learned a cooperative policy. Confirmed on real Crazyflie drones.<br><span class="muted">Limits: not in the abstract. No numbers</span></td><td>verified: abstract (publication per the comments field)</td></tr>
+      <tr><td><a class="s" href="#S-RR-16">[S-RR-16]</a><br>2025<br>arXiv</td><td>Hierarchical Policy-Gradient Reinforcement Learning for Multi-Agent Shepherding Control of Non-Cohesive Targets</td><td>Multi-shepherd herding of non-cohesive targets. Two PPO layers: the upper layer picks targets, the lower layer drives. It changes the earlier discrete-action deep Q-network (DQN) approach to continuous actions.</td><td>It converges as the target count grows. It also works with limited sensing. Trajectories are smooth.<br><span class="muted">Limits: not in the abstract. No numbers</span></td><td>verified: abstract</td></tr>
+      <tr><td><a class="s" href="#S-RR-17">[S-RR-17]</a><br>2026<br>IEEE Robotics and Automation Letters 11(6)</td><td>Safe and Adaptive Multi-Target Encirclement With Socially Aware Multi-Robot Control</td><td>Surround and track a group of moving targets with unknown speeds. Each robot keeps a safe distance from the convex hull of the target group. The safe distance comes from a social constraint.</td><td>Stability of the distribution is analyzed formally. Simulation and real unicycle-model robot tests. Safety and adaptivity are higher than other methods.<br><span class="muted">Limits: not in the abstract. The case where the group splits is not in the abstract</span></td><td>verified: abstract (OpenAlex)</td></tr>
+      <tr><td><a class="s" href="#S-RR-23">[S-RR-23]</a><br>2024<br>Information Sciences 661</td><td>Self-organized swarm robot for multi-target trapping based on self-regulated density interaction</td><td>Trap several targets from local sensing only. The same line by the same author (Lei) as <a class="s" href="#S-SMT-8">[S-SMT-8]</a> (inference). Negative feedback on density, density-distance weighted target choice.</td><td>It traps without explicit communication. Numerical simulation and real-robot experiments.<br><span class="muted">Limits: not confirmed</span></td><td>partial: search summary only. Library record HTTP 404</td></tr>
+      <tr><td><a class="s" href="#S-RR-24">[S-RR-24]</a><br>2025<br>Research 8, 0686 (review)</td><td>Microrobotic Swarms for Cancer Therapy</td><td>Cancer therapy with microrobot swarms. Design, reaching the target, imaging. External-field actuation (magnetic, electric, light, sound), in-body imaging (fluorescence, magnetic resonance imaging (MRI), ultrasound, photoacoustic).</td><td>A higher swarm concentration gives better image contrast.<br><span class="muted">Limits: verified only in small-animal models. No human-scale actuation. In-body imaging is immature. Control stability and precision are hard in a dynamic tumor environment</span></td><td>verified: first half of the text</td></tr>
+      <tr><td><a class="s" href="#S-RR-29">[S-RR-29]</a><br>2023<br>Frontiers in Control Engineering 4</td><td>Communication-free shepherding navigation with multiple steering agents</td><td>Several shepherds herd without central coordination or communication. An extension of farthest-agent targeting (FAT). A shepherd weighs the goal distance and its own distance to pick the target. Shepherds repel each other.</td><td>Success rate close to 100% in the base model. Completion time and path are shorter than the baseline (FAT). It tolerates a shepherd failure probability up to 0.4.<br><span class="muted">Limits: no convergence proof. Numerical experiments only, no real robots. Shepherds can pick the same target</span></td><td>verified: text</td></tr>
+      <tr><td><a class="s" href="#S-RR-30">[S-RR-30]</a><br>2023<br>Vendor blog (Clearpath)</td><td>Mississippi State University advances livestock management with automated herding systems</td><td>Herd dairy cows with a ground robot. A Warthog unmanned ground vehicle (UGV), camera, satellite positioning, lidar.</td><td>A proof-of-concept test. No numeric result.<br><span class="muted">Limits: preliminary stage. The autonomy algorithm is unfinished. It says people cannot be removed</span></td><td>partial: secondary source (vendor post)</td></tr>
+      <tr><td><a class="s" href="#S-RR-31">[S-RR-31]</a><br>not confirmed<br>Meat and Livestock Australia report P.PSH.1374</td><td>Livestock Mustering with Drones and Pathways to Adoption</td><td>Muster livestock with drones. Field trials (search summary only).</td><td>The number of trials and the dates in the search summary mix with another project number (P.PSH.1491). They are not used.<br><span class="muted">Limits: not confirmed</span></td><td>unverifiable: the page gives only a title. The mapping of project number and date is unresolved [UNVERIFIED]</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Survey sources inside the period are cited as they are, not repeated as table rows: <a class="s" href="#S-SMT-8">[S-SMT-8]</a> (Lei et al. 2023, density-based multi-target trapping), <a class="s" href="#S-SMT-9">[S-SMT-9]</a> (Transformer-Enhanced Reinforcement Learning (TERL) 2025), <a class="s" href="#S-SMT-17">[S-SMT-17]</a> (2023, steering herds away from danger), <a class="s" href="#S-SMT-27">[S-SMT-27]</a> (Liu et al. 2023, cluster a dispersed group and plan the collect order).</p>
+
+  <h3>4.2 (a) Past problems and how they were solved</h3>
+  <table class="t">
+    <caption>Table 9. Problem and solution by period. Why: it shows, in time order, which earlier problem today's problems follow. Part of the content rests on papers whose record only was checked.</caption>
+    <thead><tr><th>Period</th><th>Problem then</th><th>Solution</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>1987–1995</td><td>Can simple individual rules produce group motion?</td><td>Local rules (stick together, avoid, align). A phase transition of alignment under noise</td><td><a class="s" href="#S-RR-18">[S-RR-18]</a>, <a class="s" href="#S-RR-19">[S-RR-19]</a> (content is inference)</td></tr>
+      <tr><td>2002–2006</td><td>Can that motion be explained and proven?</td><td>Animal group models and leading by an informed minority. Stability theory of flocking</td><td><a class="s" href="#S-RR-20">[S-RR-20]</a>, <a class="s" href="#S-RR-21">[S-RR-21]</a>, <a class="s" href="#S-RR-22">[S-RR-22]</a> (content is inference)</td></tr>
+      <tr><td>2002–2004</td><td>Who sees what when targets outnumber robots or move?</td><td>cooperative multi-robot observation of multiple moving targets (CMOMMT). Placement in proportion to target count</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a>, <a class="s" href="#S-SMT-7">[S-SMT-7]</a></td></tr>
+      <tr><td>2009–2012</td><td>When a new target appears, who leaves the formation?</td><td>Split and merge of a sensor network. seed growing graph partition (SGGP)</td><td><a class="s" href="#S-RR-32">[S-RR-32]</a>, <a class="s" href="#S-SMT-6">[S-SMT-6]</a></td></tr>
+      <tr><td>2009</td><td>Can work be split without central dispatch?</td><td>consensus-based bundle algorithm (CBBA)</td><td><a class="s" href="#S-SMT-18">[S-SMT-18]</a></td></tr>
+      <tr><td>2014</td><td>How does one shepherd gather and push a group?</td><td>A rule that switches between collect and drive</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a></td></tr>
+      <tr><td>2017</td><td>Can robots search while tracking an unknown number of targets? Can robot bodies merge and separate?</td><td>The probability hypothesis density filter (PHD filter) and a Lloyd partition. Mergeable nervous systems</td><td><a class="s" href="#S-SMT-29">[S-SMT-29]</a>, <a class="s" href="#S-SMT-2">[S-SMT-2]</a></td></tr>
+      <tr><td>2018–2019</td><td>A learned policy breaks as the robot count changes</td><td>Mean embedding. A controller that uses only local communication, with a GNN</td><td><a class="s" href="#S-RR-26">[S-RR-26]</a>, <a class="s" href="#S-RR-27">[S-RR-27]</a></td></tr>
+      <tr><td>2021–2022</td><td>Can microswarms and drone swarms also split and merge?</td><td>Microswarm split and merge by external magnetic field parameters. A reinforcement-learning drone swarm splits by target count and merges again</td><td><a class="s" href="#S-RR-28">[S-RR-28]</a>, <a class="s" href="#S-RR-25">[S-RR-25]</a></td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.3 (b) Problems studied now (2023 to 2026)</h3>
+  <table class="t">
+    <caption>Table 10. Problems studied now. Why: it shows where the owner's topic sits in the recent flow. Three common directions are (inference): from a fixed scale to scale generalization, from cohesive to dispersing targets, and from simulation to real robots and the field.</caption>
+    <thead><tr><th>Problem</th><th>Representative papers</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>Does a learned policy generalize to more robots and targets</td><td><a class="s" href="#S-SMT-9">[S-SMT-9]</a>, <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-8">[S-RR-8]</a></td><td>Train with few, test with many</td></tr>
+      <tr><td>Herding when targets do not stay together</td><td><a class="s" href="#S-RR-10">[S-RR-10]</a>, <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>, <a class="s" href="#S-RR-4">[S-RR-4]</a>, <a class="s" href="#S-RR-11">[S-RR-11]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a></td><td>Each shepherd picks one target. There is a critical density for the shepherd count needed</td></tr>
+      <tr><td>When targets and sensors are heterogeneous</td><td><a class="s" href="#S-RR-1">[S-RR-1]</a>, <a class="s" href="#S-RR-2">[S-RR-2]</a></td><td>Encirclement thickness set by target strength. Dividing work by unused sensing capacity</td></tr>
+      <tr><td>Clustered target groups</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a>, <a class="s" href="#S-RR-17">[S-RR-17]</a></td><td>A group map and a power diagram. Safe encirclement around the convex hull of the group</td></tr>
+      <tr><td>Splitting a swarm to match the target count</td><td><a class="s" href="#S-RR-12">[S-RR-12]</a></td><td>Number of sub-swarms = number of targets. Event-based re-linking. The full method cut target switches by 48% against the baseline</td></tr>
+      <tr><td>Control structures that rebuild themselves</td><td><a class="s" href="#S-RR-5">[S-RR-5]</a></td><td>One hierarchy splits into several small ones</td></tr>
+      <tr><td>Dividing the roles of finding and tracking</td><td><a class="s" href="#S-RR-15">[S-RR-15]</a>, <a class="s" href="#S-RR-6">[S-RR-6]</a></td><td>Search roles and tracking roles are learned</td></tr>
+      <tr><td>Allocation when tasks keep appearing</td><td><a class="s" href="#S-RR-7">[S-RR-7]</a></td><td>A mix of information spread and random walks</td></tr>
+      <tr><td>Real herding by drones and ground robots</td><td><a class="s" href="#S-RR-14">[S-RR-14]</a>, <a class="s" href="#S-RR-30">[S-RR-30]</a>, <a class="s" href="#S-RR-31">[S-RR-31]</a></td><td>Simulation or proof of concept. No peer-reviewed field study was found</td></tr>
+      <tr><td>Several moving targets for a microswarm</td><td><a class="s" href="#S-RR-13">[S-RR-13]</a>, <a class="s" href="#S-RR-24">[S-RR-24]</a></td><td>One swarm follows the targets in turn. In-body imaging and control precision are the challenge</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.4 (c) Problems that are still open</h3>
+  <table class="t">
+    <caption>Table 11. How the survey's gaps changed. Why: it shows which "not found" items narrowed and which remain. "Not found" holds within the scope of this review.</caption>
+    <thead><tr><th>The survey's "not found"</th><th>After this review</th><th>Basis</th></tr></thead>
+    <tbody>
+      <tr><td>Distributed allocation that sends several shepherds to sub-groups</td><td><strong>Narrowed.</strong> Three distributed methods exist where shepherds pick individual targets. The related-work section of <a class="s" href="#S-RR-29">[S-RR-29]</a> cites Hu et al. 2020: shepherds agree by distributed clustering on who herds which sub-group, which needs several rounds of communication. Lee and Kim 2017 also treat sub-groups. Neither original was read.</td><td><a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a></td></tr>
+      <tr><td>Observation ratio against switch frequency under repeated split-merge</td><td><strong>Remains.</strong> Papers that measured target switches have targets that do not split. Papers that split by target count have no switch metric up to page 2. Hu et al. 2020 run clustering periodically, but repeated splits are not in the description of <a class="s" href="#S-RR-29">[S-RR-29]</a>.</td><td><a class="s" href="#S-RR-12">[S-RR-12]</a>, <a class="s" href="#S-RR-25">[S-RR-25]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a></td></tr>
+      <tr><td>Conditions under which a group repeatedly splits and merges during herding</td><td><strong>Remains.</strong></td><td>Not found</td></tr>
+      <tr><td>Division of roles and ratio between observing and herding</td><td><strong>Remains.</strong> A division of search and tracking roles exists.</td><td><a class="s" href="#S-RR-15">[S-RR-15]</a></td></tr>
+      <tr><td>Work that links search to herding</td><td><strong>Remains.</strong> Search and tracking of clustered targets are treated together. Herding is not.</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a></td></tr>
+      <tr><td>Field study of herding cattle with drones or robots</td><td><strong>Remains.</strong> Only a vendor post and an unconfirmed report.</td><td><a class="s" href="#S-RR-30">[S-RR-30]</a>, <a class="s" href="#S-RR-31">[S-RR-31]</a></td></tr>
+    </tbody>
+  </table>
+  <p>Open problems that remain (inference, based on the abstracts and the first pages of the papers):</p>
+  <ol>
+    <li>Local proportional reallocation when a target <strong>group</strong> repeatedly splits and merges. The tracking side splits by individual target <a class="s" href="#S-RR-12">[S-RR-12]</a>, <a class="s" href="#S-RR-25">[S-RR-25]</a>.</li>
+    <li>The trade-off curve of observation ratio and switch frequency. Switch counts are measured <a class="s" href="#S-RR-12">[S-RR-12]</a>. No source was found that plots a curve by varying the hysteresis time.</li>
+    <li>Resizing the formation when robots move away. Encirclement thickness follows target strength <a class="s" href="#S-RR-1">[S-RR-1]</a>. Resizing to a change in robot count is not in the abstract.</li>
+    <li>Handing over from tracking to herding. The ratio of observing roles to herding roles. A division of search and tracking exists <a class="s" href="#S-RR-15">[S-RR-15]</a>.</li>
+    <li>Splitting the shepherds again in proportion to group size when a sub-group splits again during herding. Recent learned methods pick one target individual <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>. Ordering the collection of groups exists for one shepherd <a class="s" href="#S-SMT-27">[S-SMT-27]</a>.</li>
+    <li>Field herding of cattle with several robots. No peer-reviewed study was found <a class="s" href="#S-RR-14">[S-RR-14]</a>, <a class="s" href="#S-RR-30">[S-RR-30]</a>, <a class="s" href="#S-RR-31">[S-RR-31]</a>.</li>
+    <li>Multi-robot herding with animal welfare constraints. Only single-drone studies exist <a class="s" href="#S-SMT-28">[S-SMT-28]</a>. Socially aware safe-distance encirclement exists <a class="s" href="#S-RR-17">[S-RR-17]</a>.</li>
+    <li>A microswarm tracking several cell groups <strong>at the same time</strong>. Today one swarm goes in turn <a class="s" href="#S-RR-13">[S-RR-13]</a>. Splitting by field parameters works <a class="s" href="#S-RR-28">[S-RR-28]</a>.</li>
+    <li>Most evaluation is in simulation. Real tests are a minority <a class="s" href="#S-RR-1">[S-RR-1]</a>, <a class="s" href="#S-RR-11">[S-RR-11]</a>, <a class="s" href="#S-RR-15">[S-RR-15]</a>.</li>
+  </ol>
+
+  <h3>4.5 (d) Extension points for the owner's topic</h3>
+  <table class="t">
+    <caption>Table 12. Nine extension points (all inference). Why: it shows which paper to widen, how, and which pipeline stage and research question it reaches. Ranks 1 to 5 are the top 5.</caption>
+    <thead><tr><th class="c">Rank</th><th>Paper to extend</th><th>What to add</th><th>Stage</th><th>Research question</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td class="c">1</td><td><a class="s" href="#S-RR-12">[S-RR-12]</a> sub-swarms = number of targets, event-based re-linking</td><td>Change the targets into <strong>groups</strong> that repeatedly split and merge. Add a hysteresis time T to the re-linking. Vary T and draw the observation ratio against switch frequency curve.</td><td class="c">4</td><td>RQ2</td></tr>
+      <tr class="rowflag"><td class="c">2</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a> search and tracking of clustered targets</td><td>Add a split or merge event decision to the long-term group map. The decision is the "2 or more animals" rule of the bison study <a class="s" href="#S-SMT-23">[S-SMT-23]</a>. Pass the events as input to the stage 4 allocation.</td><td class="c">2, 3 → 4</td><td>RQ1</td></tr>
+      <tr class="rowflag"><td class="c">3</td><td><a class="s" href="#S-RR-1">[S-RR-1]</a>, <a class="s" href="#S-RR-17">[S-RR-17]</a> adaptive encirclement, convex-hull safe distance</td><td>One ring per sub-group. Re-fit the radius to the group spread and the gap to the number of assigned robots. Use the welfare distance <a class="s" href="#S-SMT-28">[S-SMT-28]</a> as the safe distance.</td><td class="c">5</td><td>RQ3</td></tr>
+      <tr class="rowflag"><td class="c">4</td><td><a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a> shepherds picking targets. Sub-group consensus allocation by Hu et al. 2020 (cited in <a class="s" href="#S-RR-29">[S-RR-29]</a>, not confirmed)</td><td>Pick sub-groups by a local rule without a communication consensus. Send shepherds in proportion to group size. If the group splits again during herding, re-pick with a hysteresis time T. Compare with Hu et al. 2020.</td><td class="c">6 (reuse the stage 4 rule)</td><td>RQ4</td></tr>
+      <tr class="rowflag"><td class="c">5</td><td><a class="s" href="#S-RR-10">[S-RR-10]</a> scaling law and critical density of shepherd count</td><td>Send more shepherds when a sub-group density drops below the critical value. Use this rule as the baseline of the observing-to-herding role ratio.</td><td class="c">4, 6</td><td>RQ5</td></tr>
+      <tr><td class="c">6</td><td><a class="s" href="#S-RR-25">[S-RR-25]</a>, <a class="s" href="#S-RR-32">[S-RR-32]</a> split and merge by target count and distance</td><td>Compare with allocation in proportion to group size instead of target count. Measure observation ratio and switch frequency of both rules in the same scenario.</td><td class="c">4</td><td>RQ1</td></tr>
+      <tr><td class="c">7</td><td><a class="s" href="#S-RR-5">[S-RR-5]</a> self-organizing hierarchy</td><td>One temporary hierarchy per sub-swarm. Use the split of a target group as the signal to split a hierarchy.</td><td class="c">4</td><td>New question candidate</td></tr>
+      <tr><td class="c">8</td><td><a class="s" href="#S-RR-15">[S-RR-15]</a>, <a class="s" href="#S-RR-6">[S-RR-6]</a> search and tracking roles</td><td>At a group split event, turn some "search" robots into "tracking" robots. Turn them back when a new group appears.</td><td class="c">2, 5</td><td>New question candidate</td></tr>
+      <tr><td class="c">9</td><td><a class="s" href="#S-RR-13">[S-RR-13]</a>, <a class="s" href="#S-RR-28">[S-RR-28]</a> microswarm path tracking, field-based splitting</td><td>Split one swarm with one global magnetic field to follow several cell groups at the same time. Imitate sensing-free global-input allocation in ARGoS.</td><td class="c">4, 5 (micro scale)</td><td>New question candidate</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">RQ1 to RQ5 in the last column are the questions of tab 6 on this page (Table 5 of recent_review.md writes them as "survey research question n").</p>
+</section>
+
+<section class="tab" id="lineage">
+  <h2>5 Lineage chart</h2>
+  <p class="muted">Source: recent_review.md section 3 (milestone lineage) and section 4 (the mermaid lineage chart, converted to inline SVG). Placement follows research lines. The horizontal order is not a time order.</p>
+  <figure>
+    <svg viewBox="0 0 1120 966" role="img" aria-label="Lineage flowchart of milestone and recent papers. Papers sit in seven research lines, builds-on relations are arrows, and the lines that hold a heavy-bordered extension point converge on this research">
+  <defs>
+    <marker id="arrS" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#222"/></marker>
+    <marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#777"/></marker>
+    <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--s2)"/></marker>
+  </defs>
+  <line x1="20" y1="22" x2="54" y2="22" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/><text class="m" x="64" y="26">confirmed citation</text>
+  <line x1="250" y1="22" x2="284" y2="22" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/><text class="m" x="294" y="26">inferred relation (inference)</text>
+  <rect x="590" y="14" width="26" height="16" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/><text class="m" x="626" y="26">extension point (Table)</text>
+  <rect x="820" y="14" width="26" height="16" fill="#fff" stroke="#555" stroke-width="1.2"/><text class="m" x="856" y="26">other paper</text>
+  <rect x="8" y="64" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="126">multi-target tracking</text>
+  <rect x="8" y="202" width="922" height="64" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="238">task allocation</text>
+  <rect x="8" y="288" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="350">fission-fusion</text>
+  <rect x="8" y="426" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="488">flocking, formation</text>
+  <rect x="8" y="564" width="922" height="168" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="652">shepherding</text>
+  <rect x="8" y="754" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="816">learning</text>
+  <rect x="8" y="892" width="922" height="64" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="928">micro-scale</text>
+  <path d="M296,96 L324,96" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,96 L480,96" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M388,116 L388,148 L480,148" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,372 L480,372" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M388,352 L388,320 L480,320" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,320 L792,320" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,458 L324,458" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,510 L310,510 L310,458 L324,458" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,510 L792,510" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M388,438 L388,392" fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/>
+  <path d="M232,438 L232,372 L324,372" fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/>
+  <path d="M388,530 L388,576" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,596 L480,596" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M608,596 L636,596" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M608,596 L622,596 L622,648 L636,648" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M608,596 L622,596 L622,700 L636,700" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,700 L792,700" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,786 L324,786" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,838 L324,838" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M700,806 L700,818" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,786 L792,786" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M670,720 L670,766" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M730,720 L730,743 L856,743 L856,766" fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/>
+  <path d="M296,924 L324,924" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,924 L480,924" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <rect x="480" y="214" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="231" style="font-size:11px">Balachandran 2024</text><text class="m c" x="544" y="246" style="font-size:10px">S-RR-7</text>
+  <rect x="324" y="214" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="231" style="font-size:11px">CBBA 2009</text><text class="m c" x="388" y="246" style="font-size:10px">S-SMT-18</text>
+  <rect x="636" y="438" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="455" style="font-size:11px">Chaib 2026</text><text class="m c" x="700" y="470" style="font-size:10px">S-RR-17</text>
+  <rect x="480" y="76" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="93" style="font-size:11px">Chen 2023</text><text class="m c" x="544" y="108" style="font-size:10px">S-RR-2</text>
+  <rect x="480" y="128" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="544" y="145" style="font-size:11px">Chen 2025 (groups)</text><text class="m c" x="544" y="160" style="font-size:10px">S-RR-9</text>
+  <rect x="792" y="766" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="856" y="783" style="font-size:11px">Cooper et al.</text><text class="m c" x="856" y="798" style="font-size:10px">S-RR-14</text>
+  <rect x="324" y="490" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="507" style="font-size:11px">Couzin 2002</text><text class="m c" x="388" y="522" style="font-size:10px">S-RR-20</text>
+  <rect x="324" y="576" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="593" style="font-size:11px">Couzin 2005</text><text class="m c" x="388" y="608" style="font-size:10px">S-RR-21</text>
+  <rect x="636" y="818" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="835" style="font-size:11px">Covone 2025</text><text class="m c" x="700" y="850" style="font-size:10px">S-RR-16</text>
+  <rect x="324" y="76" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="93" style="font-size:11px">Dames 2017</text><text class="m c" x="388" y="108" style="font-size:10px">S-SMT-29</text>
+  <rect x="168" y="766" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="783" style="font-size:11px">Hüttenrauch 2019</text><text class="m c" x="232" y="798" style="font-size:10px">S-RR-26</text>
+  <rect x="636" y="76" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="93" style="font-size:11px">Kouzeghar 2023</text><text class="m c" x="700" y="108" style="font-size:10px">S-RR-15</text>
+  <rect x="324" y="352" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="388" y="369" style="font-size:11px">La, Sheng 2009/12</text><text class="m c" x="388" y="384" style="font-size:10px">S-RR-32</text>
+  <rect x="636" y="680" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="697" style="font-size:11px">Lama 2024</text><text class="m c" x="700" y="712" style="font-size:10px">S-RR-10</text>
+  <rect x="636" y="490" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="700" y="507" style="font-size:11px">Lei 2023</text><text class="m c" x="700" y="522" style="font-size:10px">S-SMT-8</text>
+  <rect x="636" y="628" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="645" style="font-size:11px">Li 2023</text><text class="m c" x="700" y="660" style="font-size:10px">S-RR-29</text>
+  <rect x="636" y="576" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="700" y="593" style="font-size:11px">Liu 2023</text><text class="m c" x="700" y="608" style="font-size:10px">S-SMT-27</text>
+  <rect x="168" y="214" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="231" style="font-size:11px">Low 2004</text><text class="m c" x="232" y="246" style="font-size:10px">S-SMT-7</text>
+  <rect x="636" y="300" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="700" y="317" style="font-size:11px">Mathews 2017</text><text class="m c" x="700" y="332" style="font-size:10px">S-SMT-2</text>
+  <rect x="636" y="766" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="783" style="font-size:11px">Napolitano 2024</text><text class="m c" x="700" y="798" style="font-size:10px">S-RR-3</text>
+  <rect x="324" y="438" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="455" style="font-size:11px">Olfati-Saber 2006</text><text class="m c" x="388" y="470" style="font-size:10px">S-RR-22</text>
+  <rect x="168" y="76" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="93" style="font-size:11px">Parker 2002</text><text class="m c" x="232" y="108" style="font-size:10px">S-SMT-1</text>
+  <rect x="480" y="300" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="544" y="317" style="font-size:11px">Qamar 2022</text><text class="m c" x="544" y="332" style="font-size:10px">S-RR-25</text>
+  <rect x="168" y="438" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="455" style="font-size:11px">Reynolds 1987</text><text class="m c" x="232" y="470" style="font-size:10px">S-RR-18</text>
+  <rect x="792" y="300" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="856" y="317" style="font-size:11px">SoNS 2024</text><text class="m c" x="856" y="332" style="font-size:10px">S-RR-5</text>
+  <rect x="480" y="576" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="593" style="font-size:11px">Strömbom 2014</text><text class="m c" x="544" y="608" style="font-size:10px">S-SMT-25</text>
+  <rect x="324" y="766" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="783" style="font-size:11px">TERL 2025</text><text class="m c" x="388" y="798" style="font-size:10px">S-SMT-9</text>
+  <rect x="168" y="818" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="835" style="font-size:11px">Tolstaya 2019</text><text class="m c" x="232" y="850" style="font-size:10px">S-RR-27</text>
+  <rect x="792" y="680" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="856" y="697" style="font-size:11px">Tomaselli 2026</text><text class="m c" x="856" y="712" style="font-size:10px">S-RR-11</text>
+  <rect x="324" y="818" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="835" style="font-size:11px">Tzes 2023</text><text class="m c" x="388" y="850" style="font-size:10px">S-RR-8</text>
+  <rect x="636" y="128" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="145" style="font-size:11px">Valianti 2025</text><text class="m c" x="700" y="160" style="font-size:10px">S-RR-6</text>
+  <rect x="168" y="490" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="507" style="font-size:11px">Vicsek 1995</text><text class="m c" x="232" y="522" style="font-size:10px">S-RR-19</text>
+  <rect x="480" y="352" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="544" y="369" style="font-size:11px">Xiang 2023</text><text class="m c" x="544" y="384" style="font-size:10px">S-RR-12</text>
+  <rect x="480" y="904" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="921" style="font-size:11px">Xie 2025 (review)</text><text class="m c" x="544" y="936" style="font-size:10px">S-RR-24</text>
+  <rect x="168" y="904" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="232" y="921" style="font-size:11px">Zhang 2021 (micro)</text><text class="m c" x="232" y="936" style="font-size:10px">S-RR-28</text>
+  <rect x="792" y="490" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="856" y="507" style="font-size:11px">Zhang 2024</text><text class="m c" x="856" y="522" style="font-size:10px">S-RR-1</text>
+  <rect x="324" y="904" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="388" y="921" style="font-size:11px">Zou 2024</text><text class="m c" x="388" y="936" style="font-size:10px">S-RR-13</text>
+  <rect x="972" y="64" width="140" height="892" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="1042" y="484" style="font-size:13px">This research</text>
+  <text class="m c" x="1042" y="506">Track and herd</text>
+  <text class="m c" x="1042" y="523">groups that split</text>
+  <text class="m c" x="1042" y="540">and merge</text>
+  <line x1="930" y1="122" x2="970" y2="122" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="346" x2="970" y2="346" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="484" x2="970" y2="484" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="648" x2="970" y2="648" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="812" x2="970" y2="812" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="924" x2="970" y2="924" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+</svg>
+    <figcaption>
+      Figure 5. Milestone and recent papers placed by research line and joined by "builds on" relations. Why: it shows at a glance which lines the owner's topic combines.
+      <span class="ab">Abbreviations: consensus-based bundle algorithm (CBBA) · self-organizing nervous system (SoNS) · Transformer-Enhanced Reinforcement Learning (TERL). A solid arrow is a citation confirmed in the text read. A dashed arrow is a relation inferred from the same authors, problem or method line (inference). A heavy border marks a paper that supports an extension point (Table 12). The heavy arrow on the right gathers the line that holds such a paper into this research.</span>
+    </figcaption>
+  </figure>
+  <ul>
+    <li>Two confirmed citations: the reference list of La and Sheng 2009 cites Olfati-Saber 2006 and Reynolds 1987 <a class="s" href="#S-RR-32">[S-RR-32]</a>. Page 1 of Cooper et al. cites "Lama and di Bernardo, 2024" <a class="s" href="#S-RR-14">[S-RR-14]</a>.</li>
+    <li>It is not confirmed that the "Napolitano et al., 2025" cited by Cooper et al. is the conference version of <a class="s" href="#S-RR-3">[S-RR-3]</a>. So the line from Napolitano to Cooper et al. is dashed.</li>
+    <li>Balachandran 2024, Low 2004 and CBBA 2009 have no line with a basis and stand alone.</li>
+    <li>For rows where only the record (Crossref) was checked, "contribution" and "what it made possible" come from general knowledge. They are inference and [STALE].</li>
+  </ul>
+  <table class="t">
+    <caption>Table 13. Milestone paper lineage (source: recent_review.md Table 6). Why: it lists, paper by paper, what the arrows of the chart mean as "what it made possible".</caption>
+    <thead><tr><th>Paper</th><th class="c">Year</th><th>Contribution</th><th>What it made possible</th><th>Source</th></tr></thead>
+    <tbody>
+      <tr><td>Reynolds, boids</td><td class="c">1987</td><td>A behavior model that made group motion from three local rules (inference)</td><td>Starting point of flocking control (inference)</td><td><a class="s" href="#S-RR-18">[S-RR-18]</a> [STALE], record only</td></tr>
+      <tr><td>Vicsek et al.</td><td class="c">1995</td><td>Phase transition of alignment in self-driven particles (from the title)</td><td>Analysis of alignment against noise and density (inference)</td><td><a class="s" href="#S-RR-19">[S-RR-19]</a> [STALE], record only</td></tr>
+      <tr><td>Parker, cooperative multi-robot observation of multiple moving targets (CMOMMT)</td><td class="c">2002</td><td>Defined the problem of observing several moving targets</td><td>Research on assigning tracking robots</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a> [STALE]</td></tr>
+      <tr><td>Couzin et al.</td><td class="c">2002</td><td>Collective memory and spatial sorting in animal groups (from the title)</td><td>Models of group shape change (inference)</td><td><a class="s" href="#S-RR-20">[S-RR-20]</a> [STALE], record only</td></tr>
+      <tr><td>Low, Leow, Ang</td><td class="c">2004</td><td>Zone placement in proportion to target count</td><td>A proportional allocation rule</td><td><a class="s" href="#S-SMT-7">[S-SMT-7]</a> [STALE]</td></tr>
+      <tr><td>Couzin et al.</td><td class="c">2005</td><td>Leadership and decisions in animal groups on the move (from the title)</td><td>Leading by a few informed individuals, base of herding models (inference)</td><td><a class="s" href="#S-RR-21">[S-RR-21]</a> [STALE], record only</td></tr>
+      <tr><td>Olfati-Saber</td><td class="c">2006</td><td>Flocking algorithms and theory</td><td>Flocking control for sensor-network tracking. Cited by La and Sheng 2009 as reference [2]</td><td><a class="s" href="#S-RR-22">[S-RR-22]</a> [STALE], record only. The citation is in the page 6 references of <a class="s" href="#S-RR-32">[S-RR-32]</a></td></tr>
+      <tr><td>La, Sheng</td><td class="c">2009, 2012</td><td>A sensor network splits to follow a new target and merges again. seed growing graph partition (SGGP). 2009 version: up to 49.28% shorter tracking and formation time than random selection, and 7% shorter travel distance. Only two split-merge cases tested</td><td>Split-merge tracking</td><td><a class="s" href="#S-RR-32">[S-RR-32]</a>, <a class="s" href="#S-SMT-6">[S-SMT-6]</a> [STALE]</td></tr>
+      <tr><td>consensus-based bundle algorithm (CBBA)</td><td class="c">2009</td><td>Distributed task allocation by auction and consensus</td><td>A distributed allocation baseline</td><td><a class="s" href="#S-SMT-18">[S-SMT-18]</a> [STALE]</td></tr>
+      <tr><td>Strömbom et al.</td><td class="c">2014</td><td>Collect and drive rules for one shepherd</td><td>Multi-shepherd research</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a> [STALE]</td></tr>
+      <tr><td>Mathews et al.</td><td class="c">2017</td><td>Robot bodies and brains merge and separate</td><td>Self-organizing hierarchy <a class="s" href="#S-RR-5">[S-RR-5]</a> (inference)</td><td><a class="s" href="#S-SMT-2">[S-SMT-2]</a> [STALE]</td></tr>
+      <tr><td>Dames</td><td class="c">2017</td><td>Distributed search and tracking of an unknown number of targets</td><td>Tracking of clustered targets <a class="s" href="#S-RR-9">[S-RR-9]</a> (inference, co-author)</td><td><a class="s" href="#S-SMT-29">[S-SMT-29]</a> [STALE]</td></tr>
+      <tr><td>Hüttenrauch et al.</td><td class="c">2019</td><td>Swarm state as a mean embedding. A policy independent of the count</td><td>Learning that generalizes in scale (inference)</td><td><a class="s" href="#S-RR-26">[S-RR-26]</a> [STALE]</td></tr>
+      <tr><td>Tolstaya et al.</td><td class="c">2019</td><td>A distributed flocking controller with a graph neural network (GNN)</td><td>Graph-neural-network multi-robot information gathering <a class="s" href="#S-RR-8">[S-RR-8]</a> (inference, same group)</td><td><a class="s" href="#S-RR-27">[S-RR-27]</a> [STALE]</td></tr>
+      <tr><td>Zhang et al.</td><td class="c">2021</td><td>A microswarm splits and merges by magnetic field parameters</td><td>Experimental basis for microswarm splitting</td><td><a class="s" href="#S-RR-28">[S-RR-28]</a> [STALE]</td></tr>
+      <tr><td>Qamar et al.</td><td class="c">2022</td><td>A reinforcement-learning drone swarm splits and merges by target count and distance</td><td>Learning-based split-merge tracking</td><td><a class="s" href="#S-RR-25">[S-RR-25]</a> [STALE]</td></tr>
+      <tr><td>Lei et al., Zhang et al.</td><td class="c">2023, 2024</td><td>Density-based multi-target trapping. Encirclement thickness set by target strength</td><td>Adaptive encirclement</td><td><a class="s" href="#S-SMT-8">[S-SMT-8]</a>, <a class="s" href="#S-RR-1">[S-RR-1]</a></td></tr>
+      <tr><td>Zhu et al., self-organizing nervous system (SoNS)</td><td class="c">2024</td><td>Self-organizing hierarchy. One becomes several</td><td>Split-merge control structure</td><td><a class="s" href="#S-RR-5">[S-RR-5]</a></td></tr>
+      <tr><td>Lama, di Bernardo</td><td class="c">2024</td><td>Scaling law of shepherd count and critical density</td><td>Multi-shepherd learning for dispersing targets <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a> (inference, same group)</td><td><a class="s" href="#S-RR-10">[S-RR-10]</a></td></tr>
+      <tr><td>Transformer-Enhanced Reinforcement Learning (TERL)</td><td class="c">2025</td><td>A learned policy generalizes from 15 to 80 pursuers</td><td>Large-scale multi-target encirclement</td><td><a class="s" href="#S-SMT-9">[S-SMT-9]</a></td></tr>
+      <tr><td>Chen, Dames, Park</td><td class="c">2025</td><td>Search and tracking of clustered targets</td><td>Stages 2 and 3 of the owner's topic</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="rq">
+  <h2>6 RQs and roadmap</h2>
+  <p class="muted">Source: proposal.md sections 5 to 9. Every (inference) and estimate mark keeps the mark of the source text.</p>
+  <h3>6.1 Research questions</h3>
+  <table class="t">
+    <caption>Table 14. Five research question (RQ)s. Why: stating what is new in each question helps to pick the one for the course project.</caption>
+    <thead><tr><th>ID</th><th>Question</th><th>What is new (inference)</th></tr></thead>
+    <tbody>
+      <tr><td>RQ1</td><td>How close is a split-merge rule set from local sensing alone to the global assignment (oracle)?</td><td>Measure the gap to the global baseline against the number of group splits.</td></tr>
+      <tr class="rowflag"><td>RQ2</td><td>How does the hysteresis time T trade observation ratio against churn? How does the best T relate to target speed?</td><td>The trade-off curve of repeated split-merge. It is not the cost of one split <a class="s" href="#S-SMT-6">[S-SMT-6]</a>.</td></tr>
+      <tr><td>RQ3</td><td>When is placement in proportion to group size best? What happens when group spread, target speed or sensing range changes?</td><td>Test the proportional placement of fixed zones <a class="s" href="#S-SMT-7">[S-SMT-7]</a> on moving groups.</td></tr>
+      <tr><td>RQ4</td><td>When the group splits during herding, how do several herding robots divide among the sub-groups? How close is a local rule to an order plan (a traveling salesman problem)?</td><td>Widen the one-shepherd order plan <a class="s" href="#S-SMT-27">[S-SMT-27]</a> to several shepherds and repeated splits.</td></tr>
+      <tr><td>RQ5</td><td>What is a good ratio of "observing" robots to "herding" robots? How does it change under an animal safe-distance constraint?</td><td>Measure the role split and the welfare constraint <a class="s" href="#S-SMT-28">[S-SMT-28]</a> together.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>RQ2 is the narrowest and the easiest to measure. It suits the core of the course project (inference).</li>
+    <li>Use RQ1 and RQ3 when widening to a personal research line (inference).</li>
+  </ul>
+
+  <h3>6.2 Roadmap</h3>
+  <figure>
+    <svg viewBox="0 0 1000 130" role="img" aria-label="Roadmap in four steps: course 2 weeks, scalability analysis, tracking and herding, later">
+      <defs><marker id="arrr" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+      <rect x="10" y="20" width="200" height="80" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+      <rect x="270" y="20" width="200" height="80" fill="#fff" stroke="#555" stroke-width="1.5"/>
+      <rect x="530" y="20" width="200" height="80" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+      <rect x="790" y="20" width="200" height="80" fill="#fff" stroke="#555" stroke-width="1.5"/>
+      <g stroke="#555" stroke-width="2.5"><line x1="212" y1="60" x2="266" y2="60" marker-end="url(#arrr)"/><line x1="472" y1="60" x2="526" y2="60" marker-end="url(#arrr)"/><line x1="732" y1="60" x2="786" y2="60" marker-end="url(#arrr)"/></g>
+      <g class="b c"><text x="110" y="46">Course, 2 weeks</text><text x="370" y="46">Scalability analysis</text><text x="630" y="46">Tracking + herding</text><text x="890" y="46">Later</text></g>
+      <g class="m c"><text x="110" y="68">stages 2 → 4 → 5</text><text x="110" y="86">novelty: stage 4</text><text x="370" y="68">vary robot count,</text><text x="370" y="86">split rate, range</text><text x="630" y="68">stages 2 → 6</text><text x="630" y="86">novelty: stage 6</text><text x="890" y="68">learned policy,</text><text x="890" y="86">micro-scale vision</text></g>
+    </svg>
+    <figcaption>
+      Figure 6. The four roadmap steps. A heavy orange box is a step with a new contribution. Why: it shows first that the 2-week course scope is the first piece of the full research.
+      <span class="ab">Abbreviations: none. Source: proposal.md section 7.1.</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>Table 15. Roadmap step table (source: proposal.md section 7.1). Why: it puts scope, contribution and level side by side for each step.</caption>
+    <thead><tr><th>Step</th><th>Scope</th><th>Contribution</th><th>Level</th></tr></thead>
+    <tbody>
+      <tr><td>Course project, 2 weeks</td><td>Stages 2 → 4 → 5, search is spiral search</td><td>Stage 4</td><td>Course</td></tr>
+      <tr><td>Scalability analysis</td><td>Vary robot count, split rate and sensing range</td><td>None</td><td>Workshop paper</td></tr>
+      <tr><td>Tracking + herding</td><td>Stages 2 → 6</td><td>Stage 6, observing and steering role allocation</td><td>Conference paper (International Conference on Swarm Intelligence (ANTS), International Symposium on Distributed Autonomous Robotic Systems (DARS), TAROS (the full name is not in the research files), IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS))</td></tr>
+      <tr><td>Later</td><td>A learned policy (multi-agent reinforcement learning (MARL) or graph neural network (GNN), trained on the Cradle cluster), heterogeneous unmanned aerial vehicle (UAV) and unmanned ground vehicle (UGV), adversarial targets that split and flee, a micro-scale vision</td><td>None</td><td>Thesis direction</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>Training does not run locally. It runs only on the Cradle cluster.</li>
+    <li>Chat estimate (main session, inference): course high, workshop medium-high, conference medium, thesis direction possible. Where it differs from the survey score, the survey score wins. No survey score fits the course scope (stages 2 → 4 → 5).</li>
+  </ul>
+
+  <h3>6.3 Risks</h3>
+  <table class="t">
+    <caption>Table 16. Risks and responses (source: proposal.md section 8). Why: it states in advance why the scope is narrowed and where the ethics limit lies.</caption>
+    <thead><tr><th>Risk</th><th>Response</th></tr></thead>
+    <tbody>
+      <tr><td>Neighboring fields are crowded (CMOMMT, encirclement, herding)</td><td>Narrow the scope to "split-merge + local information".</td></tr>
+      <tr><td>Control-theory venues demand proofs</td><td>Aim at swarm-specialist venues.</td></tr>
+      <tr><td>Ethics frame</td><td>Do not use tracking of people as an application. Use only cattle and cell groups.</td></tr>
+      <tr><td>Animal welfare limit during herding</td><td>Put a safe-distance constraint into the rules <a class="s" href="#S-SMT-28">[S-SMT-28]</a>.</td></tr>
+      <tr><td>The gap may already be filled</td><td>Run a gap re-check before writing a paper. Keyword candidates: "fission-fusion target tracking", "dynamic coalition target tracking", "CMOMMT target groups".</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">The sheep study is 12 sheep on one farm. It is not generalized to cattle <a class="s" href="#S-SMT-28">[S-SMT-28]</a>.</p>
+
+  <h3>6.4 Candidate venues (all inference)</h3>
+  <table class="t">
+    <caption>Table 17. Candidate venues (source: proposal.md section 9). Why: it chooses where to aim for each result level. Deadlines and scope were not checked.</caption>
+    <thead><tr><th>Step</th><th>Candidates</th><th>Matching result</th></tr></thead>
+    <tbody>
+      <tr><td>Workshop</td><td>Multi-robot workshops at IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS) and IEEE International Conference on Robotics and Automation (ICRA)</td><td>The first curve of RQ2</td></tr>
+      <tr><td>Conference (swarm-specialist)</td><td>International Conference on Swarm Intelligence (ANTS), International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM), International Symposium on Distributed Autonomous Robotic Systems (DARS)</td><td>RQ1 and RQ2, three baselines</td></tr>
+      <tr><td>Conference (general robotics and agents)</td><td>IROS, ICRA, International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</td><td>RQ1 to RQ3, heterogeneous extension</td></tr>
+      <tr><td>Journal</td><td>Swarm Intelligence, Autonomous Robots</td><td>Full results and real robots or a heterogeneous extension</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">TAROS appears only in the roadmap of the chat answer. It is not in the venue list of the survey. The survey has one TAROS 2024 paper as a source <a class="s" href="#S-SMT-31">[S-SMT-31]</a>.</p>
+
+  <h3>6.5 Open questions</h3>
+  <ul>
+    <li>The gap re-check has not been done yet.</li>
+    <li>Pages after 3 of La and Sheng were not read, so it is unknown whether the split rule is distributed and whether repeated split-merge experiments exist <a class="s" href="#S-SMT-6">[S-SMT-6]</a>.</li>
+    <li>It was not checked whether the text of Lei et al. has repeated split-merge experiments <a class="s" href="#S-SMT-8">[S-SMT-8]</a>.</li>
+    <li>The multi-shepherd section of the swarm herding survey was not checked <a class="s" href="#S-SMT-26">[S-SMT-26]</a>.</li>
+    <li>No paper measuring fission-fusion of domestic cattle was found. A bison study stands in <a class="s" href="#S-SMT-23">[S-SMT-23]</a>.</li>
+    <li>It is not confirmed whether cell groups in blood repeatedly split and merge.</li>
+    <li>The authors and content of the 2022 split-merge UAV paper were not confirmed from the full text <a class="s" href="#S-SMT-5">[S-SMT-5]</a>.</li>
+  </ul>
+</section>
+
+<section class="tab" id="sources">
+  <h2>7 Sources</h2>
+  <p class="muted">57 S-SMT and S-RR rows that this page cites. The status is the note of the research file, copied as it is. All access dates are 2026-11-10.</p>
+  <ul class="src">
+    <li id="S-SMT-1">[S-SMT-1] Distributed Algorithms for Multi-Robot Observation of Multiple Moving Targets. Published: 2002-05, Autonomous Robots 12(3) 231 to 255. Type: paper. Status (source note): BibBase record only, method from search snippet, DOI 10.1023/A:1015256330750 per snippet, partial. <a href="https://bibbase.org/network/publication/parker-distributedalgorithmsformultirobotobservationofmultiplemovingtargets-2002">https://bibbase.org/network/publication/parker-distributedalgorithmsformultirobotobservationofmultiplemovingtargets-2002</a></li>
+    <li id="S-SMT-2">[S-SMT-2] Mergeable nervous systems for robots. Published: 2017-09-12, Nature Communications 8:439. Type: paper. Status (source note): PMC full text page, verified. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5595853">https://pmc.ncbi.nlm.nih.gov/articles/PMC5595853</a></li>
+    <li id="S-SMT-3">[S-SMT-3] Fission-fusion populations. Published: 2009-08, Current Biology 19(15) R633 to R635 per search snippet. Type: paper. Status (source note): PubMed and Cell pages blocked, search snippet only, UNVERIFIED. <a href="https://doi.org/10.1016/j.cub.2009.05.034">https://doi.org/10.1016/j.cub.2009.05.034</a></li>
+    <li id="S-SMT-5">[S-SMT-5] Bio-Inspired Self-Organized Fission-Fusion Control Algorithm for UAV Swarm. Published: 2022-11 per search snippet, Aerospace. Type: paper. Status (source note): HTTP 403, search snippet only, UNVERIFIED. <a href="https://doaj.org/article/5f928ede5d1c4b5882e5d932d6e2c692">https://doaj.org/article/5f928ede5d1c4b5882e5d932d6e2c692</a></li>
+    <li id="S-SMT-6">[S-SMT-6] Dynamic target tracking and observing in a mobile sensor network. Published: 2012, Robotics and Autonomous Systems 60 996 to 1009. Type: paper. Status (source note): pages 1 and 2 read, authors La and Sheng, DOI 10.1016/j.robot.2012.03.006, verified. <a href="https://ara.cse.unr.edu/wp-content/uploads/2014/12/Elsevier_RAS_La2012.pdf">https://ara.cse.unr.edu/wp-content/uploads/2014/12/Elsevier_RAS_La2012.pdf</a></li>
+    <li id="S-SMT-7">[S-SMT-7] Task Allocation via Self-Organizing Swarm Coalitions in Distributed Mobile Sensor Network. Published: 2004, AAAI per copyright line. Type: paper. Status (source note): pages 1 and 2 read, authors Low, Leow, Ang, verified. <a href="https://www.comp.nus.edu.sg/~lowkh/pubs/aaai2004.pdf">https://www.comp.nus.edu.sg/~lowkh/pubs/aaai2004.pdf</a></li>
+    <li id="S-SMT-8">[S-SMT-8] Self-organized multi-target trapping of swarm robots with density-based interaction. Published: 2023-03-08, Complex and Intelligent Systems. Type: paper. Status (source note): abstract on a secondary host, authors Lei, Zhang, Xiang, Duan, verified. <a href="https://www.springerprofessional.de/self-organized-multi-target-trapping-of-swarm-robots-with-densit/24596984">https://www.springerprofessional.de/self-organized-multi-target-trapping-of-swarm-robots-with-densit/24596984</a></li>
+    <li id="S-SMT-9">[S-SMT-9] TERL: Large-Scale Multi-Target Encirclement Using Transformer-Enhanced Reinforcement Learning. Published: 2025-03-16, revised 2025-08-27. Type: paper. Status (source note): abstract page, accepted IROS 2025, verified. <a href="https://arxiv.org/abs/2503.12395">https://arxiv.org/abs/2503.12395</a></li>
+    <li id="S-SMT-10">[S-SMT-10] AI for robots and swarms: ARGoS reference. Published: undated. Type: blog. Status (source note): third-party tutorial, range_and_bearing fields of the Lua interface, partial. <a href="https://opentechschool-brussels.github.io/AI-for-robots-and-swarms/ref_argos.html">https://opentechschool-brussels.github.io/AI-for-robots-and-swarms/ref_argos.html</a></li>
+    <li id="S-SMT-15">[S-SMT-15] Qi Lu: Research. Published: undated. Type: official. Status (source note): carried over from the LQ pass (S-LQ-2), not re-read. <a href="https://sites.google.com/view/qilu/research">https://sites.google.com/view/qilu/research</a></li>
+    <li id="S-SMT-17">[S-SMT-17] Steering herds away from dangers in dynamic environments. Published: 2023, Royal Society Open Science 10(5) 230015. Type: paper. Status (source note): carried over from the LQ pass (S-LQ-11), record page, not re-read. <a href="https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/">https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/</a></li>
+    <li id="S-SMT-18">[S-SMT-18] Consensus-Based Decentralized Auctions for Robust Task Allocation. Published: 2009, IEEE Transactions on Robotics 25(4) 912 to 926 per search snippet. Type: paper. Status (source note): carried over from the LQ pass (S-LQ-38), HTTP 429 there, partial. <a href="https://dspace.mit.edu/handle/1721.1/52330">https://dspace.mit.edu/handle/1721.1/52330</a></li>
+    <li id="S-SMT-19">[S-SMT-19] Circulating tumor cell clusters more likely to cause metastasis than single cells (news on Aceto et al., Circulating Tumor Cell Clusters Are Oligoclonal Precursors of Breast Cancer Metastasis, Cell 158(5) 1110). Published: 2014-08-28. Type: news. Status (source note): news page read, original paper DOI 10.1016/j.cell.2014.07.013 not read, partial. <a href="https://www.sciencedaily.com/releases/2014/08/140828135519.htm">https://www.sciencedaily.com/releases/2014/08/140828135519.htm</a></li>
+    <li id="S-SMT-20">[S-SMT-20] A Survey on Swarm Microrobotics. Published: 2022, IEEE Transactions on Robotics 38(3) 1531 to 1551. Type: paper. Status (source note): record page and abstract, authors Yang, Yu, Yang, Wang, Nelson, Zhang, verified. <a href="https://research.polyu.edu.hk/en/publications/a-survey-on-swarm-microrobotics/">https://research.polyu.edu.hk/en/publications/a-survey-on-swarm-microrobotics/</a></li>
+    <li id="S-SMT-21">[S-SMT-21] Tuning Collective Cell Migration by Cell-Cell Junction Regulation. Published: 2017, Cold Spring Harbor Perspectives in Biology 9(4) a029199. Type: paper. Status (source note): PMC page, abstract and first 100000 characters read, authors Friedl and Mayor, verified. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5378050">https://pmc.ncbi.nlm.nih.gov/articles/PMC5378050</a></li>
+    <li id="S-SMT-22">[S-SMT-22] Evaluating Virtual Fencing Technology at Field Scale Today. Published: project completed 2023-02. Type: official. Status (source note): Beef Cattle Research Council fact sheet, verified. <a href="https://www.beefresearch.ca/fact-sheets/evaluating-virtual-fencing-technolofy-at-field-scale-today/">https://www.beefresearch.ca/fact-sheets/evaluating-virtual-fencing-technolofy-at-field-scale-today/</a></li>
+    <li id="S-SMT-23">[S-SMT-23] Factors Influencing Plains Bison Group Stability and Fission Fusion Events. Published: 2026-04-15, Intermountain Journal of Sciences 32. Type: paper. Status (source note): abstract page, authors Bresnan, Creel, Shamon, verified. <a href="https://arc.lib.montana.edu/ojs/index.php/IJS/article/view/3781">https://arc.lib.montana.edu/ojs/index.php/IJS/article/view/3781</a></li>
+    <li id="S-SMT-24">[S-SMT-24] Deep Learning Approaches for Automatic Livestock Detection in UAV Imagery: State-of-the-Art and Future Directions. Published: 2025-09-21, Future Internet 17(9) 431. Type: paper. Status (source note): Crossref record and abstract, authors Adam, Song, Yu, Li, verified. <a href="https://api.crossref.org/works/10.3390%2FFI17090431">https://api.crossref.org/works/10.3390%2FFI17090431</a></li>
+    <li id="S-SMT-25">[S-SMT-25] Solving the shepherding problem: heuristics for herding autonomous, interacting agents. Published: 2014, J R Soc Interface 11(100). Type: paper. Status (source note): carried over from the LQ pass (S-LQ-10), not re-read. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104">https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104</a></li>
+    <li id="S-SMT-26">[S-SMT-26] A Comprehensive Review of Shepherding as a Bio-inspired Swarm-Robotics Guidance Approach. Published: 2019-12-17, revised 2020-04-30, DOI 10.1109/TETCI.2020.2992778. Type: paper. Status (source note): abstract page, authors Long, Sammut, Sgarioto, Garratt, Abbass, verified. <a href="https://arxiv.org/abs/1912.07796">https://arxiv.org/abs/1912.07796</a></li>
+    <li id="S-SMT-27">[S-SMT-27] Planning-Assisted Context-Sensitive Autonomous Shepherding of Dispersed Robotic Swarms in Obstacle-Cluttered Environments. Published: 2023-01-25, revised 2023-02-27, IEEE TETCI 2025 per page. Type: paper. Status (source note): abstract page, authors Liu, Singh, Elsayed, Hunjet, Abbass, verified. <a href="https://arxiv.org/abs/2301.10363">https://arxiv.org/abs/2301.10363</a></li>
+    <li id="S-SMT-28">[S-SMT-28] Drone approach parameters leading to lower stress sheep flocking and movement: sky shepherding. Published: 2021, Scientific Reports. Type: paper. Status (source note): PMC page, authors Yaxley, Joiner, Abbass, verified. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8032684">https://pmc.ncbi.nlm.nih.gov/articles/PMC8032684</a></li>
+    <li id="S-SMT-29">[S-SMT-29] Distributed Multi-Target Search and Tracking using the PHD Filter. Published: 2017 per file name (MRS). Type: paper. Status (source note): page 1 read, author Dames, venue from file name only, verified. <a href="https://sites.temple.edu/pdames/files/2017/10/DamesMRS2017.pdf">https://sites.temple.edu/pdames/files/2017/10/DamesMRS2017.pdf</a></li>
+    <li id="S-SMT-30">[S-SMT-30] Adaptive Multiple Distributed Bidirectional Spiral Path Planning for Foraging Robot Swarms. Published: 2023. Type: paper. Status (source note): carried over from the LQ pass (S-LQ-5), NSF PAR record and abstract, not re-read. <a href="https://par.nsf.gov/biblio/10591790">https://par.nsf.gov/biblio/10591790</a></li>
+    <li id="S-SMT-31">[S-SMT-31] Robust Mitigation Strategy for Misleading Pheromone Trails in Foraging Robot Swarms. Published: 2025, TAROS 2024 LNAI 15052 pp. 307 to 319. Type: paper. Status (source note): carried over from the LQ pass (S-LQ-21), DBSCAN defense, not re-read. <a href="https://par.nsf.gov/servlets/purl/10593555">https://par.nsf.gov/servlets/purl/10593555</a></li>
+    <li id="S-RR-1">[S-RR-1] Heterogeneous Targets Trapping With Swarm Robots by Using Adaptive Density-Based Interaction. Published: 2024, IEEE Transactions on Robotics 40 pp. 2729 to 2748. Type: paper. Status (source note): OpenAlex record and abstract, authors Zhang, Lei, Peng, Pan. <a href="https://doi.org/10.1109/TRO.2024.3392078">https://doi.org/10.1109/TRO.2024.3392078</a></li>
+    <li id="S-RR-2">[S-RR-2] Distributed Multi-Robot Multi-Target Tracking Using Heterogeneous Limited-Range Sensors. Published: 2023-11-03, revised 2024-08-10. Type: paper. Status (source note): abstract page, authors Chen, Abugurain, Dames, Park. <a href="https://arxiv.org/abs/2311.01707">https://arxiv.org/abs/2311.01707</a></li>
+    <li id="S-RR-3">[S-RR-3] Emergent Cooperative Strategies for Multi-Agent Shepherding via Reinforcement Learning. Published: 2024-11-08, related DOI 10.23919/ECC65951.2025.11186874. Type: paper. Status (source note): abstract page, authors Napolitano, Lama, De Lellis, di Bernardo. <a href="https://arxiv.org/abs/2411.05454">https://arxiv.org/abs/2411.05454</a></li>
+    <li id="S-RR-4">[S-RR-4] Decentralized Shepherding of Non-Cohesive Swarms Through Cluttered Environments via Deep Reinforcement Learning. Published: 2025-11-26. Type: paper. Status (source note): abstract page, authors Punzo, Napolitano, Tomaselli, di Bernardo. <a href="https://arxiv.org/abs/2511.21405">https://arxiv.org/abs/2511.21405</a></li>
+    <li id="S-RR-5">[S-RR-5] Self-organizing Nervous Systems for Robot Swarms. Published: 2024-01-23 (arXiv), Science Robotics 9 eadl5161 per search snippet. Type: paper. Status (source note): arXiv abstract page, authors Zhu, Oguz, Heinrich, Allwright, Wahby, Christensen, Garone, Dorigo. <a href="https://arxiv.org/abs/2401.13103">https://arxiv.org/abs/2401.13103</a></li>
+    <li id="S-RR-6">[S-RR-6] Cooperative Search and Track of Rogue Drones using Multiagent Reinforcement Learning. Published: 2025-01-07. Type: paper. Status (source note): abstract page, authors Valianti, Malialis, Kolios, Ellinas. <a href="https://arxiv.org/abs/2501.10413">https://arxiv.org/abs/2501.10413</a></li>
+    <li id="S-RR-7">[S-RR-7] Swarm Algorithms for Dynamic Task Allocation in Unknown Environments. Published: 2024-09-14. Type: paper. Status (source note): abstract page, authors Balachandran, Harasha, Lynch. <a href="https://arxiv.org/abs/2409.09550">https://arxiv.org/abs/2409.09550</a></li>
+    <li id="S-RR-8">[S-RR-8] Graph Neural Networks for Multi-Robot Active Information Acquisition. Published: 2022-09-24, submitted to ICRA 2023. Type: paper. Status (source note): abstract page, authors Tzes, Bousias, Chatzipantazis, Pappas, ICRA 2023 award per search snippet only. <a href="https://arxiv.org/abs/2209.12091">https://arxiv.org/abs/2209.12091</a></li>
+    <li id="S-RR-9">[S-RR-9] Effective tracking of unknown clustered targets using a distributed team of mobile robots. Published: 2025-05-24 online, Autonomous Robots 49(2) article 16. Type: paper. Status (source note): Crossref record and abstract, authors Chen, Dames, Park. <a href="https://doi.org/10.1007/s10514-025-10200-z">https://doi.org/10.1007/s10514-025-10200-z</a></li>
+    <li id="S-RR-10">[S-RR-10] Shepherding control and herdability in complex multiagent systems. Published: 2023-07-31, revised 2024-02-21. Type: paper. Status (source note): abstract page, authors Lama, di Bernardo, Physical Review Research 2024 per search snippet only. <a href="https://arxiv.org/abs/2307.16797">https://arxiv.org/abs/2307.16797</a></li>
+    <li id="S-RR-11">[S-RR-11] Multi-robot obstacle-aware shepherding of non-cohesive target agents. Published: 2026-04-24, accepted ICRA 2026 per comments. Type: paper. Status (source note): abstract page, authors Tomaselli, Covone, Reina, di Bernardo. <a href="https://arxiv.org/abs/2604.22327">https://arxiv.org/abs/2604.22327</a></li>
+    <li id="S-RR-12">[S-RR-12] Dynamic UAV Swarm Collaboration for Multi-Targets Tracking under Malicious Jamming: Joint Power, Path and Target Association Optimization. Published: 2023-06-28. Type: paper. Status (source note): abstract page and HTML full text first 100000 characters, authors Xiang, Wang, Xu, Zhang, Pan, Han. <a href="https://arxiv.org/abs/2306.16196">https://arxiv.org/abs/2306.16196</a></li>
+    <li id="S-RR-13">[S-RR-13] Automatic Navigation of a Microrobotic Swarm for Tracking Multiple Mobile Targets. Published: 2023-02-02 online, IEEE RA-L 9(10) pp. 8858 to 8865, 2024-10, DOI 10.1109/LRA.2023.3241813. Type: paper. Status (source note): author copy, page 1 read, authors Zou, Liu, Yu. <a href="https://evanzouq.github.io/assets/papers/1FA-RAL-Automatic_Navigation.pdf">https://evanzouq.github.io/assets/papers/1FA-RAL-Automatic_Navigation.pdf</a></li>
+    <li id="S-RR-14">[S-RR-14] Emergent Herding Behaviour Through Decentralised Reinforcement Learning. Published: undated, cites a 2025 paper. Type: paper. Status (source note): UTS repository PDF, page 1 read, authors Cooper, Nguyen, Alempijevic, venue not shown. <a href="https://opus.lib.uts.edu.au/rest/bitstreams/626df455-7b1b-476e-aa8f-40f02418e0e7/retrieve">https://opus.lib.uts.edu.au/rest/bitstreams/626df455-7b1b-476e-aa8f-40f02418e0e7/retrieve</a></li>
+    <li id="S-RR-15">[S-RR-15] Multi-Target Pursuit by a Decentralized Heterogeneous UAV Swarm using Deep Multi-Agent Reinforcement Learning. Published: 2023-03-03, accepted ICRA 2023 per comments. Type: paper. Status (source note): abstract page, authors Kouzeghar, Song, Meghjani, Bouffanais. <a href="https://arxiv.org/abs/2303.01799">https://arxiv.org/abs/2303.01799</a></li>
+    <li id="S-RR-16">[S-RR-16] Hierarchical Policy-Gradient Reinforcement Learning for Multi-Agent Shepherding Control of Non-Cohesive Targets. Published: 2025-04-03. Type: paper. Status (source note): abstract page, authors Covone, Napolitano, De Lellis, di Bernardo. <a href="https://arxiv.org/abs/2504.02479">https://arxiv.org/abs/2504.02479</a></li>
+    <li id="S-RR-17">[S-RR-17] Safe and Adaptive Multi-Target Encirclement With Socially Aware Multi-Robot Control. Published: 2026-06, IEEE RA-L 11(6) pp. 6608 to 6615. Type: paper. Status (source note): Crossref metadata and OpenAlex abstract, authors Chaib, Alkhatib, Achour, Aranda, Lequievre, Mezouar, Hamerlain. <a href="https://doi.org/10.1109/LRA.2026.3682584">https://doi.org/10.1109/LRA.2026.3682584</a></li>
+    <li id="S-RR-18">[S-RR-18] Flocks, herds and schools: A distributed behavioral model. Published: 1987-08, ACM SIGGRAPH Computer Graphics 21(4) pp. 25 to 34. Type: paper. Status (source note): Crossref metadata only, author Reynolds. <a href="https://doi.org/10.1145/37402.37406">https://doi.org/10.1145/37402.37406</a></li>
+    <li id="S-RR-19">[S-RR-19] Novel Type of Phase Transition in a System of Self-Driven Particles. Published: 1995-08-07, Physical Review Letters 75(6) pp. 1226 to 1229. Type: paper. Status (source note): Crossref metadata only, authors Vicsek, Czirok, Ben-Jacob, Cohen, Shochet. <a href="https://doi.org/10.1103/PhysRevLett.75.1226">https://doi.org/10.1103/PhysRevLett.75.1226</a></li>
+    <li id="S-RR-20">[S-RR-20] Collective Memory and Spatial Sorting in Animal Groups. Published: 2002-09, Journal of Theoretical Biology 218(1) pp. 1 to 11. Type: paper. Status (source note): Crossref metadata only, authors Couzin, Krause, James, Ruxton, Franks. <a href="https://doi.org/10.1006/jtbi.2002.3065">https://doi.org/10.1006/jtbi.2002.3065</a></li>
+    <li id="S-RR-21">[S-RR-21] Effective leadership and decision-making in animal groups on the move. Published: 2005-02, Nature 433(7025) pp. 513 to 516. Type: paper. Status (source note): Crossref metadata only, authors Couzin, Krause, Franks, Levin. <a href="https://doi.org/10.1038/nature03236">https://doi.org/10.1038/nature03236</a></li>
+    <li id="S-RR-22">[S-RR-22] Flocking for Multi-Agent Dynamic Systems: Algorithms and Theory. Published: 2006-03, IEEE Transactions on Automatic Control 51(3) pp. 401 to 420. Type: paper. Status (source note): Crossref metadata only, author Olfati-Saber. <a href="https://doi.org/10.1109/TAC.2005.864190">https://doi.org/10.1109/TAC.2005.864190</a></li>
+    <li id="S-RR-23">[S-RR-23] Self-organized swarm robot for multi-target trapping based on self-regulated density interaction. Published: 2024-01-11 per OpenAlex, Information Sciences 661. Type: paper. Status (source note): OpenAlex metadata (no abstract), content from search snippet, authors Zhou, Yuan, Lei, Peng. <a href="https://doi.org/10.1016/j.ins.2024.120119">https://doi.org/10.1016/j.ins.2024.120119</a></li>
+    <li id="S-RR-24">[S-RR-24] Microrobotic Swarms for Cancer Therapy. Published: 2025-04-20, Research 8 article 0686, DOI 10.34133/research.0686. Type: paper. Status (source note): review, first 100000 characters read, authors Xie, Liu, Yang, Chen, Wang, Du, Fu, Song, Yu. <a href="https://castjournals.cast.org.cn/joweb/research/EN/1154804213701010425">https://castjournals.cast.org.cn/joweb/research/EN/1154804213701010425</a></li>
+    <li id="S-RR-25">[S-RR-25] Autonomous Drone Swarm Navigation and Multi-target Tracking in 3D Environments with Dynamic Obstacles. Published: 2022-02-13, related DOI 10.1109/ACCESS.2022.3202208. Type: paper. Status (source note): abstract page and PDF pages 1 and 2, authors Qamar, Khan, Arshad, Qamar, Khan. <a href="https://arxiv.org/abs/2202.06253">https://arxiv.org/abs/2202.06253</a></li>
+    <li id="S-RR-26">[S-RR-26] Deep Reinforcement Learning for Swarm Systems. Published: 2018-07-17, revised 2019-06-06, JMLR 20(54) 2019. Type: paper. Status (source note): abstract page, authors Huttenrauch, Sosic, Neumann. <a href="https://arxiv.org/abs/1807.06613">https://arxiv.org/abs/1807.06613</a></li>
+    <li id="S-RR-27">[S-RR-27] Learning Decentralized Controllers for Robot Swarms with Graph Neural Networks. Published: 2019-03-25, revised 2021-03-24. Type: paper. Status (source note): abstract page, authors Tolstaya, Gama, Paulos, Pappas, Kumar, Ribeiro, venue not on page. <a href="https://arxiv.org/abs/1903.10527">https://arxiv.org/abs/1903.10527</a></li>
+    <li id="S-RR-28">[S-RR-28] Reconfigurable Disk-like Microswarm under a Sawtooth Magnetic Field. Published: 2021, Micromachines 12 article 1529. Type: paper. Status (source note): PMC full text page, authors Zhang, Deng, Zhou, Liu, Su, Li, Zhang. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8708609/">https://pmc.ncbi.nlm.nih.gov/articles/PMC8708609/</a></li>
+    <li id="S-RR-29">[S-RR-29] Communication-free shepherding navigation with multiple steering agents. Published: 2023-03-28, Frontiers in Control Engineering 4. Type: paper. Status (source note): full text page, authors Li, Ogura, Wakamiya. <a href="https://www.frontiersin.org/articles/10.3389/fcteg.2023.989232/full">https://www.frontiersin.org/articles/10.3389/fcteg.2023.989232/full</a></li>
+    <li id="S-RR-30">[S-RR-30] Mississippi State University advances livestock management with automated herding systems. Published: 2023-05-05. Type: blog. Status (source note): vendor blog, full page read, partial. <a href="https://clearpathrobotics.com/blog/2023/05/mississippi-state-university-advances-livestock-management-with-automated-herding-systems/">https://clearpathrobotics.com/blog/2023/05/mississippi-state-university-advances-livestock-management-with-automated-herding-systems/</a></li>
+    <li id="S-RR-31">[S-RR-31] Livestock Mustering with Drones and Pathways to Adoption (P.PSH.1374). Published: unresolved, URL folder says 2023, search snippet mixed dates with P.PSH.1491. Type: official. Status (source note): page returned title only, UNVERIFIED. <a href="https://www.mla.com.au/research-and-development/reports/2023/p.psh.1374---livestock-mustering-with-drones-and-pathways-to-adoption">https://www.mla.com.au/research-and-development/reports/2023/p.psh.1374---livestock-mustering-with-drones-and-pathways-to-adoption</a></li>
+    <li id="S-RR-32">[S-RR-32] Moving Targets Tracking and Observing in a Distributed Mobile Sensor Network. Published: 2009-06, American Control Conference pp. 3319 onward. Type: paper. Status (source note): pages 1 and 6 read, authors La, Sheng. <a href="https://ara.cse.unr.edu/wp-content/uploads/2014/12/ACC_La2009.pdf">https://ara.cse.unr.edu/wp-content/uploads/2014/12/ACC_La2009.pdf</a></li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="sorting-segregation.html">← Previous: Rank 7 (tie) Sorting and segregation</a>
+  <a href="../index.html">Index</a>
+  <a href="best-of-n.html">Next: Rank 9 Collective decision →</a>
+</div>
+
+</div>
+<script>
+(function () {
+  var tabs = document.querySelector(".tabs");
+  var secs = document.querySelectorAll("section.tab");
+  var links = tabs.querySelectorAll("a");
+  function show(scroll) {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id ? document.getElementById(id) : null;
+    var sec = el ? el.closest("section.tab") : null;
+    if (!sec) { sec = secs[0]; el = null; }
+    for (var i = 0; i < secs.length; i++) secs[i].classList.toggle("on", secs[i] === sec);
+    for (var j = 0; j < links.length; j++) {
+      var cur = links[j].getAttribute("href") === "#" + sec.id;
+      links[j].classList.toggle("on", cur);
+      if (cur) links[j].setAttribute("aria-current", "true"); else links[j].removeAttribute("aria-current");
+    }
+    if (el && el !== sec) el.scrollIntoView();
+    else if (scroll) tabs.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", function () { show(true); });
+  show(false);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,885 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>7위 (공동) 분열-융합 추적 | 최종 프로젝트 후보</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+<script>document.documentElement.className += " js";</script>
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><b>한국어</b> | <a href="../en/projects/split-merge-tracking.html" hreflang="en">English</a></p>
+
+<nav class="topnav">
+  <a href="sorting-segregation.html">← 이전: 7위 (공동) 분류와 분리</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="best-of-n.html">다음: 9위 집단 결정 →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">프로젝트 7위 (공동) / 10개 (순위 순서)</div>
+  <h1>갈라지고 합치는 집단을 따라가는 군집<br><span class="muted" style="font-size:15px;font-weight:400">Split-merge tracking: a swarm that splits and merges with its targets</span></h1>
+  <div class="lead">
+    <p><strong>결론: 7위 (공동), 8점 (추적만 기준). 조각마다 선행 연구가 있다. 반복 분열-융합에서 관측률 대 전환 빈도의 맞교환을 잰 출처는 못 찾았다.</strong></p>
+    <p>왜 7위인가: 분류와 분리(8점)와 같은 점수다. 이 빈틈은 "출처를 못 찾음"이다. 아무도 안 했다는 증거가 아니다.</p>
+    <div class="chips">
+      <span class="chip">연구 가능성(research potential) 2</span>
+      <span class="chip">2주 구현 가능성(feasibility) 2</span>
+      <span class="chip">교수 연구와의 적합도(fit) 2</span>
+      <span class="chip">합계 = 곱 = 8 (추정, inference)</span>
+      <span class="chip">전체 파이프라인, 2주 기준: 2 · 1 · 3 = 6</span>
+    </div>
+  </div>
+  <ol class="toc tabs">
+    <li><a href="#summary">1 요약</a></li>
+    <li><a href="#pipeline">2 파이프라인</a></li>
+    <li><a href="#study">3 공부 가이드</a></li>
+    <li><a href="#recent">4 최근 연구</a></li>
+    <li><a href="#lineage">5 계보 흐름도</a></li>
+    <li><a href="#rq">6 RQ와 로드맵</a></li>
+    <li><a href="#sources">7 출처</a></li>
+    <li><a href="#terms">8 용어</a></li>
+  </ol>
+</header>
+
+<section class="tab" id="summary">
+  <h2>1 요약</h2>
+  <p class="muted">출처: research/split_merge_tracking/proposal.md, survey.md. 점수와 출처 ID는 그대로 옮겼다. 새로 계산하지 않았다.</p>
+
+  <h3>1.1 풀려던 문제</h3>
+  <figure>
+    <svg viewBox="0 0 1000 270" role="img" aria-label="표적 무리가 둘로 갈라지고 다시 합칠 때 군집의 링도 12대 하나, 6대 둘, 12대 하나로 바뀌는 모습">
+  <defs><marker id="arrp" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+  <circle cx="30" cy="32" r="4" fill="#222"/><text class="m" x="42" y="36">표적(target) 무리의 한 개체</text>
+  <rect x="290" y="27" width="9" height="9" fill="var(--s2)"/><text class="m" x="304" y="36">로봇</text>
+  <circle cx="388" cy="32" r="7" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/><text class="m" x="402" y="36">대형(링)</text>
+  <text class="m" x="990" y="36" style="text-anchor:end">설명용 스케치</text>
+  <circle cx="170" cy="130" r="52" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="183.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="176.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="163.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="157.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="163.5" cy="118.7" r="5" fill="#222"/>
+  <circle cx="176.5" cy="118.7" r="5" fill="#222"/>
+  <rect x="215.2" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="201.8" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="178.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="151.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="128.2" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="114.8" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="114.8" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="128.2" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="151.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="178.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="201.8" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="215.2" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <circle cx="430" cy="130" r="36" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="439.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="425.5" cy="137.8" r="5" fill="#222"/>
+  <circle cx="425.5" cy="122.2" r="5" fill="#222"/>
+  <rect x="456.2" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="425.0" y="161.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="393.8" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="393.8" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="425.0" y="89.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="456.2" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <circle cx="570" cy="130" r="36" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="579.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="565.5" cy="137.8" r="5" fill="#222"/>
+  <circle cx="565.5" cy="122.2" r="5" fill="#222"/>
+  <rect x="596.2" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="565.0" y="161.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="533.8" y="143.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="533.8" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="565.0" y="89.0" width="10" height="10" fill="var(--s2)"/>
+  <rect x="596.2" y="107.0" width="10" height="10" fill="var(--s2)"/>
+  <circle cx="830" cy="130" r="52" fill="none" stroke="#555" stroke-width="1.5" stroke-dasharray="4 3"/>
+  <circle cx="843.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="836.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="823.5" cy="141.3" r="5" fill="#222"/>
+  <circle cx="817.0" cy="130.0" r="5" fill="#222"/>
+  <circle cx="823.5" cy="118.7" r="5" fill="#222"/>
+  <circle cx="836.5" cy="118.7" r="5" fill="#222"/>
+  <rect x="875.2" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="861.8" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="838.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="811.5" y="175.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="788.2" y="161.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="774.8" y="138.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="774.8" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <rect x="788.2" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="811.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="838.5" y="74.8" width="10" height="10" fill="var(--s2)"/>
+  <rect x="861.8" y="88.2" width="10" height="10" fill="var(--s2)"/>
+  <rect x="875.2" y="111.5" width="10" height="10" fill="var(--s2)"/>
+  <line x1="262" y1="130" x2="336" y2="130" stroke="#555" stroke-width="2.5" marker-end="url(#arrp)"/><text class="m c" x="299" y="118">갈라짐</text>
+  <line x1="664" y1="130" x2="738" y2="130" stroke="#555" stroke-width="2.5" marker-end="url(#arrp)"/><text class="m c" x="701" y="118">합침</text>
+  <text class="b c" x="170" y="214">t1 표적 한 무리</text><text class="m c" x="170" y="232">링 하나 · 로봇 12대</text>
+  <text class="b c" x="500" y="214">t2 둘로 갈라짐</text><text class="m c" x="500" y="232">링 둘 · 링마다 로봇 6대</text>
+  <text class="b c" x="830" y="214">t3 다시 합침</text><text class="m c" x="830" y="232">링 하나 · 로봇 12대</text>
+</svg>
+    <figcaption>
+      그림 1. 표적 무리가 갈라지고 합칠 때 <a class="t" href="#term-swarm">군집(swarm)</a>도 같이 갈라지고 합치는 모습이다. 왜: 로봇 수와 무리 크기에 맞춰 <a class="t" href="#term-formation">대형(formation)</a> 크기가 자동으로 바뀌어야 한다.
+      <span class="ab">약어: 없음. 출처: proposal.md 1.1절. 점과 사각형의 위치는 설명용 스케치다.</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>표 1. 임무와 비전</caption>
+    <thead><tr><th>항목</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>임무(mission)</td><td>갈라지고 합치는 집단을 군집이 따라가며 관측한다.</td></tr>
+      <tr><td>비전(vision)</td><td>군집이 집단을 찾아 원하는 방향으로 이동시킨다.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>왜 군집인가 (inference): 집단이 언제, 몇 개로 갈라질지 미리 모른다.</li>
+    <li>로봇은 지역 정보만으로 결정한다. 중앙 제어기가 모든 것을 정하면 군집을 쓸 이유가 없다.</li>
+    <li>새 기여 후보는 두 곳이다. 4단계(분열·배정)와 6단계(몰이)다. 한 논문은 기여를 한 단계에만 둔다.</li>
+  </ul>
+
+  <h3>1.2 점수와 순위</h3>
+  <table class="t">
+    <caption>표 2. 두 범위의 점수 (연구 가능성 R, 2주 구현 가능성 F, 교수 연구와의 적합도 Fit, 각 1점에서 3점, 합계는 곱). 왜: 순위표에 들어가는 값은 추적만 기준 8점이다.</caption>
+    <thead><tr><th>범위</th><th class="c">R</th><th class="c">F</th><th class="c">Fit</th><th class="c">합계</th><th>이유</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td>추적만 (순위표 값)</td><td class="c">2</td><td class="c">2</td><td class="c">2</td><td class="c">8</td><td>세 조각에 선행 연구가 있다. 추적 논문 연결은 추정뿐이다 <a class="s" href="#S-SMT-6">[S-SMT-6]</a>, <a class="s" href="#S-SMT-7">[S-SMT-7]</a>, <a class="s" href="#S-SMT-8">[S-SMT-8]</a>, <a class="s" href="#S-SMT-15">[S-SMT-15]</a>.</td></tr>
+      <tr><td>전체 파이프라인, 수업 2주 기준</td><td class="c">2</td><td class="c">1</td><td class="c">3</td><td class="c">6</td><td>2단계가 Prof. Lu 논문과 직접 겹친다. 6단계를 2주에 다 만들기 어렵다.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>순위: 8점이라 집단 분류와 분리(8점)와 7위 공동이다. 집단 결정은 8위에서 9위로, 양 몰기는 9위에서 10위로 밀린다.</li>
+    <li>R × F = 4다. R × F 표의 7위 공동 묶음과 같다.</li>
+    <li>R이 3이 되는 조건: 빈틈 재확인 조사가 맞교환 측정의 부재를 다시 확인하는 것이다. 검색 두 회차에서 출처를 못 찾았다. 이것은 증명이 아니다.</li>
+    <li>채팅 추정(수업 높음, 워크숍 중상, 학회 중간)이 survey보다 낙관적인 곳에서는 survey 점수가 우선한다. 점수는 비교용 추정(inference)이다.</li>
+  </ul>
+
+  <h3>1.3 응용은 층으로 나눈다</h3>
+  <figure>
+    <svg viewBox="0 0 1000 250" role="img" aria-label="응용 세 층. 아래부터 주 응용 목초지 소 떼, 다리 실험, 비전 몸속 세포 무리">
+  <defs><marker id="arrl" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+  <rect x="40" y="20" width="700" height="52" fill="#fff" stroke="var(--s3)" stroke-width="2.5"/>
+  <text class="b" x="56" y="42">비전 (연구 단계)</text><text class="m" x="56" y="61">몸속 미세 로봇이 세포 무리를 추적한다</text>
+  <rect x="40" y="100" width="700" height="52" fill="#fff" stroke="var(--s4)" stroke-width="2.5"/>
+  <text class="b" x="56" y="122">다리 실험</text><text class="m" x="56" y="141">감지와 통신 거리를 줄여 성능 하락을 잰다</text>
+  <rect x="40" y="180" width="700" height="52" fill="#fff" stroke="var(--s1)" stroke-width="2.5"/>
+  <text class="b" x="56" y="202">주 응용 (일부 제품화)</text><text class="m" x="56" y="221">목초지 소 떼를 추적하고 몬다</text>
+  <line x1="390" y1="178" x2="390" y2="154" stroke="#555" stroke-width="2.5" marker-end="url(#arrl)"/>
+  <line x1="390" y1="98" x2="390" y2="74" stroke="#555" stroke-width="2.5" marker-end="url(#arrl)"/>
+</svg>
+    <figcaption>
+      그림 2. 응용 세 층을 성숙도 순서로 쌓았다. 왜: 소 떼를 주 응용으로 삼고, 세포 무리는 동기로만 쓰기 위해서다.
+      <span class="ab">약어: 없음. 출처: proposal.md 2절.</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>표 3. 응용 층 (출처: proposal.md 2절)</caption>
+    <thead><tr><th>층</th><th>응용</th><th>ARGoS 대응</th><th>성숙도</th><th>출처</th></tr></thead>
+    <tbody>
+      <tr><td>주 응용</td><td>목초지 소 떼</td><td>기본 <a class="t" href="#term-footbot">풋봇(foot-bot)</a>에 거의 1:1 (inference)</td><td><a class="t" href="#term-vfence">가상 울타리(virtual fencing)</a> 목걸이와 드론 가축 탐지가 이미 있다</td><td><a class="s" href="#S-SMT-22">[S-SMT-22]</a>, <a class="s" href="#S-SMT-24">[S-SMT-24]</a></td></tr>
+      <tr><td>다리 실험</td><td>감지와 통신을 줄인 foot-bot</td><td><a class="t" href="#term-rab">거리-방위 센서(range-and-bearing sensor)</a>와 위치 센서를 끈다 (inference)</td><td>시뮬레이션</td><td><a class="s" href="#S-SMT-20">[S-SMT-20]</a></td></tr>
+      <tr><td>비전</td><td><a class="t" href="#term-micro">미세 로봇(microrobot)</a>이 세포 무리 추적</td><td>감지를 줄인 foot-bot (inference)</td><td>연구 단계</td><td><a class="s" href="#S-SMT-20">[S-SMT-20]</a>, <a class="s" href="#S-SMT-21">[S-SMT-21]</a></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>소 떼: 들소는 작은 무리로 갈라지고 큰 무리로 다시 합친다 <a class="s" href="#S-SMT-23">[S-SMT-23]</a>. 2마리 이상이 떠나거나 합류하면 분열 또는 융합으로 센다. 이 정의를 로봇 실험의 판정 규칙으로 쓸 수 있다 (inference).</li>
+    <li><a class="t" href="#term-vfence">가상 울타리(virtual fencing)</a> 목걸이의 위치 정확도는 2 m 이내라고 한다 <a class="s" href="#S-SMT-22">[S-SMT-22]</a>.</li>
+    <li>여러 로봇이 갈라지는 소 떼를 나눠 따라가는 시스템, 그리고 소를 드론이나 로봇으로 모는 현장 연구는 이번 조사에서 찾지 못했다.</li>
+    <li>세포 무리: 순환 종양 세포 무리는 순환 종양 세포의 2%에서 5%다. 동물 모형에서 폐 전이의 약 절반에 기여했다 <a class="s" href="#S-SMT-19">[S-SMT-19]</a>. 뉴스로 읽었고 원문은 읽지 않았다.</li>
+    <li>미세 로봇은 몸에 센서와 구동기를 넣기 어렵다 <a class="s" href="#S-SMT-20">[S-SMT-20]</a>. 이 응용은 시뮬레이션 질문의 동기다. 의료 실현을 주장하지 않는다 (inference).</li>
+    <li>다리 실험의 질문: "감지가 거의 없을 때 추적이 얼마나 무너지나?" (inference). 선택 기준선은 모든 로봇에 같은 전역 신호를 주는 것이다.</li>
+    <li><strong>사람 감시는 응용 틀이 아니다.</strong> 윤리 문제 때문이다. 소유자도 그렇게 정했다 (2026-11-10).</li>
+  </ul>
+
+  <h3>1.4 선행 연구와 빈틈</h3>
+  <table class="t">
+    <caption>표 4. 선행 연구 갈래와 남은 빈틈 (출처: proposal.md 4.1절). 왜: 조각마다 무엇이 이미 있는지 보이면 새 기여가 어디인지 좁혀진다.</caption>
+    <thead><tr><th>갈래</th><th>있는 것</th><th>남은 빈틈 (inference)</th><th>출처</th></tr></thead>
+    <tbody>
+      <tr><td><a class="t" href="#term-cmommt">협력 다중 로봇 다중 이동 표적 관측(cooperative multi-robot observation of multiple moving targets, CMOMMT)</a></td><td>Parker가 문제를 정의했다.</td><td>표적 무리 구조를 다루는지 확인하지 못했다. 검색 요약만 읽었다.</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a></td></tr>
+      <tr><td>분열-융합 추적</td><td>La와 Sheng: 센서가 갈라져 새 표적을 따르고, 표적이 사라지면 합친다.</td><td>갈라짐 한 번의 비용만 쟀다. 반복 분열-융합의 맞교환은 1쪽에서 2쪽에 없다.</td><td><a class="s" href="#S-SMT-6">[S-SMT-6]</a></td></tr>
+      <tr><td>표적 수에 비례한 배치</td><td>Low, Leow, Ang: 구역별 로봇 수를 표적 수에 비례시킨다.</td><td>구역이 고정이다.</td><td><a class="s" href="#S-SMT-7">[S-SMT-7]</a></td></tr>
+      <tr><td>지역 밀도로 다중 표적 가두기</td><td>Lei 등: 통신 없이 단일 링, 다중 링, 다중 소그룹 포위가 생긴다.</td><td>반복 분열-융합은 초록에 없다.</td><td><a class="s" href="#S-SMT-8">[S-SMT-8]</a></td></tr>
+      <tr><td>학습한 다중 표적 <a class="t" href="#term-encirc">포위(encirclement)</a></td><td><a class="t" href="#term-terl">트랜스포머 강화 강화 학습(Transformer-Enhanced Reinforcement Learning, TERL)</a>: 추격자 15대와 표적 4개로 학습했다.</td><td>학습 정책이다. 학습은 클러스터에서 돌려야 한다.</td><td><a class="s" href="#S-SMT-9">[S-SMT-9]</a></td></tr>
+      <tr><td>군집의 <a class="t" href="#term-ff">분열-융합(fission-fusion)</a> 제어</td><td>2022년 논문이 <a class="t" href="#term-uav">무인 항공기(unmanned aerial vehicle, UAV)</a> 군집 분열-융합 제어를 다룬다.</td><td>원문을 못 열었다 [UNVERIFIED].</td><td><a class="s" href="#S-SMT-5">[S-SMT-5]</a></td></tr>
+      <tr><td>동물의 분열-융합</td><td>Couzin과 Laidre.</td><td>생물학이다. 로봇 규칙이 없다 [UNVERIFIED].</td><td><a class="s" href="#S-SMT-3">[S-SMT-3]</a></td></tr>
+      <tr><td>탐색과 추적</td><td>Dames: 수를 모르는 표적을 찾고 추적한다.</td><td>표적 무리의 분열-융합과 몰이는 1쪽에 없다.</td><td><a class="s" href="#S-SMT-29">[S-SMT-29]</a></td></tr>
+      <tr><td><a class="t" href="#term-shep">몰이(shepherding)</a></td><td>Strömbom 등의 모으기와 밀기. Long 등의 조사.</td><td>다중 몰이꾼 절은 본문에서 확인하지 않았다.</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a>, <a class="s" href="#S-SMT-26">[S-SMT-26]</a></td></tr>
+      <tr><td>흩어진 무리 몰이</td><td>Liu 등: 부분 무리로 묶고 외판원 문제로 순서를 정한다.</td><td>몰이꾼 하나의 순서 계획이다. 탐색 단계는 초록에 없다.</td><td><a class="s" href="#S-SMT-27">[S-SMT-27]</a></td></tr>
+      <tr><td>양 몰이와 복지</td><td>Yaxley 등: 양 12마리, 최고 심박이 분당 박동 수(beats per minute, bpm) 200을 넘으면 중단, 20 m 안전 구역.</td><td>한 농장 12마리다. 소에 옮길 수 없다 (inference).</td><td><a class="s" href="#S-SMT-28">[S-SMT-28]</a></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>세 조각에 선행 연구가 있다. 표적 수에 비례한 배치 <a class="s" href="#S-SMT-7">[S-SMT-7]</a>, 갈라짐 한 번의 비용 <a class="s" href="#S-SMT-6">[S-SMT-6]</a>, 다중 소그룹 링 <a class="s" href="#S-SMT-8">[S-SMT-8]</a>이다.</li>
+    <li>못 찾은 것: 반복 분열-융합에서 <a class="t" href="#term-obsratio">관측률(observation ratio)</a> 대 <a class="t" href="#term-churn">전환 빈도(churn)</a>의 맞교환(trade-off)이다. 로봇이 옮기면 비율은 맞지만 이동 중에는 관측하지 못한다. 안 옮기면 관측은 이어지지만 비율이 틀어진다 (inference).</li>
+    <li><strong>이것은 아무도 안 했다는 증거가 아니다.</strong> 개인 연구로 가려면 빈틈 재확인 조사가 한 번 더 필요하다.</li>
+  </ul>
+</section>
+
+<section class="tab" id="pipeline">
+  <h2>2 파이프라인</h2>
+  <p class="muted">소유자의 흐름을 6단계로 나눴다. 출처: proposal.md 3절. 주황 굵은 상자가 새 기여 후보(4단계와 6단계)다.</p>
+  <figure>
+    <svg viewBox="0 0 1000 250" role="img" aria-label="여섯 단계 흐름도. 펼치기, 탐색, 탐지와 묶기, 분열과 배정, 추적, 몰이. 4단계와 6단계가 새 기여 후보이고 4단계에서 탐색으로 돌아가는 화살표가 있다">
+  <defs><marker id="arrf" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+  <rect x="24" y="14" width="22" height="12" fill="#fff" stroke="#555" stroke-width="1.5"/><text class="m" x="54" y="24">기존 방법 재사용</text>
+  <rect x="250" y="14" width="22" height="12" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/><text class="m" x="280" y="24">새 기여 후보</text>
+  <text class="m" x="990" y="24" style="text-anchor:end">모든 단계는 아직 만들지 않았다 (계획)</text>
+  <rect x="8" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="81" y="82">1 펼치기</text>
+  <text class="m c" x="81" y="108">무작위 퍼짐</text><text class="m c" x="81" y="126">또는 구역 나눔</text>
+  <text class="b c" x="81" y="162" style="fill:#555">기존 방법</text>
+  <line x1="154" y1="115" x2="170" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="172" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="245" y="82">2 탐색</text>
+  <text class="m c" x="245" y="108">양방향 나선 탐색</text><text class="m c" x="245" y="126">무작위 걷기 채집</text>
+  <text class="b c" x="245" y="162" style="fill:#555">기존 방법</text>
+  <line x1="318" y1="115" x2="334" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="336" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="409" y="82">3 탐지·묶기</text>
+  <text class="m c" x="409" y="108">거리 기반 묶기</text>
+  <text class="b c" x="409" y="162" style="fill:#555">기존 방법</text>
+  <line x1="482" y1="115" x2="498" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="500" y="56" width="146" height="118" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="573" y="82">4 분열·배정</text>
+  <text class="m c" x="573" y="108">비례 규칙</text><text class="m c" x="573" y="126">이력 현상</text>
+  <text class="b c" x="573" y="162" style="fill:var(--s2)">새 기여 후보</text>
+  <line x1="646" y1="115" x2="662" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="664" y="56" width="146" height="118" fill="#fff" stroke="#555" stroke-width="1.5"/>
+  <text class="b c" x="737" y="82">5 추적</text>
+  <text class="m c" x="737" y="108">협력 관측</text><text class="m c" x="737" y="126">밀도 기반 포위</text>
+  <text class="b c" x="737" y="162" style="fill:#555">기존 방법</text>
+  <line x1="810" y1="115" x2="826" y2="115" stroke="#555" stroke-width="2.5" marker-end="url(#arrf)"/>
+  <rect x="828" y="56" width="146" height="118" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="901" y="82">6 몰이</text>
+  <text class="m c" x="901" y="108">모으기·밀기</text><text class="m c" x="901" y="126">순서 계획</text>
+  <text class="b c" x="901" y="162" style="fill:var(--s2)">기존 + 새 기여 후보</text>
+  <path d="M573,176 L573,200 L245,200 L245,178" fill="none" stroke="#555" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#arrf)"/>
+  <text class="m c" x="409" y="218">새 무리가 나타나면 다시 탐색</text>
+</svg>
+    <figcaption>
+      그림 3. 펼치기에서 몰이까지 6단계와 새 기여 후보 두 곳을 보인다. 왜: 한 논문은 기여를 한 단계에만 두므로 어느 단계가 새로운지 먼저 보여야 한다.
+      <span class="ab">약어: 없음. 출처: proposal.md 3절. 아직 만든 단계는 없다 (계획).</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>표 5. 단계표 (출처: proposal.md 3절). 왜: 단계마다 기존 방법을 얼마나 다시 쓰는지와 Prof. Lu 연구와의 연결을 나란히 본다.</caption>
+    <thead><tr><th>단계</th><th>기존 방법 재사용?</th><th>Prof. Lu와의 연결</th><th>새로움</th><th>출처</th></tr></thead>
+    <tbody>
+      <tr><td style="white-space:nowrap">1 펼치기</td><td>예. 무작위 퍼짐 또는 구역 나눔 (inference)</td><td>확인하지 않음</td><td>없음</td><td>없음</td></tr>
+      <tr><td style="white-space:nowrap">2 탐색</td><td>예. 양방향 나선 탐색, 무작위 걷기 채집</td><td><strong>강한 맞음.</strong> 그의 나선 탐색 논문이다.</td><td>없음</td><td><a class="s" href="#S-SMT-30">[S-SMT-30]</a>, <a class="s" href="#S-SMT-15">[S-SMT-15]</a></td></tr>
+      <tr><td style="white-space:nowrap">3 탐지·묶기</td><td>예. 거리 기반 묶기</td><td>그의 연구실이 <a class="t" href="#term-dbscan">밀도 기반 공간 군집화(density-based spatial clustering of applications with noise, DBSCAN)</a>을 방어에 썼다.</td><td>없음</td><td><a class="s" href="#S-SMT-31">[S-SMT-31]</a></td></tr>
+      <tr class="rowflag"><td style="white-space:nowrap">4 분열·배정</td><td>부분적. 비례 규칙과 <a class="t" href="#term-hyst">이력 현상(hysteresis)</a></td><td>직접 겹치지 않음</td><td><strong>새 기여 후보.</strong> 반복 분열-융합에서 지역 비례 배정</td><td><a class="s" href="#S-SMT-6">[S-SMT-6]</a>, <a class="s" href="#S-SMT-7">[S-SMT-7]</a></td></tr>
+      <tr><td style="white-space:nowrap">5 추적</td><td>예. 협력 관측, 밀도 기반 포위</td><td>직접 논문 없음</td><td>없음</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a>, <a class="s" href="#S-SMT-8">[S-SMT-8]</a>, <a class="s" href="#S-SMT-15">[S-SMT-15]</a></td></tr>
+      <tr class="rowflag"><td style="white-space:nowrap">6 몰이</td><td>부분적. 모으기·밀기, 모으는 순서 계획</td><td>직접 겹치지 않음</td><td><strong>새 기여 후보.</strong> 계속 갈라지는 무리 몰이, 관측과 조향 역할 나눔</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a>, <a class="s" href="#S-SMT-27">[S-SMT-27]</a></td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>2단계가 Prof. Lu 연구와 가장 직접 겹친다.</li>
+    <li>6단계의 다중 몰이꾼 배정은 4단계 배정 규칙을 다시 쓰는 문제다 (inference).</li>
+  </ul>
+  <h3>2.1 실험 틀과 알고리즘 초안 (inference)</h3>
+  <ol>
+    <li><a class="t" href="#term-loopfn">루프 함수(loop functions)</a>가 정해진 일정으로 표적 무리를 가르고 합친다. 표적은 foot-bot 8대에서 16대다.</li>
+    <li>표적은 <a class="t" href="#term-rab">거리-방위 센서(range-and-bearing sensor)</a>로 "나는 표적"을 보낸다 <a class="s" href="#S-SMT-10">[S-SMT-10]</a>. 추적 foot-bot은 12대에서 30대다.</li>
+    <li>추적 로봇이 감지한 표적을 거리로 묶는다. 간격이 d보다 크면 다른 무리다.</li>
+    <li>가장 가까운 무리에 붙는다. 두 무리가 d보다 멀어지면 먼 쪽 로봇이 먼 무리를 따른다.</li>
+    <li>표적당 로봇이 많은 쪽이 적은 쪽에 로봇을 넘긴다. 불균형이 T초 이어질 때만 옮긴다 (<a class="t" href="#term-hystT">이력 시간 T(hysteresis time T)</a>).</li>
+    <li>부분 군집마다 중심 둘레 링을 만든다. 두 중심이 d보다 가까워지면 링 하나로 합친다.</li>
+  </ol>
+  <table class="t">
+    <caption>표 6. 기준선과 지표 (inference). 왜: RQ2의 답이 되는 곡선은 전환 빈도와 관측률 두 축에서 나온다.</caption>
+    <thead><tr><th>이름</th><th>내용 또는 정의</th></tr></thead>
+    <tbody>
+      <tr><td>기준선: 고정 대형</td><td>전체 표적 중심 둘레 링 하나.</td></tr>
+      <tr><td>기준선: 가장 가까운 표적 따라가기</td><td><a class="t" href="#term-cmommt">협력 다중 로봇 다중 이동 표적 관측(cooperative multi-robot observation of multiple moving targets, CMOMMT)</a> 방식과 비슷하다 <a class="s" href="#S-SMT-1">[S-SMT-1]</a>.</td></tr>
+      <tr><td>기준선: 전역 배정</td><td><a class="t" href="#term-oracle">전역 배정(oracle)</a>. loop functions가 실제 무리 크기에 비례해 배정한다.</td></tr>
+      <tr><td>지표: <a class="t" href="#term-obsratio">관측률(observation ratio)</a></td><td>시간마다 관측 중인 표적의 비율. 감지 거리 안에 추적 로봇이 있으면 관측으로 센다. 답하는 질문: 감시가 되나.</td></tr>
+      <tr><td>지표: 무리별 로봇 비율</td><td>부분 군집마다 표적당 로봇 수. 비례 이상값과 비교한다. 답하는 질문: 배치가 맞나.</td></tr>
+      <tr><td>지표: <a class="t" href="#term-churn">전환 빈도(churn)</a></td><td>로봇 1대가 1분에 부분 군집을 바꾼 횟수. 답하는 질문: 얼마나 흔들리나.</td></tr>
+      <tr><td>지표: 맞교환 곡선</td><td>x는 전환 빈도, y는 평균 관측률. T마다 점 하나다. RQ2의 답이다.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>몰이 단계의 새 지표 (inference): 목표에 도착한 동물 비율, 걸린 시간, 동물 스트레스 대용값(로봇과의 최소 거리). 복지 제약은 규칙에 넣는다 <a class="s" href="#S-SMT-28">[S-SMT-28]</a>.</li>
+    <li>판본은 수업이 정한 ARGoS 3.0.0-beta59다. 읽은 자료는 beta59 전용이 아니다 (inference). <a class="t" href="#term-argos">ARGoS</a>의 foot-bot 거리-방위 센서 기본 거리는 확인하지 못했다.</li>
+  </ul>
+</section>
+
+<section class="tab" id="study">
+  <h2>3 공부 가이드</h2>
+  <p class="muted">출처: research/split_merge_tracking/study_guide.md (메인 세션 채팅 답변, 2026-11-10, 배경지식). 논문 서지와 검증 상태는 계보 표(표 13)를 따른다.</p>
+  <figure>
+    <svg viewBox="0 0 1000 150" role="img" aria-label="공부할 여덟 주제가 파이프라인 단계 어디에 놓이는지 보인 그림">
+      <defs><marker id="arrg" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+      <g stroke="#555" stroke-width="1.5" fill="#fff">
+        <rect x="10" y="30" width="150" height="56"/><rect x="200" y="30" width="150" height="56"/><rect x="390" y="30" width="190" height="56"/><rect x="620" y="30" width="190" height="56"/><rect x="850" y="30" width="140" height="56"/>
+      </g>
+      <g stroke="#555" stroke-width="2.5"><line x1="162" y1="58" x2="196" y2="58" marker-end="url(#arrg)"/><line x1="352" y1="58" x2="386" y2="58" marker-end="url(#arrg)"/><line x1="582" y1="58" x2="616" y2="58" marker-end="url(#arrg)"/><line x1="812" y1="58" x2="846" y2="58" marker-end="url(#arrg)"/></g>
+      <g class="b c"><text x="85" y="54">탐색</text><text x="275" y="54">묶기</text><text x="485" y="54">분열·배분</text><text x="715" y="54">추적·대형</text><text x="920" y="54">몰이</text></g>
+      <g class="m c"><text x="85" y="74">주제 7</text><text x="275" y="74">(주제 없음)</text><text x="485" y="74">주제 3, 4</text><text x="715" y="74">주제 1, 2, 5</text><text x="920" y="74">주제 6</text></g>
+      <text class="m" x="10" y="124">주제 8 (학습 기반)은 전 단계에 적용한다. 학습은 Cradle 클러스터에서 돌린다.</text>
+    </svg>
+    <figcaption>
+      그림 4. 공부 주제 여덟 개가 파이프라인 어디에 닿는지 보인다. 왜: 읽을 순서를 단계 기준으로 잡을 수 있다.
+      <span class="ab">약어: 없음. 출처: study_guide.md 앞 그림.</span>
+    </figcaption>
+  </figure>
+  <p><strong>공부 순서 추천: 1 → 2 → 4 → 3 → 5 → 7 → 6 → 8.</strong> 기초에서 핵심(관찰, 배분), 그다음 확장(몰이, 학습)이다.</p>
+  <table class="t">
+    <caption>표 7. 주요 주제 8개 (출처: study_guide.md). 왜: 각 주제가 어떤 문제에서 나왔고 이 연구의 어디에 쓰이는지 알아야 공부할 이유가 선다.</caption>
+    <thead><tr><th class="c">#</th><th>주제</th><th>풀려던 문제</th><th>해결 방법</th><th>왜 중요한가</th><th>공부할 이유 (이 연구에서의 자리)</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td><a class="t" href="#term-flocking">무리 짓기(flocking)</a>: Reynolds 1987, Vicsek 1995, Olfati-Saber 2006</td><td>새나 물고기 떼는 지휘자 없이 어떻게 함께 움직이나</td><td>국소 규칙 셋: 분리, 정렬, 응집</td><td>국소 규칙만으로 전체 질서가 생긴다는 군집 로봇공학의 출발점. Olfati-Saber가 제어 이론으로 증명</td><td>갈라진 뒤 각 조각이 하나로 움직이는 바탕 (5단계)</td></tr>
+      <tr><td class="c">2</td><td><a class="t" href="#term-cmommt">협력 다중 로봇 다중 이동 표적 관측(cooperative multi-robot observation of multiple moving targets, CMOMMT)</a>: Parker 1999, 2002</td><td>대상이 로봇보다 많을 때 최대한 오래 관찰하려면</td><td>근처 대상에게 끌림 + 다른 로봇에게서 밀림을 합한 힘</td><td>"관찰 비율" 지표를 처음 정한 기준 문제</td><td>직접적인 조상. CMOMMT는 대상을 하나씩 본다. 이 연구는 갈라지는 집단을 본다 (5단계)</td></tr>
+      <tr><td class="c">3</td><td><a class="t" href="#term-ff">분열-융합(fission-fusion)</a>: Couzin 2009, Mergeable Nervous Systems 2017</td><td>동물 무리는 왜, 어떻게 갈라졌다 합치나. 로봇도 그렇게 할 수 있나</td><td>생물학: 먹이나 위험에 따른 분열 모형. 로봇: 물리적으로 합치고 나뉘는 시스템</td><td>군집이 크기를 상황에 맞춰 바꿀 수 있다는 근거</td><td>소 떼의 실제 움직임. 대상 움직임 모형이자 군집의 분열 규칙 (4단계)</td></tr>
+      <tr><td class="c">4</td><td>작업 배분(task allocation): 반응 임계값(response threshold), 경매(auction), <a class="t" href="#term-cbba">합의 기반 묶음 알고리즘(consensus-based bundle algorithm, CBBA)</a></td><td>로봇 N대와 일 M개. 누가 무엇을 하나</td><td>임계값: 자극이 기준을 넘으면 맡는다 (개미 모형). 경매, CBBA: 입찰로 정한다</td><td>중앙 통제 없이 일을 나누는 표준 방법</td><td>"무리마다 몇 대를 보낼까"가 배분 문제. 핵심 4단계</td></tr>
+      <tr><td class="c">5</td><td><a class="t" href="#term-encirc">포위(encirclement)</a>와 <a class="t" href="#term-formation">대형(formation)</a> 제어(formation control)</td><td>대상 둘레에 일정한 모양(링)을 유지하려면</td><td>대상까지 거리와 이웃 각도 간격을 제어한다. 로봇 수가 바뀌면 간격을 다시 나눈다</td><td>감시, 호위, 포획에 공통</td><td>"포메이션이 숫자에 맞게 자동 조절"되는 부분 (5단계)</td></tr>
+      <tr><td class="c">6</td><td><a class="t" href="#term-shep">몰이(shepherding)</a>: Strömbom 2014</td><td>개 한 마리가 양 수십 마리를 어떻게 모나</td><td>두 행동: 퍼지면 바깥 양 모으기(collect), 모이면 뒤에서 밀기(drive)</td><td>단순 규칙 두 개로 몰이가 된다. 로봇·드론 몰이의 기준선</td><td>6단계. 기존은 한 무리를 가정한다. 이 연구는 갈라지는 무리를 몬다</td></tr>
+      <tr><td class="c">7</td><td>탐색(search): 무작위 걷기(random walk), 레비 비행(Lévy flight), 나선 탐색(spiral search)</td><td>위치를 모를 때 빨리 찾으려면</td><td>무작위 걷기, 가끔 멀리 뛰는 레비 비행, 체계적인 나선 경로 (Lu 교수 2023)</td><td>먹이 찾기(foraging) 연구의 핵심. 탐색 효율이 전체 성능을 정한다</td><td>2단계. 교수 연구와 직접 이어진다</td></tr>
+      <tr><td class="c">8</td><td>학습 기반 군집: <a class="t" href="#term-marl">다중 에이전트 강화 학습(multi-agent reinforcement learning, MARL)</a>, <a class="t" href="#term-gnn">그래프 신경망(graph neural network, GNN)</a></td><td>손으로 만든 규칙은 복잡한 상황에서 최적이 아니다</td><td>시뮬레이션에서 보상으로 정책 학습. GNN은 이웃 정보를 모아 판단</td><td>최근 3년 주류. 로봇 수가 바뀌어도 같은 정책</td><td>규칙 기반을 기준선으로 두고 비교하는 다음 논문 단계. 학습은 Cradle 클러스터</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="recent">
+  <h2>4 최근 연구 (2023에서 2026)</h2>
+  <p class="muted">출처: research/split_merge_tracking/recent_review.md. 조사일 2026-11-10. 표 칸의 "초록에 없음"은 그 논문이 안 했다는 뜻이 아니다. 초록만 읽었다는 뜻이다.</p>
+  <ul>
+    <li><strong>결론: 다중 몰이꾼 배정과 무리 표적 추적에는 선행 연구가 더 있다. 표적 무리가 반복해서 갈라지고 합칠 때의 비례 재배정과 그 맞교환은 여전히 출처를 못 찾았다.</strong></li>
+    <li>최근 논문 표: 22편. 확인(verified) 17, 부분(partial) 4, 확인 불가(unverifiable) 1.</li>
+    <li>이 조사의 새 출처(S-RR) 32개 중 이 페이지는 표에 쓴 것과 계보 흐름도의 이정표를 인용한다.</li>
+  </ul>
+
+  <h3>4.1 최근 논문 표</h3>
+  <table class="t">
+    <caption>표 8. 최근 논문 22편, 한 행에 한 편. 왜: 요즘 무엇이 다뤄지고 무엇이 비어 있는지 논문 단위로 확인한다.</caption>
+    <thead><tr><th>ID · 연도 · 게재</th><th>제목</th><th>문제와 방법</th><th>결과·주장 (한계는 아래 줄)</th><th>검증</th></tr></thead>
+    <tbody>
+      <tr><td><a class="s" href="#S-RR-1">[S-RR-1]</a><br>2024<br>IEEE Transactions on Robotics 40</td><td>Heterogeneous Targets Trapping With Swarm Robots by Using Adaptive Density-Based Interaction</td><td>강도가 다른 표적(약함, 강함, 무리 이동)을 가둔다. 밀도 기반 지역 상호작용, 적응 배정과 변형 기전.</td><td>포위 두께와 무리 크기를 표적 강도에 맞춘다. 실물 로봇 최대 50대 실험.<br><span class="muted">한계: 초록에 없음</span></td><td>verified: 초록 (OpenAlex)</td></tr>
+      <tr><td><a class="s" href="#S-RR-2">[S-RR-2]</a><br>2023 (v2 2024)<br>arXiv</td><td>Distributed Multi-Robot Multi-Target Tracking Using Heterogeneous Limited-Range Sensors</td><td>이종 센서망의 다중 표적 추적 정확도. "정규화된 미사용 감지 용량" 지표로 분산 커버리지 제어.</td><td><a class="t" href="#term-ros">로봇 운영 체제(Robot Operating System, ROS)</a>와 MATLAB 시뮬레이션에서 이종성을 무시한 방법보다 낫다.<br><span class="muted">한계: 초록에 없음</span></td><td>verified: 초록</td></tr>
+      <tr><td><a class="s" href="#S-RR-3">[S-RR-3]</a><br>2024<br>arXiv (관련 DOI는 European Control Conference 2025, inference)</td><td>Emergent Cooperative Strategies for Multi-Agent Shepherding via Reinforcement Learning</td><td>응집하지 않는 표적의 다중 몰이꾼 몰이. 분산 강화 학습 두 층: 아래 층은 표적 하나 가두기, 위 층은 표적 고르기.</td><td>몰이꾼이 서로 다른 표적을 스스로 고른다. 적은 에이전트로 학습한 정책을 큰 규모에 쓴다.<br><span class="muted">한계: 초록에 없음, 수치 없음</span></td><td>verified: 초록</td></tr>
+      <tr><td><a class="s" href="#S-RR-4">[S-RR-4]</a><br>2025<br>arXiv</td><td>Decentralized Shepherding of Non-Cohesive Swarms Through Cluttered Environments via Deep Reinforcement Learning</td><td>장애물 속에서 흩어지는 표적 무리 몰이. 위 층 배정 규칙 + 아래 층 <a class="t" href="#term-ppo">근접 정책 최적화(proximal policy optimization, PPO)</a> 정책. 1대 1, 장애물 1개로 학습.</td><td>재학습 없이 다중 몰이꾼, 다중 장애물에서 표적이 목표에 모인다.<br><span class="muted">한계: 시뮬레이션만 (inference, 초록 기준)</span></td><td>verified: 초록</td></tr>
+      <tr><td><a class="s" href="#S-RR-5">[S-RR-5]</a><br>2024<br>Science Robotics 9, eadl5161 (arXiv 2401.13103)</td><td>Self-organizing Nervous Systems for Robot Swarms</td><td>고정 구조의 한계: 분산형은 설계가 어렵고 중앙형은 단일 고장점이 있다. 스스로 생기는 계층(self-organized hierarchy)을 임시로 만들고 다시 짠다.</td><td>군집 n대가 n대짜리 계층 하나가 되고, 다시 작은 독립 계층 여럿으로 나뉜다. 실물 공중-지상 이종 군집, 시뮬레이션 최대 250대.<br><span class="muted">한계: 초록에 없음</span></td><td>verified: 초록 (arXiv). 학술지 정보는 검색 요약</td></tr>
+      <tr><td><a class="s" href="#S-RR-6">[S-RR-6]</a><br>2025<br>arXiv</td><td>Cooperative Search and Track of Rogue Drones using Multiagent Reinforcement Learning</td><td>시설 위의 불법 드론 여러 대를 찾고 추적한다 (응용은 소유자 주제와 다르다. 방법만 참고). <a class="t" href="#term-marl">다중 에이전트 강화 학습(multi-agent reinforcement learning, MARL)</a>으로 추격 드론의 이동을 정한다.</td><td>시뮬레이션에서 에이전트 수를 바꿔 성능과 확장성을 보였다. 수치는 초록에 없음.<br><span class="muted">한계: 시뮬레이션만 (inference)</span></td><td>verified: 초록</td></tr>
+      <tr><td><a class="s" href="#S-RR-7">[S-RR-7]</a><br>2024<br>arXiv</td><td>Swarm Algorithms for Dynamic Task Allocation in Unknown Environments</td><td>작업이 모르는 곳에 계속 나타날 때 군집 배정. 정보 전파, 분업(일부는 Lévy 걷기), 둘을 오가는 혼합.</td><td>작업 발생이 느리거나 중간이면 분업과 혼합이 낫다. 빠르면 Lévy 걷기가 같거나 낫다.<br><span class="muted">한계: 이산 모형 (초록 기준)</span></td><td>verified: 초록</td></tr>
+      <tr><td><a class="s" href="#S-RR-8">[S-RR-8]</a><br>2022 (ICRA 2023)<br>arXiv, ICRA 2023 제출</td><td>Graph Neural Networks for Multi-Robot Active Information Acquisition</td><td>통신 그래프 위 로봇 팀의 능동 정보 수집. 표적 추적 포함. <a class="t" href="#term-gnn">그래프 신경망(graph neural network, GNN)</a> I-GBNet. 중앙 전문가 해법을 모방 학습.</td><td>학습보다 큰 그래프와 새 환경에 일반화. 동적 표적 추적에서 보였다.<br><span class="muted">한계: 초록에 없음. 중앙 전문가에 의존 (inference)</span></td><td>partial: 초록. 학회 게재와 수상은 검색 요약만</td></tr>
+      <tr><td><a class="s" href="#S-RR-9">[S-RR-9]</a><br>2025<br>Autonomous Robots 49(2)</td><td>Effective tracking of unknown clustered targets using a distributed team of mobile robots</td><td>모이는 표적(예: 동물 무리)을 찾고 추적한다. 추정기 둘: 현재 표적 상태와 무리 위치의 장기 지도. power diagram으로 탐색 영역을 나눈다.</td><td>무리 표적에서 다른 방법보다 추적 정확도가 높다. 고른 분포 표적에서도 잘 된다.<br><span class="muted">한계: 초록에 없음. 시뮬레이션 (초록 기준)</span></td><td>verified: 초록 (Crossref)</td></tr>
+      <tr><td><a class="s" href="#S-RR-10">[S-RR-10]</a><br>2023 (v2 2024)<br>arXiv (검색 요약상 Physical Review Research 2024)</td><td>Shepherding control and herdability in complex multiagent systems</td><td>응집하지 않는 표적, 지역 감지 몰이꾼. 표적 수 대비 필요한 몰이꾼 수. 비례 법칙(scaling law), "herdability graph"의 퍼콜레이션(percolation), 1차원 <a class="t" href="#term-pde">편미분 방정식(partial differential equation, PDE)</a>.</td><td>표적 밀도가 임계값 아래면 필요한 몰이꾼 수가 크게 늘어난다.<br><span class="muted">한계: 해석은 단순 1차원뿐 (inference, 초록 기준)</span></td><td>verified: 초록. 학술지는 검색 요약</td></tr>
+      <tr><td><a class="s" href="#S-RR-11">[S-RR-11]</a><br>2026<br>IEEE International Conference on Robotics and Automation 2026 (arXiv 2604.22327)</td><td>Multi-robot obstacle-aware shepherding of non-cohesive target agents</td><td>장애물 속, 서로 협조하지 않는 표적 몰이. 혼합 정책: 목표 쪽 직접 조향 + 장애물 접선 따라 돌기.</td><td>시뮬레이션에서 기존 몰이 방법보다 가둠 비율이 높다. TurtleBot4 몰이꾼과 실물 표적 로봇으로 실내 실험.<br><span class="muted">한계: 초록에 없음</span></td><td>verified: 초록 (게재는 comments 기준)</td></tr>
+      <tr><td><a class="s" href="#S-RR-12">[S-RR-12]</a><br>2023<br>arXiv</td><td>Dynamic UAV Swarm Collaboration for Multi-Targets Tracking under Malicious Jamming: Joint Power, Path and Target Association Optimization</td><td>전파 방해 속 다중 표적 추적. 세 부분 문제로 나눈다. <a class="t" href="#term-ceta">무리 진화 표적 연결(cluster-evolutionary target association, CETA)</a>가 군집을 부분 군집으로 나눠 표적에 짝짓는다. 인공 퍼텐셜장 경로, 평균장 게임 출력 제어.</td><td>기준선보다 평균 간섭 28%, 추적 단계 33%, 표적 전환 48% 줄었다. 본문: 부분 군집 수 = 표적 수. 중심에서 가장 가까운 표적이 바뀔 때만 다시 짝짓는다(사건 기반).<br><span class="muted">한계: 표적은 서로 다른 방향으로 곧게 가며 갈라지거나 합치지 않는다. 비행 에너지는 무시한다. 시뮬레이션만</span></td><td>verified: 본문 앞 100000자</td></tr>
+      <tr><td><a class="s" href="#S-RR-13">[S-RR-13]</a><br>2024<br>IEEE Robotics and Automation Letters 9(10)</td><td>Automatic Navigation of a Microrobotic Swarm for Tracking Multiple Mobile Targets</td><td>자기장 구동 미세 로봇 군집으로 이동 표적 여럿 추적. <a class="t" href="#term-orrt">최적화 빠른 탐색 무작위 트리 스타(optimized rapidly-exploring random tree star, ORRT*)</a> 경로 + 최단 경로 선택 + 슬라이딩 모드 제어.</td><td>가상 미로에서 시뮬레이션과 실험으로 다중 이동 표적 추적을 보였다.<br><span class="muted">한계: 미세 군집은 탑재 센서와 구동기가 거의 없다고 쓴다. 군집 하나가 표적을 차례로 따른다 (inference)</span></td><td>verified: 1쪽</td></tr>
+      <tr><td><a class="s" href="#S-RR-14">[S-RR-14]</a><br>2025 이후 (inference)<br>미확인 (UTS 저장소)</td><td>Emergent Herding Behaviour Through Decentralised Reinforcement Learning</td><td>드론 팀의 가축 몰이. 분산 강화 학습. 반발-끌림 보상과 단계 학습(간격, 포위, 유도 순).</td><td>지역 관측과 최소 통신으로 확장 가능한 몰이. 여러 행동 조건에서 시뮬레이션 성공.<br><span class="muted">한계: 초록에 없음. 시뮬레이션만 (inference)</span></td><td>partial: 1쪽. 학회와 연도 미확인</td></tr>
+      <tr><td><a class="s" href="#S-RR-15">[S-RR-15]</a><br>2023<br>IEEE International Conference on Robotics and Automation 2023 (arXiv 2303.01799)</td><td>Multi-Target Pursuit by a Decentralized Heterogeneous UAV Swarm using Deep Multi-Agent Reinforcement Learning</td><td>모르는 환경에서 빠르게 도망가는 표적 여럿을 추격. 역할 기반 <a class="t" href="#term-maddpg">다중 에이전트 심층 결정 정책 경사(multi-agent deep deterministic policy gradient, MADDPG)</a>. 일부는 탐색, 일부는 추적. Voronoi 기반 탐색 보상.</td><td>협력 정책을 배웠다. Crazyflie 실물 드론에서 확인.<br><span class="muted">한계: 초록에 없음. 수치 없음</span></td><td>verified: 초록 (게재는 comments 기준)</td></tr>
+      <tr><td><a class="s" href="#S-RR-16">[S-RR-16]</a><br>2025<br>arXiv</td><td>Hierarchical Policy-Gradient Reinforcement Learning for Multi-Agent Shepherding Control of Non-Cohesive Targets</td><td>응집하지 않는 표적의 다중 몰이꾼 몰이. PPO 두 층: 위 층 표적 고르기, 아래 층 몰기. 이전의 이산 행동 <a class="t" href="#term-dqn">심층 Q 신경망(deep Q-network, DQN)</a> 방식을 연속 행동으로 바꾼다.</td><td>표적 수가 늘어도 수렴. 제한된 감지에서도 된다. 궤적이 부드럽다.<br><span class="muted">한계: 초록에 없음. 수치 없음</span></td><td>verified: 초록</td></tr>
+      <tr><td><a class="s" href="#S-RR-17">[S-RR-17]</a><br>2026<br>IEEE Robotics and Automation Letters 11(6)</td><td>Safe and Adaptive Multi-Target Encirclement With Socially Aware Multi-Robot Control</td><td>속도를 모르는 이동 표적 무리를 둘러싸고 추적한다. 로봇마다 표적 무리의 <a class="t" href="#term-hull">볼록 껍질(convex hull)</a>과 안전 거리를 지킨다. 안전 거리는 사회적 제약으로 정한다.</td><td>분포의 안정성을 형식적으로 분석했다. 시뮬레이션과 외바퀴 모형(unicycle) 로봇 실물 시험. 다른 방법보다 안전성과 적응성이 높다.<br><span class="muted">한계: 초록에 없음. 무리가 갈라지는 경우는 초록에 없음</span></td><td>verified: 초록 (OpenAlex)</td></tr>
+      <tr><td><a class="s" href="#S-RR-23">[S-RR-23]</a><br>2024<br>Information Sciences 661</td><td>Self-organized swarm robot for multi-target trapping based on self-regulated density interaction</td><td>지역 감지만으로 여러 표적 가두기. <a class="s" href="#S-SMT-8">[S-SMT-8]</a>과 같은 저자(Lei)의 같은 갈래 (inference). 밀도 음의 되먹임, 밀도-거리 가중 표적 선택.</td><td>명시적 통신 없이 가둔다. 수치 시뮬레이션과 실물 로봇 실험.<br><span class="muted">한계: 확인 못함</span></td><td>partial: 검색 요약만. 도서관 기록 HTTP 404</td></tr>
+      <tr><td><a class="s" href="#S-RR-24">[S-RR-24]</a><br>2025<br>Research 8, 0686 (리뷰)</td><td>Microrobotic Swarms for Cancer Therapy</td><td>미세 로봇 군집으로 암 치료. 설계, 표적 도달, 영상. 외부장 구동(자기, 전기, 빛, 소리), 몸속 영상(형광, <a class="t" href="#term-mri">자기 공명 영상(magnetic resonance imaging, MRI)</a>, 초음파, 광음향).</td><td>군집 농도가 높으면 영상 대비가 좋아진다.<br><span class="muted">한계: 소동물 모형에서만 검증. 사람 크기 구동 없음. 몸속 영상 미숙. 동적 종양 환경에서 제어 안정성과 정밀도가 어렵다</span></td><td>verified: 본문 앞 절반</td></tr>
+      <tr><td><a class="s" href="#S-RR-29">[S-RR-29]</a><br>2023<br>Frontiers in Control Engineering 4</td><td>Communication-free shepherding navigation with multiple steering agents</td><td>몰이꾼 여럿이 중앙 조정과 통신 없이 몬다. <a class="t" href="#term-fat">가장 먼 개체 겨누기(farthest-agent targeting, FAT)</a> 확장. 목표 거리와 자기 거리를 저울질해 표적 양을 고른다. 몰이꾼끼리 밀어낸다.</td><td>기준 모형에서 성공률 거의 100%. 기준 방법(FAT)보다 완료 시간과 경로가 짧다. 몰이꾼 고장 확률 0.4까지 견딘다.<br><span class="muted">한계: 수렴 증명 없음. 수치 실험만, 실물 없음. 몰이꾼이 같은 양을 고르기도 한다</span></td><td>verified: 본문</td></tr>
+      <tr><td><a class="s" href="#S-RR-30">[S-RR-30]</a><br>2023<br>업체 블로그 (Clearpath)</td><td>Mississippi State University advances livestock management with automated herding systems</td><td>지상 로봇으로 젖소를 몬다. Warthog <a class="t" href="#term-ugv">무인 지상 차량(unmanned ground vehicle, UGV)</a>, 카메라, 위성 위치, 라이다.</td><td>개념 증명 시험. 수치 결과 없음.<br><span class="muted">한계: 예비 단계. 자율 알고리즘 미완성. 사람을 뺄 수 없다고 쓴다</span></td><td>partial: 2차 출처 (업체 글)</td></tr>
+      <tr><td><a class="s" href="#S-RR-31">[S-RR-31]</a><br>미확인<br>Meat and Livestock Australia 보고서 P.PSH.1374</td><td>Livestock Mustering with Drones and Pathways to Adoption</td><td>드론으로 가축 모으기. 현장 시험 (검색 요약만).</td><td>검색 요약의 시험 횟수와 날짜는 다른 과제 번호(P.PSH.1491)와 섞여 있다. 쓰지 않는다.<br><span class="muted">한계: 확인 못함</span></td><td>unverifiable: 페이지가 제목만 준다. 과제 번호와 날짜의 대응 미해결 [UNVERIFIED]</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">기간 안의 survey 출처는 표의 행으로 다시 쓰지 않고 그대로 인용한다: <a class="s" href="#S-SMT-8">[S-SMT-8]</a> (Lei 등 2023, 밀도 기반 다중 표적 가두기), <a class="s" href="#S-SMT-9">[S-SMT-9]</a> (<a class="t" href="#term-terl">트랜스포머 강화 강화 학습(Transformer-Enhanced Reinforcement Learning, TERL)</a> 2025), <a class="s" href="#S-SMT-17">[S-SMT-17]</a> (2023, 위험에서 무리 돌리기), <a class="s" href="#S-SMT-27">[S-SMT-27]</a> (Liu 등 2023, 흩어진 무리를 묶고 모으는 순서 계획).</p>
+
+  <h3>4.2 (a) 과거의 문제와 해결 흐름</h3>
+  <table class="t">
+    <caption>표 9. 시기별 문제와 해결. 왜: 지금의 문제가 어떤 문제의 후속인지 시간순으로 본다. 내용 일부는 서지만 확인한 논문에 기댄다.</caption>
+    <thead><tr><th>시기</th><th>그때의 문제</th><th>해결 방식</th><th>출처</th></tr></thead>
+    <tbody>
+      <tr><td>1987–1995</td><td>단순한 개체 규칙으로 집단 운동이 나오나?</td><td>지역 규칙(붙기, 피하기, 맞추기). 잡음 속 방향 맞춤의 상전이</td><td><a class="s" href="#S-RR-18">[S-RR-18]</a>, <a class="s" href="#S-RR-19">[S-RR-19]</a> (내용은 inference)</td></tr>
+      <tr><td>2002–2006</td><td>그 운동을 설명하고 증명할 수 있나?</td><td>동물 무리 모형과 정보 가진 소수의 이끌기. 무리 짓기의 안정성 이론</td><td><a class="s" href="#S-RR-20">[S-RR-20]</a>, <a class="s" href="#S-RR-21">[S-RR-21]</a>, <a class="s" href="#S-RR-22">[S-RR-22]</a> (내용은 inference)</td></tr>
+      <tr><td>2002–2004</td><td>표적이 로봇보다 많거나 움직일 때 누가 무엇을 보나?</td><td><a class="t" href="#term-cmommt">협력 다중 로봇 다중 이동 표적 관측(cooperative multi-robot observation of multiple moving targets, CMOMMT)</a>. 표적 수에 비례한 배치</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a>, <a class="s" href="#S-SMT-7">[S-SMT-7]</a></td></tr>
+      <tr><td>2009–2012</td><td>새 표적이 나타나면 누가 대형에서 떨어져 나가나?</td><td>센서망의 분열과 융합. <a class="t" href="#term-sggp">씨앗 성장 그래프 분할(seed growing graph partition, SGGP)</a></td><td><a class="s" href="#S-RR-32">[S-RR-32]</a>, <a class="s" href="#S-SMT-6">[S-SMT-6]</a></td></tr>
+      <tr><td>2009</td><td>중앙 배차 없이 작업을 나눌 수 있나?</td><td><a class="t" href="#term-cbba">합의 기반 묶음 알고리즘(consensus-based bundle algorithm, CBBA)</a></td><td><a class="s" href="#S-SMT-18">[S-SMT-18]</a></td></tr>
+      <tr><td>2014</td><td>몰이꾼 하나가 무리를 어떻게 모으고 미나?</td><td>모으기와 밀기를 오가는 규칙</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a></td></tr>
+      <tr><td>2017</td><td>수를 모르는 표적을 찾으면서 추적할 수 있나? 로봇 몸이 합치고 나뉠 수 있나?</td><td><a class="t" href="#term-phd">확률 가설 밀도 필터(probability hypothesis density filter, PHD filter)</a>와 Lloyd 분할. 병합 가능한 신경계</td><td><a class="s" href="#S-SMT-29">[S-SMT-29]</a>, <a class="s" href="#S-SMT-2">[S-SMT-2]</a></td></tr>
+      <tr><td>2018–2019</td><td>학습 정책이 로봇 수에 따라 무너진다</td><td>평균 임베딩(mean embedding). GNN으로 지역 통신만 쓰는 제어기</td><td><a class="s" href="#S-RR-26">[S-RR-26]</a>, <a class="s" href="#S-RR-27">[S-RR-27]</a></td></tr>
+      <tr><td>2021–2022</td><td>미세 군집과 드론 군집도 나뉘고 합칠 수 있나?</td><td>외부 자기장 매개변수로 미세 군집 분열과 융합. 강화 학습 드론 군집이 표적 수대로 나뉘고 다시 합친다</td><td><a class="s" href="#S-RR-28">[S-RR-28]</a>, <a class="s" href="#S-RR-25">[S-RR-25]</a></td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.3 (b) 지금 다루는 문제 (2023에서 2026)</h3>
+  <table class="t">
+    <caption>표 10. 지금 다루는 문제. 왜: 소유자 주제가 최근 흐름의 어디에 놓이는지 가늠한다. 공통 방향 세 가지는 (inference)다: 고정 규모에서 규모 일반화로, 응집 표적에서 흩어지는 표적으로, 시뮬레이션에서 실물과 현장으로.</caption>
+    <thead><tr><th>문제</th><th>대표 논문</th><th>상태</th></tr></thead>
+    <tbody>
+      <tr><td>학습 정책이 더 많은 로봇과 표적에 일반화되나</td><td><a class="s" href="#S-SMT-9">[S-SMT-9]</a>, <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-8">[S-RR-8]</a></td><td>적은 수로 학습하고 큰 수에서 시험한다</td></tr>
+      <tr><td>표적이 서로 붙어 다니지 않을 때의 몰이</td><td><a class="s" href="#S-RR-10">[S-RR-10]</a>, <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>, <a class="s" href="#S-RR-4">[S-RR-4]</a>, <a class="s" href="#S-RR-11">[S-RR-11]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a></td><td>몰이꾼마다 표적 하나를 고른다. 필요한 몰이꾼 수의 임계 밀도가 있다</td></tr>
+      <tr><td>표적과 센서가 이종일 때</td><td><a class="s" href="#S-RR-1">[S-RR-1]</a>, <a class="s" href="#S-RR-2">[S-RR-2]</a></td><td>표적 강도에 맞춘 포위 두께. 미사용 감지 용량으로 일 나누기</td></tr>
+      <tr><td>모여 있는 표적 무리</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a>, <a class="s" href="#S-RR-17">[S-RR-17]</a></td><td>무리 지도와 power diagram. 무리의 볼록 껍질 둘레 안전 포위</td></tr>
+      <tr><td>표적 수에 맞춘 부분 군집 나누기</td><td><a class="s" href="#S-RR-12">[S-RR-12]</a></td><td>부분 군집 수 = 표적 수. 사건 기반 재연결. 방법 전체가 기준선보다 표적 전환을 48% 줄였다</td></tr>
+      <tr><td>다시 짜는 제어 구조</td><td><a class="s" href="#S-RR-5">[S-RR-5]</a></td><td>계층 하나가 작은 계층 여럿으로 나뉜다</td></tr>
+      <tr><td>찾기와 추적의 역할 나눔</td><td><a class="s" href="#S-RR-15">[S-RR-15]</a>, <a class="s" href="#S-RR-6">[S-RR-6]</a></td><td>탐색 역할과 추적 역할을 학습한다</td></tr>
+      <tr><td>작업이 계속 나타나는 배정</td><td><a class="s" href="#S-RR-7">[S-RR-7]</a></td><td>정보 전파와 무작위 걷기의 혼합</td></tr>
+      <tr><td>드론과 지상 로봇의 실제 몰이</td><td><a class="s" href="#S-RR-14">[S-RR-14]</a>, <a class="s" href="#S-RR-30">[S-RR-30]</a>, <a class="s" href="#S-RR-31">[S-RR-31]</a></td><td>시뮬레이션 또는 개념 증명. 동료 심사 현장 연구는 못 찾았다</td></tr>
+      <tr><td>미세 군집의 다중 이동 표적</td><td><a class="s" href="#S-RR-13">[S-RR-13]</a>, <a class="s" href="#S-RR-24">[S-RR-24]</a></td><td>군집 하나가 표적을 차례로 따른다. 몸속 영상과 제어 정밀도가 과제</td></tr>
+    </tbody>
+  </table>
+
+  <h3>4.4 (c) 아직 열린 문제</h3>
+  <table class="t">
+    <caption>표 11. survey 빈틈의 변화. 왜: 이번 조사로 어떤 "못 찾음"이 좁혀지고 어떤 것이 남았는지 보인다. "못 찾음"은 이번 조사의 범위에서다.</caption>
+    <thead><tr><th>survey의 "못 찾음"</th><th>이번 조사 뒤</th><th>근거</th></tr></thead>
+    <tbody>
+      <tr><td>몰이꾼 여럿을 부분 무리에 나눠 보내는 분산 배정</td><td><strong>좁혀짐.</strong> 몰이꾼이 표적 개체를 고르는 분산 방법이 셋 있다. <a class="s" href="#S-RR-29">[S-RR-29]</a>의 관련 연구 절은 Hu 등 2020을 든다. 분산 묶기로 어느 몰이꾼이 어느 부분 무리를 몰지 합의하고, 통신이 여러 번 필요하다. Lee와 Kim 2017도 부분 무리를 다룬다. 두 원문은 읽지 않았다.</td><td><a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a></td></tr>
+      <tr><td>반복 분열-융합에서 관측률 대 전환 빈도</td><td><strong>남음.</strong> 표적 전환을 잰 논문은 표적이 갈라지지 않는다. 표적 수대로 나누는 논문은 2쪽까지 전환 지표가 없다. Hu 등 2020은 묶기를 주기적으로 돌리지만 반복 분열은 <a class="s" href="#S-RR-29">[S-RR-29]</a>의 서술에 없다.</td><td><a class="s" href="#S-RR-12">[S-RR-12]</a>, <a class="s" href="#S-RR-25">[S-RR-25]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a></td></tr>
+      <tr><td>몰이 도중 무리가 반복해서 갈라지고 합치는 조건</td><td><strong>남음.</strong></td><td>못 찾음</td></tr>
+      <tr><td>관측과 몰기의 역할 나눔과 비율</td><td><strong>남음.</strong> 탐색과 추적의 역할 나눔은 있다.</td><td><a class="s" href="#S-RR-15">[S-RR-15]</a></td></tr>
+      <tr><td>탐색 다음 몰이까지 잇는 연구</td><td><strong>남음.</strong> 무리 표적의 탐색과 추적은 함께 다룬다. 몰이는 없다.</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a></td></tr>
+      <tr><td>소를 드론이나 로봇으로 모는 현장 연구</td><td><strong>남음.</strong> 업체 글과 미확인 보고서뿐이다.</td><td><a class="s" href="#S-RR-30">[S-RR-30]</a>, <a class="s" href="#S-RR-31">[S-RR-31]</a></td></tr>
+    </tbody>
+  </table>
+  <p>남은 열린 문제 (inference, 근거 논문의 초록과 앞쪽 기준):</p>
+  <ol>
+    <li>표적 <strong>무리</strong>가 반복해서 갈라지고 합칠 때의 지역 비례 재배정. 추적 쪽은 표적 개체 단위로 나눈다 <a class="s" href="#S-RR-12">[S-RR-12]</a>, <a class="s" href="#S-RR-25">[S-RR-25]</a>.</li>
+    <li>관측률과 전환 빈도의 맞교환 곡선. 전환 횟수는 잰다 <a class="s" href="#S-RR-12">[S-RR-12]</a>. 이력 시간을 바꿔 가며 곡선을 그린 출처는 못 찾았다.</li>
+    <li>로봇이 옮겨 갈 때 대형 크기를 다시 맞추기. 포위 두께를 표적 강도에 맞춘다 <a class="s" href="#S-RR-1">[S-RR-1]</a>. 로봇 수 변화에 맞춘 크기 조절은 초록에 없다.</li>
+    <li>추적에서 몰이로 넘기기. 관측 역할과 몰기 역할의 비율. 찾기와 추적의 역할 나눔은 있다 <a class="s" href="#S-RR-15">[S-RR-15]</a>.</li>
+    <li>몰이 도중 부분 무리가 다시 갈라질 때 몰이꾼을 무리 크기에 비례해 다시 나누는 문제. 최근 학습 방법은 표적 개체 하나를 고른다 <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>. 무리 단위 모으기 순서는 몰이꾼 하나에 있다 <a class="s" href="#S-SMT-27">[S-SMT-27]</a>.</li>
+    <li>소 떼의 다중 로봇 현장 몰이. 동료 심사 연구는 못 찾았다 <a class="s" href="#S-RR-14">[S-RR-14]</a>, <a class="s" href="#S-RR-30">[S-RR-30]</a>, <a class="s" href="#S-RR-31">[S-RR-31]</a>.</li>
+    <li>동물 복지 제약을 넣은 다중 로봇 몰이. 단일 드론 연구만 있다 <a class="s" href="#S-SMT-28">[S-SMT-28]</a>. 사회적 안전 거리 포위는 있다 <a class="s" href="#S-RR-17">[S-RR-17]</a>.</li>
+    <li>미세 군집이 여러 세포 무리를 <strong>동시에</strong> 추적. 지금은 군집 하나가 차례로 간다 <a class="s" href="#S-RR-13">[S-RR-13]</a>. 장 매개변수로 나누기는 된다 <a class="s" href="#S-RR-28">[S-RR-28]</a>.</li>
+    <li>평가가 대부분 시뮬레이션이다. 실물 시험은 일부다 <a class="s" href="#S-RR-1">[S-RR-1]</a>, <a class="s" href="#S-RR-11">[S-RR-11]</a>, <a class="s" href="#S-RR-15">[S-RR-15]</a>.</li>
+  </ol>
+
+  <h3>4.5 (d) 소유자 주제의 확장 지점</h3>
+  <table class="t">
+    <caption>표 12. 확장 지점 9개 (모두 inference). 왜: 어느 논문을 어떻게 넓히면 어느 파이프라인 단계와 연구 질문에 닿는지 본다. 순위 1에서 5가 상위 5개다.</caption>
+    <thead><tr><th class="c">순위</th><th>확장할 논문</th><th>더할 것</th><th>단계</th><th>연구 질문</th></tr></thead>
+    <tbody>
+      <tr class="rowflag"><td class="c">1</td><td><a class="s" href="#S-RR-12">[S-RR-12]</a> 부분 군집 = 표적 수, 사건 기반 재연결</td><td>표적을 반복해서 갈라지고 합치는 <strong>무리</strong>로 바꾼다. 재연결에 이력 시간 T를 넣는다. T를 바꿔 관측률 대 전환 빈도 곡선을 그린다.</td><td class="c">4</td><td>RQ2</td></tr>
+      <tr class="rowflag"><td class="c">2</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a> 무리 표적 탐색·추적</td><td>장기 무리 지도에 분열·융합 사건 판정을 더한다. 판정은 들소 연구의 "2마리 이상" 규칙 <a class="s" href="#S-SMT-23">[S-SMT-23]</a>. 사건을 4단계 배정의 입력으로 넘긴다.</td><td class="c">2, 3 → 4</td><td>RQ1</td></tr>
+      <tr class="rowflag"><td class="c">3</td><td><a class="s" href="#S-RR-1">[S-RR-1]</a>, <a class="s" href="#S-RR-17">[S-RR-17]</a> 적응 포위, 볼록 껍질 안전 거리</td><td>부분 무리마다 링 하나. 반지름은 무리 퍼짐, 간격은 배정된 로봇 수로 다시 맞춘다. 안전 거리는 복지 거리 <a class="s" href="#S-SMT-28">[S-SMT-28]</a>로 둔다.</td><td class="c">5</td><td>RQ3</td></tr>
+      <tr class="rowflag"><td class="c">4</td><td><a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a>, <a class="s" href="#S-RR-29">[S-RR-29]</a> 몰이꾼의 표적 고르기. 부분 무리 합의 배정 Hu 등 2020 (<a class="s" href="#S-RR-29">[S-RR-29]</a> 인용, 미확인)</td><td>통신 합의 없이 지역 규칙으로 부분 무리를 고른다. 무리 크기에 비례해 몰이꾼을 보낸다. 몰이 중 무리가 또 갈라지면 이력 시간 T를 두고 다시 고른다. Hu 등 2020과 비교한다.</td><td class="c">6 (4의 규칙 재사용)</td><td>RQ4</td></tr>
+      <tr class="rowflag"><td class="c">5</td><td><a class="s" href="#S-RR-10">[S-RR-10]</a> 몰이꾼 수 비례 법칙과 임계 밀도</td><td>부분 무리 밀도가 임계값 아래로 떨어지면 몰이꾼을 더 보낸다. 이 규칙을 관측·몰기 역할 비율의 기준으로 쓴다.</td><td class="c">4, 6</td><td>RQ5</td></tr>
+      <tr><td class="c">6</td><td><a class="s" href="#S-RR-25">[S-RR-25]</a>, <a class="s" href="#S-RR-32">[S-RR-32]</a> 표적 수와 거리로 나누고 합치기</td><td>표적 수 대신 무리 크기 비례 배정과 비교한다. 같은 시나리오에서 두 규칙의 관측률과 전환 빈도를 잰다.</td><td class="c">4</td><td>RQ1</td></tr>
+      <tr><td class="c">7</td><td><a class="s" href="#S-RR-5">[S-RR-5]</a> 스스로 짜는 계층</td><td>부분 군집마다 임시 계층 하나. 표적 무리 분열을 계층 분열의 신호로 쓴다.</td><td class="c">4</td><td>새 질문 후보</td></tr>
+      <tr><td class="c">8</td><td><a class="s" href="#S-RR-15">[S-RR-15]</a>, <a class="s" href="#S-RR-6">[S-RR-6]</a> 탐색과 추적 역할</td><td>무리 분열 사건 때 "탐색" 로봇 일부를 "추적"으로 돌린다. 새 무리가 나타나면 되돌린다.</td><td class="c">2, 5</td><td>새 질문 후보</td></tr>
+      <tr><td class="c">9</td><td><a class="s" href="#S-RR-13">[S-RR-13]</a>, <a class="s" href="#S-RR-28">[S-RR-28]</a> 미세 군집 경로 추적, 장 기반 분열</td><td>전역 자기장 하나로 군집을 나눠 세포 무리 여럿을 동시에 따른다. 감지 없는 전역 입력 배정을 ARGoS에서 흉내 낸다.</td><td class="c">4, 5 (미세 규모)</td><td>새 질문 후보</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">연구 질문 열의 RQ1에서 RQ5는 이 페이지 6번 탭의 질문이다 (recent_review.md 표 5는 "survey 연구 질문 n"으로 적었다).</p>
+</section>
+
+<section class="tab" id="lineage">
+  <h2>5 계보 흐름도</h2>
+  <p class="muted">출처: recent_review.md 3절(이정표 계보)과 4절(계보 흐름도의 mermaid를 인라인 SVG로 옮겼다). 위치는 연구 갈래 기준이다. 가로 순서는 연도 순서가 아니다.</p>
+  <figure>
+    <svg viewBox="0 0 1120 966" role="img" aria-label="이정표와 최근 논문의 계보 흐름도. 일곱 연구 갈래에 논문을 놓고, 위에 쌓음 관계를 화살표로 잇고, 굵은 테두리의 확장 지점이 있는 갈래를 이 연구로 모은다">
+  <defs>
+    <marker id="arrS" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#222"/></marker>
+    <marker id="arrD" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="12" markerHeight="12" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#777"/></marker>
+    <marker id="arrO" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="16" markerHeight="16" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="var(--s2)"/></marker>
+  </defs>
+  <line x1="20" y1="22" x2="54" y2="22" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/><text class="m" x="64" y="26">확인한 인용</text>
+  <line x1="210" y1="22" x2="244" y2="22" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/><text class="m" x="254" y="26">추정한 관계 (inference)</text>
+  <rect x="470" y="14" width="26" height="16" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/><text class="m" x="506" y="26">표 확장 지점</text>
+  <rect x="660" y="14" width="26" height="16" fill="#fff" stroke="#555" stroke-width="1.2"/><text class="m" x="696" y="26">그 밖의 논문</text>
+  <rect x="8" y="64" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="120">다중 표적 추적</text><text class="m" x="16" y="136" style="font-size:9.5px">multi-target tracking</text>
+  <rect x="8" y="202" width="922" height="64" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="232">작업 배정</text><text class="m" x="16" y="248" style="font-size:9.5px">task allocation</text>
+  <rect x="8" y="288" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="344">분열-융합</text><text class="m" x="16" y="360" style="font-size:9.5px">fission-fusion</text>
+  <rect x="8" y="426" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="482">무리 짓기·대형</text><text class="m" x="16" y="498" style="font-size:9.5px">flocking, formation</text>
+  <rect x="8" y="564" width="922" height="168" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="646">몰이</text><text class="m" x="16" y="662" style="font-size:9.5px">shepherding</text>
+  <rect x="8" y="754" width="922" height="116" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="810">학습</text><text class="m" x="16" y="826" style="font-size:9.5px">learning</text>
+  <rect x="8" y="892" width="922" height="64" fill="#fafafa" stroke="#e0e0e0"/>
+  <text class="b" x="16" y="922">미세 규모</text><text class="m" x="16" y="938" style="font-size:9.5px">micro-scale</text>
+  <path d="M296,96 L324,96" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,96 L480,96" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M388,116 L388,148 L480,148" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,372 L480,372" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M388,352 L388,320 L480,320" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,320 L792,320" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,458 L324,458" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,510 L310,510 L310,458 L324,458" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,510 L792,510" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M388,438 L388,392" fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/>
+  <path d="M232,438 L232,372 L324,372" fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/>
+  <path d="M388,530 L388,576" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,596 L480,596" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M608,596 L636,596" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M608,596 L622,596 L622,648 L636,648" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M608,596 L622,596 L622,700 L636,700" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,700 L792,700" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,786 L324,786" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M296,838 L324,838" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M700,806 L700,818" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M764,786 L792,786" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M670,720 L670,766" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M730,720 L730,743 L856,743 L856,766" fill="none" stroke="#222" stroke-width="2" marker-end="url(#arrS)"/>
+  <path d="M296,924 L324,924" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <path d="M452,924 L480,924" fill="none" stroke="#777" stroke-width="1.5" stroke-dasharray="5 3" marker-end="url(#arrD)"/>
+  <rect x="480" y="214" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="231" style="font-size:11px">Balachandran 2024</text><text class="m c" x="544" y="246" style="font-size:10px">S-RR-7</text>
+  <rect x="324" y="214" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="231" style="font-size:11px">CBBA 2009</text><text class="m c" x="388" y="246" style="font-size:10px">S-SMT-18</text>
+  <rect x="636" y="438" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="455" style="font-size:11px">Chaib 2026</text><text class="m c" x="700" y="470" style="font-size:10px">S-RR-17</text>
+  <rect x="480" y="76" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="93" style="font-size:11px">Chen 2023</text><text class="m c" x="544" y="108" style="font-size:10px">S-RR-2</text>
+  <rect x="480" y="128" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="544" y="145" style="font-size:11px">Chen 2025 (무리)</text><text class="m c" x="544" y="160" style="font-size:10px">S-RR-9</text>
+  <rect x="792" y="766" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="856" y="783" style="font-size:11px">Cooper 등</text><text class="m c" x="856" y="798" style="font-size:10px">S-RR-14</text>
+  <rect x="324" y="490" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="507" style="font-size:11px">Couzin 2002</text><text class="m c" x="388" y="522" style="font-size:10px">S-RR-20</text>
+  <rect x="324" y="576" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="593" style="font-size:11px">Couzin 2005</text><text class="m c" x="388" y="608" style="font-size:10px">S-RR-21</text>
+  <rect x="636" y="818" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="835" style="font-size:11px">Covone 2025</text><text class="m c" x="700" y="850" style="font-size:10px">S-RR-16</text>
+  <rect x="324" y="76" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="93" style="font-size:11px">Dames 2017</text><text class="m c" x="388" y="108" style="font-size:10px">S-SMT-29</text>
+  <rect x="168" y="766" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="783" style="font-size:11px">Hüttenrauch 2019</text><text class="m c" x="232" y="798" style="font-size:10px">S-RR-26</text>
+  <rect x="636" y="76" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="93" style="font-size:11px">Kouzeghar 2023</text><text class="m c" x="700" y="108" style="font-size:10px">S-RR-15</text>
+  <rect x="324" y="352" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="388" y="369" style="font-size:11px">La, Sheng 2009/12</text><text class="m c" x="388" y="384" style="font-size:10px">S-RR-32</text>
+  <rect x="636" y="680" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="697" style="font-size:11px">Lama 2024</text><text class="m c" x="700" y="712" style="font-size:10px">S-RR-10</text>
+  <rect x="636" y="490" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="700" y="507" style="font-size:11px">Lei 2023</text><text class="m c" x="700" y="522" style="font-size:10px">S-SMT-8</text>
+  <rect x="636" y="628" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="645" style="font-size:11px">Li 2023</text><text class="m c" x="700" y="660" style="font-size:10px">S-RR-29</text>
+  <rect x="636" y="576" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="700" y="593" style="font-size:11px">Liu 2023</text><text class="m c" x="700" y="608" style="font-size:10px">S-SMT-27</text>
+  <rect x="168" y="214" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="231" style="font-size:11px">Low 2004</text><text class="m c" x="232" y="246" style="font-size:10px">S-SMT-7</text>
+  <rect x="636" y="300" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="700" y="317" style="font-size:11px">Mathews 2017</text><text class="m c" x="700" y="332" style="font-size:10px">S-SMT-2</text>
+  <rect x="636" y="766" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="783" style="font-size:11px">Napolitano 2024</text><text class="m c" x="700" y="798" style="font-size:10px">S-RR-3</text>
+  <rect x="324" y="438" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="455" style="font-size:11px">Olfati-Saber 2006</text><text class="m c" x="388" y="470" style="font-size:10px">S-RR-22</text>
+  <rect x="168" y="76" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="93" style="font-size:11px">Parker 2002</text><text class="m c" x="232" y="108" style="font-size:10px">S-SMT-1</text>
+  <rect x="480" y="300" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="544" y="317" style="font-size:11px">Qamar 2022</text><text class="m c" x="544" y="332" style="font-size:10px">S-RR-25</text>
+  <rect x="168" y="438" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="455" style="font-size:11px">Reynolds 1987</text><text class="m c" x="232" y="470" style="font-size:10px">S-RR-18</text>
+  <rect x="792" y="300" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="856" y="317" style="font-size:11px">SoNS 2024</text><text class="m c" x="856" y="332" style="font-size:10px">S-RR-5</text>
+  <rect x="480" y="576" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="593" style="font-size:11px">Strömbom 2014</text><text class="m c" x="544" y="608" style="font-size:10px">S-SMT-25</text>
+  <rect x="324" y="766" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="783" style="font-size:11px">TERL 2025</text><text class="m c" x="388" y="798" style="font-size:10px">S-SMT-9</text>
+  <rect x="168" y="818" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="835" style="font-size:11px">Tolstaya 2019</text><text class="m c" x="232" y="850" style="font-size:10px">S-RR-27</text>
+  <rect x="792" y="680" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="856" y="697" style="font-size:11px">Tomaselli 2026</text><text class="m c" x="856" y="712" style="font-size:10px">S-RR-11</text>
+  <rect x="324" y="818" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="388" y="835" style="font-size:11px">Tzes 2023</text><text class="m c" x="388" y="850" style="font-size:10px">S-RR-8</text>
+  <rect x="636" y="128" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="700" y="145" style="font-size:11px">Valianti 2025</text><text class="m c" x="700" y="160" style="font-size:10px">S-RR-6</text>
+  <rect x="168" y="490" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="232" y="507" style="font-size:11px">Vicsek 1995</text><text class="m c" x="232" y="522" style="font-size:10px">S-RR-19</text>
+  <rect x="480" y="352" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="544" y="369" style="font-size:11px">Xiang 2023</text><text class="m c" x="544" y="384" style="font-size:10px">S-RR-12</text>
+  <rect x="480" y="904" width="128" height="40" fill="#fff" stroke="#555" stroke-width="1.2"/>
+  <text class="b c" x="544" y="921" style="font-size:11px">Xie 2025 (리뷰)</text><text class="m c" x="544" y="936" style="font-size:10px">S-RR-24</text>
+  <rect x="168" y="904" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="232" y="921" style="font-size:11px">Zhang 2021 (미세)</text><text class="m c" x="232" y="936" style="font-size:10px">S-RR-28</text>
+  <rect x="792" y="490" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="856" y="507" style="font-size:11px">Zhang 2024</text><text class="m c" x="856" y="522" style="font-size:10px">S-RR-1</text>
+  <rect x="324" y="904" width="128" height="40" fill="#fff" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="388" y="921" style="font-size:11px">Zou 2024</text><text class="m c" x="388" y="936" style="font-size:10px">S-RR-13</text>
+  <rect x="972" y="64" width="140" height="892" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+  <text class="b c" x="1042" y="484" style="font-size:13px">이 연구</text>
+  <text class="m c" x="1042" y="506">갈라지고 합치는</text>
+  <text class="m c" x="1042" y="523">집단을 추적하고</text>
+  <text class="m c" x="1042" y="540">모는 군집</text>
+  <line x1="930" y1="122" x2="970" y2="122" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="346" x2="970" y2="346" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="484" x2="970" y2="484" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="648" x2="970" y2="648" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="812" x2="970" y2="812" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+  <line x1="930" y1="924" x2="970" y2="924" stroke="var(--s2)" stroke-width="4" marker-end="url(#arrO)"/>
+</svg>
+    <figcaption>
+      그림 5. 이정표와 최근 논문을 연구 갈래별로 놓고 "위에 쌓음" 관계로 이었다. 왜: 소유자 주제가 어느 갈래들을 합치는지 한눈에 보인다.
+      <span class="ab">약어: <a class="t" href="#term-cbba">합의 기반 묶음 알고리즘(consensus-based bundle algorithm, CBBA)</a> · <a class="t" href="#term-sons">스스로 짜는 신경계(self-organizing nervous system, SoNS)</a> · <a class="t" href="#term-terl">트랜스포머 강화 강화 학습(Transformer-Enhanced Reinforcement Learning, TERL)</a>. 실선은 읽은 쪽에서 확인한 인용이고 점선은 같은 저자, 같은 문제, 같은 방법 갈래에서 추정한 관계(inference)다. 굵은 테두리는 확장 지점(표 12)을 뒷받침하는 논문이다. 오른쪽 굵은 화살표는 그 논문이 있는 갈래를 이 연구로 모은다.</span>
+    </figcaption>
+  </figure>
+  <ul>
+    <li>확인한 인용 둘: La와 Sheng 2009 참고문헌이 Olfati-Saber 2006과 Reynolds 1987을 인용한다 <a class="s" href="#S-RR-32">[S-RR-32]</a>. Cooper 등 1쪽이 "Lama and di Bernardo, 2024"를 인용한다 <a class="s" href="#S-RR-14">[S-RR-14]</a>.</li>
+    <li>Cooper 등이 인용한 "Napolitano et al., 2025"가 <a class="s" href="#S-RR-3">[S-RR-3]</a>의 학회판인지 확인하지 못했다. 그래서 Napolitano에서 Cooper 등으로 가는 선은 점선이다.</li>
+    <li>Balachandran 2024, Low 2004, CBBA 2009는 근거 있는 선이 없어 홀로 둔다.</li>
+    <li>서지(Crossref)만 확인한 행은 "기여"와 "다음에 가능해진 것"이 일반 지식에서 왔다. inference이고 [STALE]이다.</li>
+  </ul>
+  <table class="t">
+    <caption>표 13. 이정표 논문 계보 (출처: recent_review.md 표 6). 왜: 흐름도의 화살표가 가리키는 "다음에 가능해진 것"을 논문별로 적는다.</caption>
+    <thead><tr><th>논문</th><th class="c">연도</th><th>기여</th><th>다음에 가능해진 것</th><th>출처</th></tr></thead>
+    <tbody>
+      <tr><td>Reynolds, boids</td><td class="c">1987</td><td>지역 규칙 셋으로 무리 운동을 만든 행동 모형 (inference)</td><td>무리 짓기 제어의 출발점 (inference)</td><td><a class="s" href="#S-RR-18">[S-RR-18]</a> [STALE], 서지만</td></tr>
+      <tr><td>Vicsek 등</td><td class="c">1995</td><td>자기 추진 입자의 방향 맞춤 상전이 (제목 기준)</td><td>잡음과 밀도에 따른 정렬 분석 (inference)</td><td><a class="s" href="#S-RR-19">[S-RR-19]</a> [STALE], 서지만</td></tr>
+      <tr><td>Parker, <a class="t" href="#term-cmommt">협력 다중 로봇 다중 이동 표적 관측(cooperative multi-robot observation of multiple moving targets, CMOMMT)</a></td><td class="c">2002</td><td>이동 표적 다중 관측 문제 정의</td><td>추적 로봇 배정 연구</td><td><a class="s" href="#S-SMT-1">[S-SMT-1]</a> [STALE]</td></tr>
+      <tr><td>Couzin 등</td><td class="c">2002</td><td>동물 무리의 집단 기억과 공간 분류 (제목 기준)</td><td>무리 모양 전환 모형 (inference)</td><td><a class="s" href="#S-RR-20">[S-RR-20]</a> [STALE], 서지만</td></tr>
+      <tr><td>Low, Leow, Ang</td><td class="c">2004</td><td>표적 수에 비례한 구역 배치</td><td>비례 배정 규칙</td><td><a class="s" href="#S-SMT-7">[S-SMT-7]</a> [STALE]</td></tr>
+      <tr><td>Couzin 등</td><td class="c">2005</td><td>이동하는 동물 무리의 이끌기와 결정 (제목 기준)</td><td>소수 정보 개체의 이끌기, 몰이 모형의 바탕 (inference)</td><td><a class="s" href="#S-RR-21">[S-RR-21]</a> [STALE], 서지만</td></tr>
+      <tr><td>Olfati-Saber</td><td class="c">2006</td><td>무리 짓기 알고리즘과 이론</td><td>센서망 추적의 무리 짓기 제어. La와 Sheng 2009가 참고문헌 [2]로 인용</td><td><a class="s" href="#S-RR-22">[S-RR-22]</a> [STALE], 서지만. 인용 관계는 <a class="s" href="#S-RR-32">[S-RR-32]</a> 6쪽 참고문헌</td></tr>
+      <tr><td>La, Sheng</td><td class="c">2009, 2012</td><td>센서망이 갈라져 새 표적을 따르고 다시 합친다. <a class="t" href="#term-sggp">씨앗 성장 그래프 분할(seed growing graph partition, SGGP)</a>. 2009판: 무작위 선택보다 최대 추적·대형 시간 49.28% 짧고, 이동 거리 7% 짧다. 분열·융합 두 경우만 시험</td><td>분열-융합 추적</td><td><a class="s" href="#S-RR-32">[S-RR-32]</a>, <a class="s" href="#S-SMT-6">[S-SMT-6]</a> [STALE]</td></tr>
+      <tr><td><a class="t" href="#term-cbba">합의 기반 묶음 알고리즘(consensus-based bundle algorithm, CBBA)</a></td><td class="c">2009</td><td>경매와 합의로 분산 작업 배분</td><td>분산 배정 기준선</td><td><a class="s" href="#S-SMT-18">[S-SMT-18]</a> [STALE]</td></tr>
+      <tr><td>Strömbom 등</td><td class="c">2014</td><td>몰이꾼 하나의 모으기·밀기 규칙</td><td>다중 몰이꾼 연구</td><td><a class="s" href="#S-SMT-25">[S-SMT-25]</a> [STALE]</td></tr>
+      <tr><td>Mathews 등</td><td class="c">2017</td><td>로봇 몸과 두뇌가 합치고 나뉜다</td><td>스스로 짜는 계층 <a class="s" href="#S-RR-5">[S-RR-5]</a> (inference)</td><td><a class="s" href="#S-SMT-2">[S-SMT-2]</a> [STALE]</td></tr>
+      <tr><td>Dames</td><td class="c">2017</td><td>수를 모르는 표적의 분산 탐색·추적</td><td>무리 표적 추적 <a class="s" href="#S-RR-9">[S-RR-9]</a> (inference, 공동 저자)</td><td><a class="s" href="#S-SMT-29">[S-SMT-29]</a> [STALE]</td></tr>
+      <tr><td>Hüttenrauch 등</td><td class="c">2019</td><td>군집 상태를 평균 임베딩으로. 수와 무관한 정책</td><td>규모 일반화 학습 (inference)</td><td><a class="s" href="#S-RR-26">[S-RR-26]</a> [STALE]</td></tr>
+      <tr><td>Tolstaya 등</td><td class="c">2019</td><td><a class="t" href="#term-gnn">그래프 신경망(graph neural network, GNN)</a>으로 분산 무리 짓기 제어기</td><td>그래프 신경망 다중 로봇 정보 수집 <a class="s" href="#S-RR-8">[S-RR-8]</a> (inference, 같은 그룹)</td><td><a class="s" href="#S-RR-27">[S-RR-27]</a> [STALE]</td></tr>
+      <tr><td>Zhang 등</td><td class="c">2021</td><td>자기장 매개변수로 미세 군집이 나뉘고 합친다</td><td>미세 군집 분열의 실험 근거</td><td><a class="s" href="#S-RR-28">[S-RR-28]</a> [STALE]</td></tr>
+      <tr><td>Qamar 등</td><td class="c">2022</td><td>강화 학습 드론 군집이 표적 수와 거리로 나뉘고 다시 합친다</td><td>학습 기반 분열-융합 추적</td><td><a class="s" href="#S-RR-25">[S-RR-25]</a> [STALE]</td></tr>
+      <tr><td>Lei 등, Zhang 등</td><td class="c">2023, 2024</td><td>밀도 기반 다중 표적 가두기. 표적 강도에 맞춘 포위 두께</td><td>적응 포위</td><td><a class="s" href="#S-SMT-8">[S-SMT-8]</a>, <a class="s" href="#S-RR-1">[S-RR-1]</a></td></tr>
+      <tr><td>Zhu 등, <a class="t" href="#term-sons">스스로 짜는 신경계(self-organizing nervous system, SoNS)</a></td><td class="c">2024</td><td>스스로 짜는 계층. 하나가 여럿으로 나뉜다</td><td>분열·융합 제어 구조</td><td><a class="s" href="#S-RR-5">[S-RR-5]</a></td></tr>
+      <tr><td>Lama, di Bernardo</td><td class="c">2024</td><td>몰이꾼 수 비례 법칙과 임계 밀도</td><td>흩어지는 표적의 다중 몰이꾼 학습 <a class="s" href="#S-RR-3">[S-RR-3]</a>, <a class="s" href="#S-RR-16">[S-RR-16]</a> (inference, 같은 그룹)</td><td><a class="s" href="#S-RR-10">[S-RR-10]</a></td></tr>
+      <tr><td><a class="t" href="#term-terl">트랜스포머 강화 강화 학습(Transformer-Enhanced Reinforcement Learning, TERL)</a></td><td class="c">2025</td><td>학습 정책이 추격자 15대에서 80대로 일반화</td><td>대규모 다중 표적 포위</td><td><a class="s" href="#S-SMT-9">[S-SMT-9]</a></td></tr>
+      <tr><td>Chen, Dames, Park</td><td class="c">2025</td><td>무리 표적의 탐색과 추적</td><td>소유자 주제의 2단계와 3단계</td><td><a class="s" href="#S-RR-9">[S-RR-9]</a></td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section class="tab" id="rq">
+  <h2>6 RQ와 로드맵</h2>
+  <p class="muted">출처: proposal.md 5절에서 9절. 모든 표시 (inference)와 추정은 원문의 표시를 지켰다.</p>
+  <h3>6.1 <a class="t" href="#term-rq">연구 질문(research question, RQ)</a></h3>
+  <table class="t">
+    <caption>표 14. 연구 질문 5개. 왜: 질문마다 무엇이 새로운지 적어 두면 어느 질문을 수업 프로젝트로 삼을지 고를 수 있다.</caption>
+    <thead><tr><th>ID</th><th>질문</th><th>무엇이 새로운가 (inference)</th></tr></thead>
+    <tbody>
+      <tr><td>RQ1</td><td>지역 감지만으로 정한 분열-융합 규칙이 <a class="t" href="#term-oracle">전역 배정(oracle)</a>에 얼마나 가까운가?</td><td>전역 기준 대비 차이를 무리 분열 횟수별로 잰다.</td></tr>
+      <tr class="rowflag"><td>RQ2</td><td><a class="t" href="#term-hyst">이력 현상(hysteresis)</a> 시간 T가 관측률과 <a class="t" href="#term-churn">전환 빈도(churn)</a>을 어떻게 맞바꾸나? 최적 T는 표적 속도와 어떤 관계인가?</td><td>반복 분열-융합의 맞교환 곡선이다. 갈라짐 한 번의 비용 <a class="s" href="#S-SMT-6">[S-SMT-6]</a>이 아니다.</td></tr>
+      <tr><td>RQ3</td><td>무리 크기에 비례한 배치는 언제 최선인가? 무리 퍼짐, 표적 속도, 감지 거리가 바뀌면 어떻게 되나?</td><td>고정 구역의 비례 배치 <a class="s" href="#S-SMT-7">[S-SMT-7]</a>를 움직이는 무리에서 시험한다.</td></tr>
+      <tr><td>RQ4</td><td>몰이 중 무리가 갈라지면, 몰이 로봇 여럿을 부분 무리에 어떻게 나눠 보내나? 지역 규칙이 순서 계획(외판원 문제)에 얼마나 가까운가?</td><td>몰이꾼 하나의 순서 계획 <a class="s" href="#S-SMT-27">[S-SMT-27]</a>을 여럿과 반복 분열로 넓힌다.</td></tr>
+      <tr><td>RQ5</td><td>"관측" 로봇과 "몰기" 로봇의 비율은 얼마가 좋은가? 동물 안전 거리 제약에서 어떻게 바뀌나?</td><td>역할 나눔과 복지 제약 <a class="s" href="#S-SMT-28">[S-SMT-28]</a>을 함께 잰다.</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>RQ2가 가장 좁고 재기 쉽다. 수업 프로젝트의 핵심으로 맞다 (inference).</li>
+    <li>RQ1과 RQ3은 개인 연구로 넓힐 때 쓴다 (inference).</li>
+  </ul>
+
+  <h3>6.2 로드맵</h3>
+  <figure>
+    <svg viewBox="0 0 1000 130" role="img" aria-label="로드맵 네 단계. 수업 2주, 확장성 분석, 추적과 몰이, 이후">
+      <defs><marker id="arrr" viewBox="0 0 10 10" refX="9" refY="5" markerUnits="userSpaceOnUse" markerWidth="14" markerHeight="14" orient="auto"><path d="M0 0 L10 5 L0 10 z" fill="#555"/></marker></defs>
+      <rect x="10" y="20" width="200" height="80" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+      <rect x="270" y="20" width="200" height="80" fill="#fff" stroke="#555" stroke-width="1.5"/>
+      <rect x="530" y="20" width="200" height="80" fill="#fff4ec" stroke="var(--s2)" stroke-width="3.5"/>
+      <rect x="790" y="20" width="200" height="80" fill="#fff" stroke="#555" stroke-width="1.5"/>
+      <g stroke="#555" stroke-width="2.5"><line x1="212" y1="60" x2="266" y2="60" marker-end="url(#arrr)"/><line x1="472" y1="60" x2="526" y2="60" marker-end="url(#arrr)"/><line x1="732" y1="60" x2="786" y2="60" marker-end="url(#arrr)"/></g>
+      <g class="b c"><text x="110" y="46">수업 2주</text><text x="370" y="46">확장성 분석</text><text x="630" y="46">추적 + 몰이</text><text x="890" y="46">이후</text></g>
+      <g class="m c"><text x="110" y="68">2 → 4 → 5단계</text><text x="110" y="86">기여: 4단계</text><text x="370" y="68">로봇 수, 분열 빈도,</text><text x="370" y="86">감지 거리 변화</text><text x="630" y="68">2 → 6단계</text><text x="630" y="86">기여: 6단계</text><text x="890" y="68">학습 정책, 이종 군집</text><text x="890" y="86">미세 규모 비전</text></g>
+    </svg>
+    <figcaption>
+      그림 6. 로드맵 네 단계를 보인다. 주황 굵은 상자는 새 기여가 있는 단계다. 왜: 수업 2주 범위가 전체 연구의 첫 조각임을 먼저 보인다.
+      <span class="ab">약어: 없음. 출처: proposal.md 7.1절.</span>
+    </figcaption>
+  </figure>
+  <table class="t">
+    <caption>표 15. 로드맵 단계표 (출처: proposal.md 7.1절). 왜: 단계마다 범위, 기여, 수준을 나란히 본다.</caption>
+    <thead><tr><th>단계</th><th>범위</th><th>기여</th><th>수준</th></tr></thead>
+    <tbody>
+      <tr><td>수업 프로젝트, 2주</td><td>2 → 4 → 5단계, 탐색은 나선 탐색</td><td>4단계</td><td>수업</td></tr>
+      <tr><td>확장성 분석</td><td>로봇 수, 분열 빈도, 감지 거리를 바꾼다</td><td>없음</td><td>워크숍 논문</td></tr>
+      <tr><td>추적 + 몰이</td><td>2 → 6단계</td><td>6단계, 관측과 조향 역할 배정</td><td>학회 논문 (<a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-dars">International Symposium on Distributed Autonomous Robotic Systems (DARS)</a>, <a class="t" href="#term-taros">TAROS (전체 이름이 조사 자료에 없다)</a>, <a class="t" href="#term-iros">IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</a>)</td></tr>
+      <tr><td>이후</td><td>학습 정책(<a class="t" href="#term-marl">다중 에이전트 강화 학습(multi-agent reinforcement learning, MARL)</a> 또는 <a class="t" href="#term-gnn">그래프 신경망(graph neural network, GNN)</a>, Cradle 클러스터에서 학습), 이종 <a class="t" href="#term-uav">무인 항공기(unmanned aerial vehicle, UAV)</a>와 <a class="t" href="#term-ugv">무인 지상 차량(unmanned ground vehicle, UGV)</a>, 분열해 도망치는 적대적 표적, 미세 규모 비전</td><td>없음</td><td>학위 논문 방향</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>학습은 로컬에서 돌리지 않는다. Cradle 클러스터에서만 돌린다.</li>
+    <li>채팅 추정 (메인 세션, inference): 수업 높음, 워크숍 중상, 학회 중간, 학위 논문 방향 가능. survey 점수와 어긋나는 곳에서는 survey 점수가 우선한다. 수업 범위(2 → 4 → 5단계)에 맞는 survey 점수는 없다.</li>
+  </ul>
+
+  <h3>6.3 위험</h3>
+  <table class="t">
+    <caption>표 16. 위험과 대응 (출처: proposal.md 8절). 왜: 범위를 좁히는 이유와 윤리 한계를 미리 적어 둔다.</caption>
+    <thead><tr><th>위험</th><th>대응</th></tr></thead>
+    <tbody>
+      <tr><td>인접 분야가 붐빈다 (CMOMMT, 포위, 몰이)</td><td>범위를 "분열-융합 + 지역 정보"로 좁힌다.</td></tr>
+      <tr><td>제어 이론 학회는 증명을 요구한다</td><td>군집 전문 학회를 겨냥한다.</td></tr>
+      <tr><td>윤리 틀</td><td>사람 감시를 응용으로 두지 않는다. 소 떼와 세포 무리만 쓴다.</td></tr>
+      <tr><td>몰이 중 동물 복지 한계</td><td>안전 거리 제약을 규칙에 넣는다 <a class="s" href="#S-SMT-28">[S-SMT-28]</a>.</td></tr>
+      <tr><td>빈틈이 이미 메워졌을 수 있다</td><td>논문 쓰기 전에 빈틈 재확인 조사를 한다. 키워드 후보: "fission-fusion target tracking", "dynamic coalition target tracking", "CMOMMT target groups".</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">양 연구는 한 농장 12마리다. 소로 일반화하지 않는다 <a class="s" href="#S-SMT-28">[S-SMT-28]</a>.</p>
+
+  <h3>6.4 투고처 후보 (모두 inference)</h3>
+  <table class="t">
+    <caption>표 17. 투고처 후보 (출처: proposal.md 9절). 왜: 결과 수준별로 어디를 겨눌지 정한다. 마감과 범위는 확인하지 않았다.</caption>
+    <thead><tr><th>단계</th><th>후보</th><th>맞는 결과</th></tr></thead>
+    <tbody>
+      <tr><td>워크숍</td><td><a class="t" href="#term-iros">IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</a>와 <a class="t" href="#term-icra">IEEE International Conference on Robotics and Automation (ICRA)</a>의 다중 로봇 워크숍</td><td>RQ2의 첫 곡선</td></tr>
+      <tr><td>학회 (군집 전문)</td><td><a class="t" href="#term-ants">International Conference on Swarm Intelligence (ANTS)</a>, <a class="t" href="#term-swarmconf">International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM)</a>, <a class="t" href="#term-dars">International Symposium on Distributed Autonomous Robotic Systems (DARS)</a></td><td>RQ1과 RQ2, 기준선 3개</td></tr>
+      <tr><td>학회 (일반 로봇·에이전트)</td><td>IROS, ICRA, <a class="t" href="#term-aamas">International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</a></td><td>RQ1에서 RQ3, 이종 확장</td></tr>
+      <tr><td>학술지</td><td>Swarm Intelligence, Autonomous Robots</td><td>전체 결과와 실제 로봇 또는 이종 확장</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">TAROS는 채팅 답변의 로드맵에만 있다. survey 투고처 목록에는 없다. survey는 TAROS 2024 논문 한 편을 출처로 가졌다 <a class="s" href="#S-SMT-31">[S-SMT-31]</a>.</p>
+
+  <h3>6.5 열린 질문</h3>
+  <ul>
+    <li>빈틈 재확인 조사를 아직 하지 않았다.</li>
+    <li>La와 Sheng의 분할 규칙이 분산형인지, 반복 분열-융합 실험이 있는지 3쪽 이후를 읽지 않았다 <a class="s" href="#S-SMT-6">[S-SMT-6]</a>.</li>
+    <li>Lei 등의 본문에 반복 분열-융합 실험이 있는지 확인하지 않았다 <a class="s" href="#S-SMT-8">[S-SMT-8]</a>.</li>
+    <li>군집 몰이 조사의 다중 몰이꾼 절을 확인하지 않았다 <a class="s" href="#S-SMT-26">[S-SMT-26]</a>.</li>
+    <li>가축 소의 분열-융합 측정 논문을 찾지 못했다. 들소 연구로 대신했다 <a class="s" href="#S-SMT-23">[S-SMT-23]</a>.</li>
+    <li>혈액 속 세포 무리가 반복해서 갈라지고 합치는지 확인하지 못했다.</li>
+    <li>2022년 분열-융합 UAV 논문의 저자와 내용을 원문에서 확인하지 못했다 <a class="s" href="#S-SMT-5">[S-SMT-5]</a>.</li>
+  </ul>
+</section>
+
+<section class="tab" id="sources">
+  <h2>7 출처</h2>
+  <p class="muted">이 페이지가 인용한 S-SMT와 S-RR 행 57개다. 상태는 조사 문서의 note를 그대로 옮겼다(영어 원문). 접근일은 모두 2026-11-10이다.</p>
+  <ul class="src">
+    <li id="S-SMT-1">[S-SMT-1] Distributed Algorithms for Multi-Robot Observation of Multiple Moving Targets. 발행: 2002-05, Autonomous Robots 12(3) 231 to 255. 유형: paper. 상태(원문 note): BibBase record only, method from search snippet, DOI 10.1023/A:1015256330750 per snippet, partial. <a href="https://bibbase.org/network/publication/parker-distributedalgorithmsformultirobotobservationofmultiplemovingtargets-2002">https://bibbase.org/network/publication/parker-distributedalgorithmsformultirobotobservationofmultiplemovingtargets-2002</a></li>
+    <li id="S-SMT-2">[S-SMT-2] Mergeable nervous systems for robots. 발행: 2017-09-12, Nature Communications 8:439. 유형: paper. 상태(원문 note): PMC full text page, verified. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5595853">https://pmc.ncbi.nlm.nih.gov/articles/PMC5595853</a></li>
+    <li id="S-SMT-3">[S-SMT-3] Fission-fusion populations. 발행: 2009-08, Current Biology 19(15) R633 to R635 per search snippet. 유형: paper. 상태(원문 note): PubMed and Cell pages blocked, search snippet only, UNVERIFIED. <a href="https://doi.org/10.1016/j.cub.2009.05.034">https://doi.org/10.1016/j.cub.2009.05.034</a></li>
+    <li id="S-SMT-5">[S-SMT-5] Bio-Inspired Self-Organized Fission-Fusion Control Algorithm for UAV Swarm. 발행: 2022-11 per search snippet, Aerospace. 유형: paper. 상태(원문 note): HTTP 403, search snippet only, UNVERIFIED. <a href="https://doaj.org/article/5f928ede5d1c4b5882e5d932d6e2c692">https://doaj.org/article/5f928ede5d1c4b5882e5d932d6e2c692</a></li>
+    <li id="S-SMT-6">[S-SMT-6] Dynamic target tracking and observing in a mobile sensor network. 발행: 2012, Robotics and Autonomous Systems 60 996 to 1009. 유형: paper. 상태(원문 note): pages 1 and 2 read, authors La and Sheng, DOI 10.1016/j.robot.2012.03.006, verified. <a href="https://ara.cse.unr.edu/wp-content/uploads/2014/12/Elsevier_RAS_La2012.pdf">https://ara.cse.unr.edu/wp-content/uploads/2014/12/Elsevier_RAS_La2012.pdf</a></li>
+    <li id="S-SMT-7">[S-SMT-7] Task Allocation via Self-Organizing Swarm Coalitions in Distributed Mobile Sensor Network. 발행: 2004, AAAI per copyright line. 유형: paper. 상태(원문 note): pages 1 and 2 read, authors Low, Leow, Ang, verified. <a href="https://www.comp.nus.edu.sg/~lowkh/pubs/aaai2004.pdf">https://www.comp.nus.edu.sg/~lowkh/pubs/aaai2004.pdf</a></li>
+    <li id="S-SMT-8">[S-SMT-8] Self-organized multi-target trapping of swarm robots with density-based interaction. 발행: 2023-03-08, Complex and Intelligent Systems. 유형: paper. 상태(원문 note): abstract on a secondary host, authors Lei, Zhang, Xiang, Duan, verified. <a href="https://www.springerprofessional.de/self-organized-multi-target-trapping-of-swarm-robots-with-densit/24596984">https://www.springerprofessional.de/self-organized-multi-target-trapping-of-swarm-robots-with-densit/24596984</a></li>
+    <li id="S-SMT-9">[S-SMT-9] TERL: Large-Scale Multi-Target Encirclement Using Transformer-Enhanced Reinforcement Learning. 발행: 2025-03-16, revised 2025-08-27. 유형: paper. 상태(원문 note): abstract page, accepted IROS 2025, verified. <a href="https://arxiv.org/abs/2503.12395">https://arxiv.org/abs/2503.12395</a></li>
+    <li id="S-SMT-10">[S-SMT-10] AI for robots and swarms: ARGoS reference. 발행: undated. 유형: blog. 상태(원문 note): third-party tutorial, range_and_bearing fields of the Lua interface, partial. <a href="https://opentechschool-brussels.github.io/AI-for-robots-and-swarms/ref_argos.html">https://opentechschool-brussels.github.io/AI-for-robots-and-swarms/ref_argos.html</a></li>
+    <li id="S-SMT-15">[S-SMT-15] Qi Lu: Research. 발행: undated. 유형: official. 상태(원문 note): carried over from the LQ pass (S-LQ-2), not re-read. <a href="https://sites.google.com/view/qilu/research">https://sites.google.com/view/qilu/research</a></li>
+    <li id="S-SMT-17">[S-SMT-17] Steering herds away from dangers in dynamic environments. 발행: 2023, Royal Society Open Science 10(5) 230015. 유형: paper. 상태(원문 note): carried over from the LQ pass (S-LQ-11), record page, not re-read. <a href="https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/">https://research.wur.nl/en/publications/steering-herds-away-from-dangers-in-dynamic-environments/</a></li>
+    <li id="S-SMT-18">[S-SMT-18] Consensus-Based Decentralized Auctions for Robust Task Allocation. 발행: 2009, IEEE Transactions on Robotics 25(4) 912 to 926 per search snippet. 유형: paper. 상태(원문 note): carried over from the LQ pass (S-LQ-38), HTTP 429 there, partial. <a href="https://dspace.mit.edu/handle/1721.1/52330">https://dspace.mit.edu/handle/1721.1/52330</a></li>
+    <li id="S-SMT-19">[S-SMT-19] Circulating tumor cell clusters more likely to cause metastasis than single cells (news on Aceto et al., Circulating Tumor Cell Clusters Are Oligoclonal Precursors of Breast Cancer Metastasis, Cell 158(5) 1110). 발행: 2014-08-28. 유형: news. 상태(원문 note): news page read, original paper DOI 10.1016/j.cell.2014.07.013 not read, partial. <a href="https://www.sciencedaily.com/releases/2014/08/140828135519.htm">https://www.sciencedaily.com/releases/2014/08/140828135519.htm</a></li>
+    <li id="S-SMT-20">[S-SMT-20] A Survey on Swarm Microrobotics. 발행: 2022, IEEE Transactions on Robotics 38(3) 1531 to 1551. 유형: paper. 상태(원문 note): record page and abstract, authors Yang, Yu, Yang, Wang, Nelson, Zhang, verified. <a href="https://research.polyu.edu.hk/en/publications/a-survey-on-swarm-microrobotics/">https://research.polyu.edu.hk/en/publications/a-survey-on-swarm-microrobotics/</a></li>
+    <li id="S-SMT-21">[S-SMT-21] Tuning Collective Cell Migration by Cell-Cell Junction Regulation. 발행: 2017, Cold Spring Harbor Perspectives in Biology 9(4) a029199. 유형: paper. 상태(원문 note): PMC page, abstract and first 100000 characters read, authors Friedl and Mayor, verified. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC5378050">https://pmc.ncbi.nlm.nih.gov/articles/PMC5378050</a></li>
+    <li id="S-SMT-22">[S-SMT-22] Evaluating Virtual Fencing Technology at Field Scale Today. 발행: project completed 2023-02. 유형: official. 상태(원문 note): Beef Cattle Research Council fact sheet, verified. <a href="https://www.beefresearch.ca/fact-sheets/evaluating-virtual-fencing-technolofy-at-field-scale-today/">https://www.beefresearch.ca/fact-sheets/evaluating-virtual-fencing-technolofy-at-field-scale-today/</a></li>
+    <li id="S-SMT-23">[S-SMT-23] Factors Influencing Plains Bison Group Stability and Fission Fusion Events. 발행: 2026-04-15, Intermountain Journal of Sciences 32. 유형: paper. 상태(원문 note): abstract page, authors Bresnan, Creel, Shamon, verified. <a href="https://arc.lib.montana.edu/ojs/index.php/IJS/article/view/3781">https://arc.lib.montana.edu/ojs/index.php/IJS/article/view/3781</a></li>
+    <li id="S-SMT-24">[S-SMT-24] Deep Learning Approaches for Automatic Livestock Detection in UAV Imagery: State-of-the-Art and Future Directions. 발행: 2025-09-21, Future Internet 17(9) 431. 유형: paper. 상태(원문 note): Crossref record and abstract, authors Adam, Song, Yu, Li, verified. <a href="https://api.crossref.org/works/10.3390%2FFI17090431">https://api.crossref.org/works/10.3390%2FFI17090431</a></li>
+    <li id="S-SMT-25">[S-SMT-25] Solving the shepherding problem: heuristics for herding autonomous, interacting agents. 발행: 2014, J R Soc Interface 11(100). 유형: paper. 상태(원문 note): carried over from the LQ pass (S-LQ-10), not re-read. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104">https://pmc.ncbi.nlm.nih.gov/articles/PMC4191104</a></li>
+    <li id="S-SMT-26">[S-SMT-26] A Comprehensive Review of Shepherding as a Bio-inspired Swarm-Robotics Guidance Approach. 발행: 2019-12-17, revised 2020-04-30, DOI 10.1109/TETCI.2020.2992778. 유형: paper. 상태(원문 note): abstract page, authors Long, Sammut, Sgarioto, Garratt, Abbass, verified. <a href="https://arxiv.org/abs/1912.07796">https://arxiv.org/abs/1912.07796</a></li>
+    <li id="S-SMT-27">[S-SMT-27] Planning-Assisted Context-Sensitive Autonomous Shepherding of Dispersed Robotic Swarms in Obstacle-Cluttered Environments. 발행: 2023-01-25, revised 2023-02-27, IEEE TETCI 2025 per page. 유형: paper. 상태(원문 note): abstract page, authors Liu, Singh, Elsayed, Hunjet, Abbass, verified. <a href="https://arxiv.org/abs/2301.10363">https://arxiv.org/abs/2301.10363</a></li>
+    <li id="S-SMT-28">[S-SMT-28] Drone approach parameters leading to lower stress sheep flocking and movement: sky shepherding. 발행: 2021, Scientific Reports. 유형: paper. 상태(원문 note): PMC page, authors Yaxley, Joiner, Abbass, verified. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8032684">https://pmc.ncbi.nlm.nih.gov/articles/PMC8032684</a></li>
+    <li id="S-SMT-29">[S-SMT-29] Distributed Multi-Target Search and Tracking using the PHD Filter. 발행: 2017 per file name (MRS). 유형: paper. 상태(원문 note): page 1 read, author Dames, venue from file name only, verified. <a href="https://sites.temple.edu/pdames/files/2017/10/DamesMRS2017.pdf">https://sites.temple.edu/pdames/files/2017/10/DamesMRS2017.pdf</a></li>
+    <li id="S-SMT-30">[S-SMT-30] Adaptive Multiple Distributed Bidirectional Spiral Path Planning for Foraging Robot Swarms. 발행: 2023. 유형: paper. 상태(원문 note): carried over from the LQ pass (S-LQ-5), NSF PAR record and abstract, not re-read. <a href="https://par.nsf.gov/biblio/10591790">https://par.nsf.gov/biblio/10591790</a></li>
+    <li id="S-SMT-31">[S-SMT-31] Robust Mitigation Strategy for Misleading Pheromone Trails in Foraging Robot Swarms. 발행: 2025, TAROS 2024 LNAI 15052 pp. 307 to 319. 유형: paper. 상태(원문 note): carried over from the LQ pass (S-LQ-21), DBSCAN defense, not re-read. <a href="https://par.nsf.gov/servlets/purl/10593555">https://par.nsf.gov/servlets/purl/10593555</a></li>
+    <li id="S-RR-1">[S-RR-1] Heterogeneous Targets Trapping With Swarm Robots by Using Adaptive Density-Based Interaction. 발행: 2024, IEEE Transactions on Robotics 40 pp. 2729 to 2748. 유형: paper. 상태(원문 note): OpenAlex record and abstract, authors Zhang, Lei, Peng, Pan. <a href="https://doi.org/10.1109/TRO.2024.3392078">https://doi.org/10.1109/TRO.2024.3392078</a></li>
+    <li id="S-RR-2">[S-RR-2] Distributed Multi-Robot Multi-Target Tracking Using Heterogeneous Limited-Range Sensors. 발행: 2023-11-03, revised 2024-08-10. 유형: paper. 상태(원문 note): abstract page, authors Chen, Abugurain, Dames, Park. <a href="https://arxiv.org/abs/2311.01707">https://arxiv.org/abs/2311.01707</a></li>
+    <li id="S-RR-3">[S-RR-3] Emergent Cooperative Strategies for Multi-Agent Shepherding via Reinforcement Learning. 발행: 2024-11-08, related DOI 10.23919/ECC65951.2025.11186874. 유형: paper. 상태(원문 note): abstract page, authors Napolitano, Lama, De Lellis, di Bernardo. <a href="https://arxiv.org/abs/2411.05454">https://arxiv.org/abs/2411.05454</a></li>
+    <li id="S-RR-4">[S-RR-4] Decentralized Shepherding of Non-Cohesive Swarms Through Cluttered Environments via Deep Reinforcement Learning. 발행: 2025-11-26. 유형: paper. 상태(원문 note): abstract page, authors Punzo, Napolitano, Tomaselli, di Bernardo. <a href="https://arxiv.org/abs/2511.21405">https://arxiv.org/abs/2511.21405</a></li>
+    <li id="S-RR-5">[S-RR-5] Self-organizing Nervous Systems for Robot Swarms. 발행: 2024-01-23 (arXiv), Science Robotics 9 eadl5161 per search snippet. 유형: paper. 상태(원문 note): arXiv abstract page, authors Zhu, Oguz, Heinrich, Allwright, Wahby, Christensen, Garone, Dorigo. <a href="https://arxiv.org/abs/2401.13103">https://arxiv.org/abs/2401.13103</a></li>
+    <li id="S-RR-6">[S-RR-6] Cooperative Search and Track of Rogue Drones using Multiagent Reinforcement Learning. 발행: 2025-01-07. 유형: paper. 상태(원문 note): abstract page, authors Valianti, Malialis, Kolios, Ellinas. <a href="https://arxiv.org/abs/2501.10413">https://arxiv.org/abs/2501.10413</a></li>
+    <li id="S-RR-7">[S-RR-7] Swarm Algorithms for Dynamic Task Allocation in Unknown Environments. 발행: 2024-09-14. 유형: paper. 상태(원문 note): abstract page, authors Balachandran, Harasha, Lynch. <a href="https://arxiv.org/abs/2409.09550">https://arxiv.org/abs/2409.09550</a></li>
+    <li id="S-RR-8">[S-RR-8] Graph Neural Networks for Multi-Robot Active Information Acquisition. 발행: 2022-09-24, submitted to ICRA 2023. 유형: paper. 상태(원문 note): abstract page, authors Tzes, Bousias, Chatzipantazis, Pappas, ICRA 2023 award per search snippet only. <a href="https://arxiv.org/abs/2209.12091">https://arxiv.org/abs/2209.12091</a></li>
+    <li id="S-RR-9">[S-RR-9] Effective tracking of unknown clustered targets using a distributed team of mobile robots. 발행: 2025-05-24 online, Autonomous Robots 49(2) article 16. 유형: paper. 상태(원문 note): Crossref record and abstract, authors Chen, Dames, Park. <a href="https://doi.org/10.1007/s10514-025-10200-z">https://doi.org/10.1007/s10514-025-10200-z</a></li>
+    <li id="S-RR-10">[S-RR-10] Shepherding control and herdability in complex multiagent systems. 발행: 2023-07-31, revised 2024-02-21. 유형: paper. 상태(원문 note): abstract page, authors Lama, di Bernardo, Physical Review Research 2024 per search snippet only. <a href="https://arxiv.org/abs/2307.16797">https://arxiv.org/abs/2307.16797</a></li>
+    <li id="S-RR-11">[S-RR-11] Multi-robot obstacle-aware shepherding of non-cohesive target agents. 발행: 2026-04-24, accepted ICRA 2026 per comments. 유형: paper. 상태(원문 note): abstract page, authors Tomaselli, Covone, Reina, di Bernardo. <a href="https://arxiv.org/abs/2604.22327">https://arxiv.org/abs/2604.22327</a></li>
+    <li id="S-RR-12">[S-RR-12] Dynamic UAV Swarm Collaboration for Multi-Targets Tracking under Malicious Jamming: Joint Power, Path and Target Association Optimization. 발행: 2023-06-28. 유형: paper. 상태(원문 note): abstract page and HTML full text first 100000 characters, authors Xiang, Wang, Xu, Zhang, Pan, Han. <a href="https://arxiv.org/abs/2306.16196">https://arxiv.org/abs/2306.16196</a></li>
+    <li id="S-RR-13">[S-RR-13] Automatic Navigation of a Microrobotic Swarm for Tracking Multiple Mobile Targets. 발행: 2023-02-02 online, IEEE RA-L 9(10) pp. 8858 to 8865, 2024-10, DOI 10.1109/LRA.2023.3241813. 유형: paper. 상태(원문 note): author copy, page 1 read, authors Zou, Liu, Yu. <a href="https://evanzouq.github.io/assets/papers/1FA-RAL-Automatic_Navigation.pdf">https://evanzouq.github.io/assets/papers/1FA-RAL-Automatic_Navigation.pdf</a></li>
+    <li id="S-RR-14">[S-RR-14] Emergent Herding Behaviour Through Decentralised Reinforcement Learning. 발행: undated, cites a 2025 paper. 유형: paper. 상태(원문 note): UTS repository PDF, page 1 read, authors Cooper, Nguyen, Alempijevic, venue not shown. <a href="https://opus.lib.uts.edu.au/rest/bitstreams/626df455-7b1b-476e-aa8f-40f02418e0e7/retrieve">https://opus.lib.uts.edu.au/rest/bitstreams/626df455-7b1b-476e-aa8f-40f02418e0e7/retrieve</a></li>
+    <li id="S-RR-15">[S-RR-15] Multi-Target Pursuit by a Decentralized Heterogeneous UAV Swarm using Deep Multi-Agent Reinforcement Learning. 발행: 2023-03-03, accepted ICRA 2023 per comments. 유형: paper. 상태(원문 note): abstract page, authors Kouzeghar, Song, Meghjani, Bouffanais. <a href="https://arxiv.org/abs/2303.01799">https://arxiv.org/abs/2303.01799</a></li>
+    <li id="S-RR-16">[S-RR-16] Hierarchical Policy-Gradient Reinforcement Learning for Multi-Agent Shepherding Control of Non-Cohesive Targets. 발행: 2025-04-03. 유형: paper. 상태(원문 note): abstract page, authors Covone, Napolitano, De Lellis, di Bernardo. <a href="https://arxiv.org/abs/2504.02479">https://arxiv.org/abs/2504.02479</a></li>
+    <li id="S-RR-17">[S-RR-17] Safe and Adaptive Multi-Target Encirclement With Socially Aware Multi-Robot Control. 발행: 2026-06, IEEE RA-L 11(6) pp. 6608 to 6615. 유형: paper. 상태(원문 note): Crossref metadata and OpenAlex abstract, authors Chaib, Alkhatib, Achour, Aranda, Lequievre, Mezouar, Hamerlain. <a href="https://doi.org/10.1109/LRA.2026.3682584">https://doi.org/10.1109/LRA.2026.3682584</a></li>
+    <li id="S-RR-18">[S-RR-18] Flocks, herds and schools: A distributed behavioral model. 발행: 1987-08, ACM SIGGRAPH Computer Graphics 21(4) pp. 25 to 34. 유형: paper. 상태(원문 note): Crossref metadata only, author Reynolds. <a href="https://doi.org/10.1145/37402.37406">https://doi.org/10.1145/37402.37406</a></li>
+    <li id="S-RR-19">[S-RR-19] Novel Type of Phase Transition in a System of Self-Driven Particles. 발행: 1995-08-07, Physical Review Letters 75(6) pp. 1226 to 1229. 유형: paper. 상태(원문 note): Crossref metadata only, authors Vicsek, Czirok, Ben-Jacob, Cohen, Shochet. <a href="https://doi.org/10.1103/PhysRevLett.75.1226">https://doi.org/10.1103/PhysRevLett.75.1226</a></li>
+    <li id="S-RR-20">[S-RR-20] Collective Memory and Spatial Sorting in Animal Groups. 발행: 2002-09, Journal of Theoretical Biology 218(1) pp. 1 to 11. 유형: paper. 상태(원문 note): Crossref metadata only, authors Couzin, Krause, James, Ruxton, Franks. <a href="https://doi.org/10.1006/jtbi.2002.3065">https://doi.org/10.1006/jtbi.2002.3065</a></li>
+    <li id="S-RR-21">[S-RR-21] Effective leadership and decision-making in animal groups on the move. 발행: 2005-02, Nature 433(7025) pp. 513 to 516. 유형: paper. 상태(원문 note): Crossref metadata only, authors Couzin, Krause, Franks, Levin. <a href="https://doi.org/10.1038/nature03236">https://doi.org/10.1038/nature03236</a></li>
+    <li id="S-RR-22">[S-RR-22] Flocking for Multi-Agent Dynamic Systems: Algorithms and Theory. 발행: 2006-03, IEEE Transactions on Automatic Control 51(3) pp. 401 to 420. 유형: paper. 상태(원문 note): Crossref metadata only, author Olfati-Saber. <a href="https://doi.org/10.1109/TAC.2005.864190">https://doi.org/10.1109/TAC.2005.864190</a></li>
+    <li id="S-RR-23">[S-RR-23] Self-organized swarm robot for multi-target trapping based on self-regulated density interaction. 발행: 2024-01-11 per OpenAlex, Information Sciences 661. 유형: paper. 상태(원문 note): OpenAlex metadata (no abstract), content from search snippet, authors Zhou, Yuan, Lei, Peng. <a href="https://doi.org/10.1016/j.ins.2024.120119">https://doi.org/10.1016/j.ins.2024.120119</a></li>
+    <li id="S-RR-24">[S-RR-24] Microrobotic Swarms for Cancer Therapy. 발행: 2025-04-20, Research 8 article 0686, DOI 10.34133/research.0686. 유형: paper. 상태(원문 note): review, first 100000 characters read, authors Xie, Liu, Yang, Chen, Wang, Du, Fu, Song, Yu. <a href="https://castjournals.cast.org.cn/joweb/research/EN/1154804213701010425">https://castjournals.cast.org.cn/joweb/research/EN/1154804213701010425</a></li>
+    <li id="S-RR-25">[S-RR-25] Autonomous Drone Swarm Navigation and Multi-target Tracking in 3D Environments with Dynamic Obstacles. 발행: 2022-02-13, related DOI 10.1109/ACCESS.2022.3202208. 유형: paper. 상태(원문 note): abstract page and PDF pages 1 and 2, authors Qamar, Khan, Arshad, Qamar, Khan. <a href="https://arxiv.org/abs/2202.06253">https://arxiv.org/abs/2202.06253</a></li>
+    <li id="S-RR-26">[S-RR-26] Deep Reinforcement Learning for Swarm Systems. 발행: 2018-07-17, revised 2019-06-06, JMLR 20(54) 2019. 유형: paper. 상태(원문 note): abstract page, authors Huttenrauch, Sosic, Neumann. <a href="https://arxiv.org/abs/1807.06613">https://arxiv.org/abs/1807.06613</a></li>
+    <li id="S-RR-27">[S-RR-27] Learning Decentralized Controllers for Robot Swarms with Graph Neural Networks. 발행: 2019-03-25, revised 2021-03-24. 유형: paper. 상태(원문 note): abstract page, authors Tolstaya, Gama, Paulos, Pappas, Kumar, Ribeiro, venue not on page. <a href="https://arxiv.org/abs/1903.10527">https://arxiv.org/abs/1903.10527</a></li>
+    <li id="S-RR-28">[S-RR-28] Reconfigurable Disk-like Microswarm under a Sawtooth Magnetic Field. 발행: 2021, Micromachines 12 article 1529. 유형: paper. 상태(원문 note): PMC full text page, authors Zhang, Deng, Zhou, Liu, Su, Li, Zhang. <a href="https://pmc.ncbi.nlm.nih.gov/articles/PMC8708609/">https://pmc.ncbi.nlm.nih.gov/articles/PMC8708609/</a></li>
+    <li id="S-RR-29">[S-RR-29] Communication-free shepherding navigation with multiple steering agents. 발행: 2023-03-28, Frontiers in Control Engineering 4. 유형: paper. 상태(원문 note): full text page, authors Li, Ogura, Wakamiya. <a href="https://www.frontiersin.org/articles/10.3389/fcteg.2023.989232/full">https://www.frontiersin.org/articles/10.3389/fcteg.2023.989232/full</a></li>
+    <li id="S-RR-30">[S-RR-30] Mississippi State University advances livestock management with automated herding systems. 발행: 2023-05-05. 유형: blog. 상태(원문 note): vendor blog, full page read, partial. <a href="https://clearpathrobotics.com/blog/2023/05/mississippi-state-university-advances-livestock-management-with-automated-herding-systems/">https://clearpathrobotics.com/blog/2023/05/mississippi-state-university-advances-livestock-management-with-automated-herding-systems/</a></li>
+    <li id="S-RR-31">[S-RR-31] Livestock Mustering with Drones and Pathways to Adoption (P.PSH.1374). 발행: unresolved, URL folder says 2023, search snippet mixed dates with P.PSH.1491. 유형: official. 상태(원문 note): page returned title only, UNVERIFIED. <a href="https://www.mla.com.au/research-and-development/reports/2023/p.psh.1374---livestock-mustering-with-drones-and-pathways-to-adoption">https://www.mla.com.au/research-and-development/reports/2023/p.psh.1374---livestock-mustering-with-drones-and-pathways-to-adoption</a></li>
+    <li id="S-RR-32">[S-RR-32] Moving Targets Tracking and Observing in a Distributed Mobile Sensor Network. 발행: 2009-06, American Control Conference pp. 3319 onward. 유형: paper. 상태(원문 note): pages 1 and 6 read, authors La, Sheng. <a href="https://ara.cse.unr.edu/wp-content/uploads/2014/12/ACC_La2009.pdf">https://ara.cse.unr.edu/wp-content/uploads/2014/12/ACC_La2009.pdf</a></li>
+  </ul>
+</section>
+
+<section class="tab" id="terms">
+  <h2>8 용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-swarm">군집(swarm)</dt><dd>단순한 로봇 여럿이 지역 규칙으로 함께 일하는 무리.</dd>
+    <dt id="term-formation">대형(formation)</dt><dd>로봇들이 지키는 상대 위치 모양. 예: 링.</dd>
+    <dt id="term-ff">분열-융합(fission-fusion)</dt><dd>무리가 자주 갈라지고 다시 합치는 집단 구조.</dd>
+    <dt id="term-churn">전환 빈도(churn)</dt><dd>로봇 1대가 1분에 부분 군집을 바꾸는 횟수.</dd>
+    <dt id="term-hyst">이력 현상(hysteresis)</dt><dd>조건이 일정 시간 이어져야 상태를 바꾸는 규칙. 잦은 뒤집힘을 막는다.</dd>
+    <dt id="term-loopfn">루프 함수(loop functions)</dt><dd>ARGoS에서 매 단계 실험 환경을 다루는 사용자 코드.</dd>
+    <dt id="term-rab">거리-방위 센서(range-and-bearing sensor)</dt><dd>이웃 로봇의 메시지와 함께 그 거리와 방향을 받는 장치.</dd>
+    <dt id="term-shep">몰이(shepherding)</dt><dd>소수의 몰이꾼이 무리를 목표 쪽으로 모으고 미는 일.</dd>
+    <dt id="term-encirc">포위(encirclement)</dt><dd>로봇들이 표적 둘레를 감싸는 일.</dd>
+    <dt id="term-flocking">무리 짓기(flocking)</dt><dd>새나 물고기 떼처럼 개체가 지역 규칙으로 함께 움직이는 일.</dd>
+    <dt id="term-cmommt">협력 다중 로봇 다중 이동 표적 관측(cooperative multi-robot observation of multiple moving targets, CMOMMT)</dt><dd>로봇 팀이 이동 표적을 최대한 오래 관측하는 문제.</dd>
+    <dt id="term-terl">트랜스포머 강화 강화 학습(Transformer-Enhanced Reinforcement Learning, TERL)</dt><dd>트랜스포머로 표적 우선순위를 배우는 다중 표적 포위 방법.</dd>
+    <dt id="term-uav">무인 항공기(unmanned aerial vehicle, UAV)</dt><dd>사람이 타지 않는 비행 로봇.</dd>
+    <dt id="term-ugv">무인 지상 차량(unmanned ground vehicle, UGV)</dt><dd>사람이 타지 않는 지상 로봇.</dd>
+    <dt id="term-marl">다중 에이전트 강화 학습(multi-agent reinforcement learning, MARL)</dt><dd>여러 에이전트가 함께 보상을 받으며 배우는 강화 학습.</dd>
+    <dt id="term-gnn">그래프 신경망(graph neural network, GNN)</dt><dd>이웃끼리 정보를 주고받는 구조의 신경망. 로봇 통신 그래프에 맞는다.</dd>
+    <dt id="term-ppo">근접 정책 최적화(proximal policy optimization, PPO)</dt><dd>정책을 조금씩만 바꾸게 막는 강화 학습 방법.</dd>
+    <dt id="term-dqn">심층 Q 신경망(deep Q-network, DQN)</dt><dd>이산 행동의 가치를 신경망으로 배우는 강화 학습 방법.</dd>
+    <dt id="term-maddpg">다중 에이전트 심층 결정 정책 경사(multi-agent deep deterministic policy gradient, MADDPG)</dt><dd>학습 때는 전체 정보를, 실행 때는 자기 관측만 쓰는 연속 행동 강화 학습.</dd>
+    <dt id="term-orrt">최적화 빠른 탐색 무작위 트리 스타(optimized rapidly-exploring random tree star, ORRT*)</dt><dd>무작위 표본으로 나무를 키워 짧은 경로를 찾는 계획 방법의 변형.</dd>
+    <dt id="term-mri">자기 공명 영상(magnetic resonance imaging, MRI)</dt><dd>자기장으로 몸속을 찍는 영상. 깊이는 좋지만 느리다.</dd>
+    <dt id="term-pde">편미분 방정식(partial differential equation, PDE)</dt><dd>여러 변수에 대한 변화율을 묶은 방정식. 밀도의 시간 변화를 나타낸다.</dd>
+    <dt id="term-fat">가장 먼 개체 겨누기(farthest-agent targeting, FAT)</dt><dd>몰이꾼이 목표에서 가장 먼 개체를 먼저 미는 규칙.</dd>
+    <dt id="term-sggp">씨앗 성장 그래프 분할(seed growing graph partition, SGGP)</dt><dd>센서 연결 그래프를 씨앗에서 키워 무리를 나누는 방법.</dd>
+    <dt id="term-cbba">합의 기반 묶음 알고리즘(consensus-based bundle algorithm, CBBA)</dt><dd>로봇들이 경매와 합의로 작업을 나누는 방법.</dd>
+    <dt id="term-phd">확률 가설 밀도 필터(probability hypothesis density filter, PHD filter)</dt><dd>표적 수와 위치를 함께 추정하는 필터.</dd>
+    <dt id="term-sons">스스로 짜는 신경계(self-organizing nervous system, SoNS)</dt><dd>로봇들이 임시 계층을 만들고 나누고 합치는 군집 구조.</dd>
+    <dt id="term-ceta">무리 진화 표적 연결(cluster-evolutionary target association, CETA)</dt><dd>밀도와 거리로 부분 군집 중심을 골라 표적에 짝짓는 방법.</dd>
+    <dt id="term-ros">로봇 운영 체제(Robot Operating System, ROS)</dt><dd>로봇 소프트웨어를 잇는 공개 미들웨어.</dd>
+    <dt id="term-dbscan">밀도 기반 공간 군집화(density-based spatial clustering of applications with noise, DBSCAN)</dt><dd>가까운 점을 밀도로 묶는 묶기 방법.</dd>
+    <dt id="term-hull">볼록 껍질(convex hull)</dt><dd>점들을 모두 감싸는 가장 작은 볼록 다각형.</dd>
+    <dt id="term-oracle">전역 배정(oracle)</dt><dd>시뮬레이터가 실제 값을 알고 내리는 기준 배정.</dd>
+    <dt id="term-obsratio">관측률(observation ratio)</dt><dd>시간마다 관측 중인 표적의 비율.</dd>
+    <dt id="term-vfence">가상 울타리(virtual fencing)</dt><dd>목걸이로 경계를 정하고 소리와 전기 자극으로 소를 막는 기술.</dd>
+    <dt id="term-micro">미세 로봇(microrobot)</dt><dd>몸속에서 일할 만큼 작은 로봇.</dd>
+    <dt id="term-rq">연구 질문(research question, RQ)</dt><dd>이 연구가 답하려는 물음.</dd>
+    <dt id="term-argos">ARGoS</dt><dd>군집 로봇 시뮬레이터. foot-bot은 그 안의 바퀴 로봇 모델이다.</dd>
+    <dt id="term-hystT">이력 시간 T(hysteresis time T)</dt><dd>불균형이 T초 이어질 때만 로봇을 옮기는 규칙의 시간.</dd>
+    <dt id="term-ants">International Conference on Swarm Intelligence (ANTS)</dt><dd>군집 지능 학회. 후보 학회는 조사 문서의 추정이다.</dd>
+    <dt id="term-dars">International Symposium on Distributed Autonomous Robotic Systems (DARS)</dt><dd>분산 자율 로봇 시스템 학회. 후보 학회는 조사 문서의 추정이다.</dd>
+    <dt id="term-swarmconf">International Symposium on Swarm Behavior and Bio-Inspired Robotics (SWARM)</dt><dd>군집 행동과 생체 모방 로봇 심포지엄. 후보 학회는 조사 문서의 추정이다.</dd>
+    <dt id="term-iros">IEEE/RSJ International Conference on Intelligent Robots and Systems (IROS)</dt><dd>지능형 로봇 학회. 후보 학회는 조사 문서의 추정이다.</dd>
+    <dt id="term-icra">IEEE International Conference on Robotics and Automation (ICRA)</dt><dd>로봇공학과 자동화 학회. 후보 학회는 조사 문서의 추정이다.</dd>
+    <dt id="term-aamas">International Conference on Autonomous Agents and Multiagent Systems (AAMAS)</dt><dd>자율 에이전트와 다중 에이전트 시스템 학회. 후보 학회는 조사 문서의 추정이다.</dd>
+    <dt id="term-taros">TAROS (전체 이름이 조사 자료에 없다)</dt><dd>전체 이름이 조사 자료에 없다. 확인이 필요하다.</dd>
+    <dt id="term-footbot">풋봇(foot-bot)</dt><dd>ARGoS가 기본으로 주는 바퀴 달린 로봇 모델이다.</dd>
+  </dl>
+</section>
+
+<div class="pager">
+  <a href="sorting-segregation.html">← 이전: 7위 (공동) 분류와 분리</a>
+  <a href="../index.html">목록(index)</a>
+  <a href="best-of-n.html">다음: 9위 집단 결정 →</a>
+</div>
+
+</div>
+<script>
+(function () {
+  var tabs = document.querySelector(".tabs");
+  var secs = document.querySelectorAll("section.tab");
+  var links = tabs.querySelectorAll("a");
+  function show(scroll) {
+    var id = decodeURIComponent(location.hash.slice(1));
+    var el = id ? document.getElementById(id) : null;
+    var sec = el ? el.closest("section.tab") : null;
+    if (!sec) { sec = secs[0]; el = null; }
+    for (var i = 0; i < secs.length; i++) secs[i].classList.toggle("on", secs[i] === sec);
+    for (var j = 0; j < links.length; j++) {
+      var cur = links[j].getAttribute("href") === "#" + sec.id;
+      links[j].classList.toggle("on", cur);
+      if (cur) links[j].setAttribute("aria-current", "true"); else links[j].removeAttribute("aria-current");
+    }
+    if (el && el !== sec) el.scrollIntoView();
+    else if (scroll) tabs.scrollIntoView();
+    else window.scrollTo(0, 0);
+  }
+  window.addEventListener("hashchange", function () { show(true); });
+  show(false);
+})();
+</script>
+</body>
+</html>
