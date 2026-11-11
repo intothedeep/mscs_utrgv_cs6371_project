@@ -1,6 +1,6 @@
 # M6 travel-time margin from saved logs (D-048 D1)
 
-**Result: margin = [TBD] (p95 of actual over expected travel time, n = [TBD] episodes). Fallback 1.5 if not frozen before the M6 prereg.**
+**Result: margin = 5.4 (p95 of actual over expected travel time, n = 2762 episodes). Fallback 1.5 if not frozen before the M6 prereg.**
 
 - Status: method fixed before the run. Numbers come from `results/real/m6_margin.csv` only (`rules/answering.md` §3).
 - Code: `tools/m6_margin.py`. Run: `OMP_NUM_THREADS=1 timeout 300 uv run python tools/m6_margin.py`.
@@ -75,23 +75,23 @@ Table 1. Ratio distribution per variant and proxy. Source: `results/real/m6_marg
 
 | Variant | Proxy | n | p50 | p90 | p95 | p99 | Margin |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| each | pick (primary) | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| each | near | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| each | far | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| first | pick | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| first | near | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| first | far | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
+| each | pick (primary) | 2762 | 1.3229 | 3.3576 | 5.3048 | 7.8184 | 5.4 |
+| each | near | 2762 | 1.4047 | 3.6558 | 5.7865 | 8.7226 | 5.8 |
+| each | far | 2762 | 1.1016 | 2.8161 | 4.3281 | 6.5531 | 4.4 |
+| first | pick | 1713 | 1.4941 | 3.3004 | 5.4509 | 7.7490 | 5.5 |
+| first | near | 1713 | 1.5917 | 3.5914 | 5.8337 | 8.4722 | 5.9 |
+| first | far | 1713 | 1.2831 | 2.7868 | 4.6804 | 6.5662 | 4.7 |
 
 Table 2. Honest miss share at margin 1.5 and at the p95 margin
 
 | Variant | Proxy | `miss_ep` 1.5 | `miss_ep` p95 | `miss_all` 1.5 | `miss_all` p95 | Censored (1.5 / p95) |
 | --- | --- | --- | --- | --- | --- | --- |
-| each | pick (primary) | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| each | near | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| each | far | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| first | pick | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| first | near | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| first | far | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
+| each | pick (primary) | 0.4178 | 0.0471 | 0.4426 | 0.0498 | 225 / 340 |
+| each | near | 0.4518 | 0.0496 | 0.4752 | 0.0517 | 225 / 342 |
+| each | far | 0.3316 | 0.0492 | 0.3601 | 0.0568 | 225 / 326 |
+| first | pick | 0.4974 | 0.0479 | 0.5203 | 0.0501 | 157 / 235 |
+| first | near | 0.5336 | 0.0479 | 0.5549 | 0.0495 | 157 / 236 |
+| first | far | 0.3987 | 0.0502 | 0.4262 | 0.0574 | 157 / 226 |
 
 - `miss_ep` at the p95 margin is about 5 % by construction.
 - `miss_all` is the share that drives honest strikes (R1).
@@ -99,7 +99,7 @@ Table 2. Honest miss share at margin 1.5 and at the p95 margin
 ## 5. Reading
 
 - All six margins equal: freeze that value. Primary = `each` / `pick`.
-- Margins differ: [TBD]. The main session takes the options to the owner. No pick after the numbers.
+- Margins differ: 4.4 to 5.9 over the six variants (Table 1). Frozen: primary `each` / `pick` = 5.4 (D-049). The other 5 are report-only. The main session takes the options to the owner. No pick after the numbers.
 - `near` gives the tightest deadline, so its margin is the conservative one for honest robots.
 - The printed `MARGIN p95=` value is the rounded margin, not the raw p95. The CSV holds the raw p95.
 - Margin much above 1.5: the deadline gets loose. Decoy victims may then pick up food in time by chance (`DESIGN_M6.md` §3.2).

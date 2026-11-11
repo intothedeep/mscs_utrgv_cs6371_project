@@ -1,11 +1,11 @@
 # M5 step 0: kill check for defense v5 (confirm-twice)
 
-Status: 2026-11-11. Method and threshold written before the run. Numbers: placeholders `[TBD]`.
+Status: 2026-11-11. Method and threshold written before the run. Numbers filled from `results/real/v5_killcheck.csv` after the run (project-end review P-2).
 Numbers come from `results/real/v5_killcheck.csv` (`tools/v5_killcheck.py`, run by the main session).
 
 ## 1. Conclusion
 
-**Verdict: `[TBD]` (proceed with A, k = 2 / switch to A' / straddle).** Copy the script's `VERDICT` line here.
+**Verdict: proceed with A, k = 2 (D-046).** Primary `valid/A` confirmed at sources 1.70 [1.20, 2.20] per run. Upper `all/A` 2.50 [1.95, 3.00].
 
 ## 2. Why
 
@@ -70,39 +70,39 @@ Numbers come from `results/real/v5_killcheck.csv` (`tools/v5_killcheck.py`, run 
 | Opposite sides | straddle: report both, Fable decides |
 | Interval | 95 % bootstrap over seeds, context only. The rule uses the mean |
 
-## 6. Results `[TBD]`
+## 6. Results
 
 Table 1. d = 0, `off_lock0`, per run (scope `cell`)
 
 | Variant / policy | Failures at sources (`fail_src_k1`) | Robot points at sources (`pts_src`) | Confirmed at sources (`act_src`) | 95 % interval | 3rd+ failures (`fail3plus_src`) | Active seconds (`act_src_s`) |
 | --- | --- | --- | --- | --- | --- | --- |
-| valid / A | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| dur / A | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| all / A | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
-| valid / A' | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] | [TBD] |
+| valid / A | 16.95 | 15.00 | 1.70 | [1.20, 2.20] | 0.25 | 286.86 |
+| dur / A | 17.15 | 15.10 | 1.80 | [1.30, 2.30] | 0.25 | 339.32 |
+| all / A | 18.70 | 15.70 | 2.50 | [1.95, 3.00] | 0.50 | 502.41 |
+| valid / A' | 16.95 | 15.70 | 1.05 | [0.65, 1.45] | 0.20 | 193.50 |
 
 - `fail_src_k1` is not expected to match 14.45. Off runs have no masks, so repeat failures inflate it. Table 2 is the check.
-- Share confirmed (computed): `act_src` / `pts_src` = [TBD].
+- Share confirmed (computed): `act_src` / `pts_src` = 1.70 / 15.00 = 0.11 (`valid/A`).
 
 Table 2. Calibration, `on_lock0` d = 0, summed over runs (scope `calib_sum`)
 
 | Variant, subset | tp | fp | fn | tn |
 | --- | --- | --- | --- | --- |
-| all, no_mask | [TBD] | [TBD] | [TBD] | [TBD] |
-| dur, no_mask | [TBD] | [TBD] | [TBD] | [TBD] |
-| valid, no_mask | [TBD] | [TBD] | [TBD] | [TBD] |
-| valid, all_peaks | [TBD] | [TBD] | [TBD] | [TBD] |
+| all, no_mask | 212 | 31 | 0 | 0 |
+| dur, no_mask | 212 | 22 | 0 | 9 |
+| valid, no_mask | 212 | 21 | 0 | 10 |
+| valid, all_peaks | 275 | 25 | 17 | 157 |
 
 Table 3. d = 2, `off_lock0`, per decoy (scopes `cell` and `cell_decoy`, variant `valid/A`)
 
 | Measure | Value |
 | --- | --- |
-| Robots with ≥ 1 failure (`dec_robots_ge1`) | [TBD] |
-| Robots that confirm (`dec_robots_ge2`) | [TBD] |
-| First failure, any robot (`first_fail_s`) | [TBD] s |
-| First confirmation, any robot (`first_confirm_s`) | [TBD] s |
-| Gap, first to second failure (`gap_mean_s`) | [TBD] s |
-| Decoys with a confirmation (n of `cell_decoy`) | [TBD] / 40 |
+| Robots with ≥ 1 failure (`dec_robots_ge1`) | 12.80 |
+| Robots that confirm (`dec_robots_ge2`) | 8.85 |
+| First failure, any robot (`first_fail_s`) | 64.56 s |
+| First confirmation, any robot (`first_confirm_s`) | 127.23 s |
+| Gap, first to second failure (`gap_mean_s`) | 107.87 s |
+| Decoys with a confirmation (n of `cell_decoy`) | 40 / 40 |
 
 - Delay of decoy learning under k = 2: `first_confirm_s` minus `first_fail_s`.
 

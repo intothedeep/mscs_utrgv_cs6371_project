@@ -6,12 +6,14 @@
 
 ## 0. Mission block (quoted from `PLAN.md`)
 
-> - Mission: Keep swarm foraging trustworthy when some robots lay false pheromone trails.
-> - Vision: One chart and one demo show the defense winning back lost food.
-> - G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (4 detractor counts 0/1/2/4 x 2 defense states x 10 seeds).
-> - G2: By 2026-11-28, report recovered loss share for detractor counts 1, 2, 4 with 10-seed error bars.
+> - Mission: Keep pheromone foraging swarms trustworthy against false trails as they scale, change and learn. (Fable, owner-delegated, 2026-11-11, D-034)
+> - Vision: A chart sets our no-ID defense beside Prof. Lu's ID-based defense, each failure explained. (Fable, owner-delegated, 2026-11-11, D-035)
+> - G1: By 2026-11-24, log 80 runs with food collected and wasted robot-seconds (measure: logged runs out of 80 = 4 detractor counts x 2 defense states x 10 seeds). (Fable, owner-delegated, 2026-11-10, D-004)
+> - G2: By 2026-11-28, report recovered loss share for 3 of 3 nonzero detractor counts (1, 2, 4) with 10-seed error bars. (Fable, owner-delegated, 2026-11-10, D-004)
+> - G3: By 2026-11-28, 3 of 3 run tracks (T-A, T-B, T-D) have a committed `verdict.json`, plus a root-cause memo for each fail. (Fable, owner-delegated, 2026-11-11, D-036)
+> - Goals (question-type): [RQ.md](./RQ.md)
 
-- Source: the mission block of `PLAN.md` (D-004). `product-manager` writes `PLAN.md`. If the two differ, `PLAN.md` wins.
+- Source: the mission block of `PLAN.md` (D-004 goals, D-034 mission, D-035 vision, D-036 G3). `product-manager` writes `PLAN.md`. If the two differ, `PLAN.md` wins.
 - S1 → G1, G2: strategy A (D-006). Listed alternative: B only. C is a post-G2 stretch.
 - Constraints: no local training. The owner runs builds and simulations by hand (repo-root `CLAUDE.md` Execution).
 - Exception (D-002): the main session builds and runs one 1-seed smoke run per gate, on the owner's order.
