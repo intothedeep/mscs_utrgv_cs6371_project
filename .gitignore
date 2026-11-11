@@ -6,3 +6,5 @@
 __pycache__/
 01_pheromone/src/build/
 01_pheromone/mock/runs/
+# macOS folder metadata
+.DS_Store
