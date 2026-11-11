@@ -32,6 +32,7 @@
     </div>
   </div>
   <ol class="toc">
+    <li><a href="#result">Results</a></li>
     <li><a href="#s1">1 Problem</a></li>
     <li><a href="#s2">2 Goal</a></li>
     <li><a href="#s3">3 How it works in ARGoS</a></li>
@@ -43,6 +44,42 @@
     <li><a href="#s9">9 Risks</a></li>
   </ol>
 </header>
+
+<section id="result">
+  <h2>Results (2026-11-12)</h2>
+  <div class="lead">
+    <p><strong>Status: done. All three research questions are answered.</strong></p>
+    <p>Why this section: it replaces the planned empty chart with measured results. Each track is judged on one pre-registered contrast only.</p>
+  </div>
+  <table class="t">
+    <caption>Table R1. One judged contrast per track. Values [95 % interval] are food items per run (source: 01_pheromone/results/report.html Table 1)</caption>
+    <thead><tr><th>Track</th><th>Judged contrast</th><th>Value [95 % interval]</th><th>Verdict</th></tr></thead>
+    <tbody>
+      <tr><td>v3 baseline</td><td>recovered loss share R(2)</td><td>0.07 [−0.02, 0.15]</td><td>null, no gain resolved</td></tr>
+      <tr><td>v2 lockout</td><td>G(2) and the d = 0 cost, t_lock 10</td><td>G(2) 4.05 [0.85, 7.25]<br>Cost −6.7 [−9.7, −3.85]</td><td><b>FAIL</b></td></tr>
+      <tr><td>M5 confirm-twice</td><td>G(2) and the d = 0 cost, arm k2t10</td><td>G(2) 2.75 [0.40, 4.975]<br>Cost 0.125 [−0.975, 1.15]</td><td><b>PASS</b></td></tr>
+      <tr><td>M6 identifier arm</td><td>F(2, id) minus F(2, k1t10)</td><td>4.375 [2.25, 6.45]</td><td><b>differs</b></td></tr>
+      <tr><td>M7 scale</td><td>gain per robot, N = 40 minus N = 20, per arm</td><td>v3 −0.1458 [−0.3175, 0.0234]<br>v5 −0.2458 [−0.4108, −0.085]</td><td>v3 not resolved. <b>v5 scales worse</b>: worse than itself at N = 20</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:12px">Abbreviations: gain G(d) = food collected with the defense on minus food collected with it off, at d detractors, per run. A negative value at d = 0 is food lost with no attacker. v3 = confirm count 1, no lockout. v5 = confirm count 2, lockout 10 s. N = number of honest robots.</p>
+  <ul>
+    <li><b>Research question 1: yes, by the pre-registered rule.</b> The no-attack cost of k2t10 is not resolved: 0.125 [−0.975, 1.15]. The gain at 2 detractors is above 0: 2.75 [0.40, 4.975].</li>
+    <li><b>Research question 2: the two defenses differ.</b> The identifier arm beats the best defense without identifiers (k1t10) at 2 detractors by 4.375 [2.25, 6.45]. It pays by isolating honest robots: 9.05 per run with no attacker.</li>
+    <li><b>Research question 3: no for v5.</b> It is worse than v5 at N = 20: −0.2458 [−0.4108, −0.085]. It is not shown worse than v3: −0.100 [−0.230, 0.032]. For v3 alone the result is not resolved.</li>
+  </ul>
+  <figure>
+    <a href="../../../01_pheromone/results/real/final/fig_cost_vs_gain.png"><img src="../../../01_pheromone/results/real/final/fig_cost_vs_gain.png" alt="Cost at 0 detractors (x) against gain at 2 detractors (y) per arm" style="max-width:100%;height:auto;border:1px solid var(--rule)"></a>
+    <figcaption>
+      Figure R1. Cost at 0 detractors (x) against gain at 2 detractors (y) per arm, with 95 % intervals. Why: it shows which arm sits near zero cost and high gain, but the position depends on the seed block, so compare within one marker shape. Source: 01_pheromone/results/real/final.
+    </figcaption>
+  </figure>
+  <p>Full report: <a href="../../../01_pheromone/results/report.html">01_pheromone/results/report.html</a></p>
+</section>
+
+<section id="plan">
+  <h3 style="font-size:15px">Original plan (before the build)</h3>
+</section>
 
 <section id="fig">
   <figure>
@@ -86,6 +123,7 @@
     <figcaption>
       Figure 1. The left side shows the true and false trails in the arena. The right side shows the axes of the planned chart. Why: a false trail pulls robots to an empty place, and the defense gain over that loss is the core of this project.
       <span class="ab">Abbreviations: none. Source: original Suggested figure <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>. Error bars use 10 seeds.</span>
+      <span class="ab">This chart is the planned empty frame. The measured results are in the <a href="#result">Results section</a> above.</span>
     </figcaption>
   </figure>
 </section>

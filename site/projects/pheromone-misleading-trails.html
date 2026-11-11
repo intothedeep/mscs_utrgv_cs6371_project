@@ -32,6 +32,7 @@
     </div>
   </div>
   <ol class="toc">
+    <li><a href="#result">결과</a></li>
     <li><a href="#s1">1 문제</a></li>
     <li><a href="#s2">2 목표</a></li>
     <li><a href="#s3">3 ARGoS 작동</a></li>
@@ -44,6 +45,42 @@
     <li><a href="#terms">용어 부록</a></li>
   </ol>
 </header>
+
+<section id="result">
+  <h2>결과 (2026-11-12)</h2>
+  <div class="lead">
+    <p><strong>상태: 완료(done). 연구 질문 3개에 모두 답했다.</strong></p>
+    <p>왜 보이나: 계획한 빈 차트를 실측 결과로 바꿔 읽는 곳이다. 판정은 사전 등록(<a class="t" href="#term-prereg">pre-registration</a>)한 대비 하나로만 한다.</p>
+  </div>
+  <table class="t">
+    <caption>표 R1. 트랙마다 판정한 대비 하나. 값 [95 % 구간(<a class="t" href="#term-interval">95 % interval</a>)]의 단위는 실행당 먹이 개수다 (출처: 01_pheromone/results/report.html 표 1)</caption>
+    <thead><tr><th>트랙</th><th>판정한 대비(judged contrast)</th><th>값 [95 % 구간]</th><th>판정(verdict)</th></tr></thead>
+    <tbody>
+      <tr><td>v3 기준선</td><td>손실 회복 비율 R(2)</td><td>0.07 [−0.02, 0.15]</td><td>null. 이득이 확인되지 않음(not resolved)</td></tr>
+      <tr><td>v2 잠금(<a class="t" href="#term-lockout">lockout</a>)</td><td>G(2)와 d = 0 비용, t_lock 10</td><td>G(2) 4.05 [0.85, 7.25]<br>비용 −6.7 [−9.7, −3.85]</td><td><b>FAIL</b></td></tr>
+      <tr><td>M5 두 번 확인(confirm-twice)</td><td>G(2)와 d = 0 비용, arm k2t10</td><td>G(2) 2.75 [0.40, 4.975]<br>비용 0.125 [−0.975, 1.15]</td><td><b>PASS</b></td></tr>
+      <tr><td>M6 식별자 arm(identifier arm)</td><td>F(2, id) 빼기 F(2, k1t10)</td><td>4.375 [2.25, 6.45]</td><td><b>differs</b> (차이 있음)</td></tr>
+      <tr><td>M7 규모(scale)</td><td>로봇당 이득, N = 40 빼기 N = 20, arm별</td><td>v3 −0.1458 [−0.3175, 0.0234]<br>v5 −0.2458 [−0.4108, −0.085]</td><td>v3 not resolved. <b>v5 scales worse</b>: N = 20의 자기 자신보다 나쁘다</td></tr>
+    </tbody>
+  </table>
+  <p class="muted" style="font-size:12px">약어: 이득 G(d)(<a class="t" href="#term-gain">gain</a>) = 방어를 켠 먹이 수 빼기 끈 먹이 수. 방해 로봇 d대, 실행당. d = 0의 음수는 공격이 없을 때 잃은 먹이다. v3 = 확인 횟수 1, 잠금 없음. v5 = 확인 횟수 2, 잠금 10초. N = 정직한 로봇 수.</p>
+  <ul>
+    <li><b>연구 질문 1: 예 (사전 등록 규칙 기준).</b> k2t10의 공격 없을 때 비용은 해결되지 않았다(not resolved): 0.125 [−0.975, 1.15]. 2대일 때 이득은 0보다 크다: 2.75 [0.40, 4.975].</li>
+    <li><b>연구 질문 2: 두 방어는 다르다.</b> 식별자 arm이 식별자 없는 최선 방어(k1t10)를 2대에서 4.375 [2.25, 6.45] 앞선다. 대가로 정직한 로봇을 격리한다: 공격이 없어도 실행당 9.05.</li>
+    <li><b>연구 질문 3: v5는 아니오.</b> N = 20의 v5보다 나빠졌다: −0.2458 [−0.4108, −0.085]. v3보다 나쁘다고는 보이지 않았다: −0.100 [−0.230, 0.032]. v3 단독은 해결되지 않았다(not resolved).</li>
+  </ul>
+  <figure>
+    <a href="../../01_pheromone/results/real/final/fig_cost_vs_gain.png"><img src="../../01_pheromone/results/real/final/fig_cost_vs_gain.png" alt="방해 로봇 0대의 비용(x)과 2대의 이득(y)을 arm별로 비교한 그림" style="max-width:100%;height:auto;border:1px solid var(--rule)"></a>
+    <figcaption>
+      그림 R1. 방해 로봇 0대의 비용(x)과 2대의 이득(y)을 arm마다 95 % 구간과 함께 한 평면에 놓았다. 왜: 비용이 0에 가깝고 이득이 높은 arm을 한눈에 찾지만, 위치는 시드(seed) 묶음에 따라 달라서 같은 모양끼리만 비교한다. 출처: 01_pheromone/results/real/final.
+    </figcaption>
+  </figure>
+  <p>전체 보고서: <a href="../../01_pheromone/results/report.html">01_pheromone/results/report.html</a></p>
+</section>
+
+<section id="plan">
+  <h3 style="font-size:15px">착수 전 계획 (원문)</h3>
+</section>
 
 <section id="fig">
   <figure>
@@ -87,6 +124,7 @@
     <figcaption>
       그림 1. 왼쪽은 경기장의 참 흔적과 거짓 흔적을, 오른쪽은 계획한 차트의 축을 보인다. 왜: 거짓 흔적이 로봇을 빈 곳으로 끈다는 점과, 방어가 그 손실을 얼마나 줄이는지가 이 프로젝트의 핵심이다.
       <span class="ab">약어: 없음. 출처: 원문 Suggested figure <a class="s" href="../index.html#S-LQ-21">[S-LQ-21]</a>. 오차 막대는 시드(seed) 10개 기준이다.</span>
+      <span class="ab">이 차트는 계획한 빈 틀이다. 실측 결과는 위 <a href="#result">결과 절</a>에 있다.</span>
     </figcaption>
   </figure>
 </section>
@@ -206,6 +244,10 @@
 <section id="terms">
   <h2>용어 부록</h2>
   <dl class="terms">
+    <dt id="term-prereg">사전 등록(pre-registration)</dt><dd>실험 전에 판정 규칙을 파일로 적어 두는 일이다. 결과를 본 뒤 기준을 바꾸지 못한다.</dd>
+    <dt id="term-interval">95 % 구간(95 % interval)</dt><dd>부트스트랩(bootstrap)으로 구한 값의 범위다. 0을 포함하면 해결되지 않음(not resolved)이라고 쓴다.</dd>
+    <dt id="term-lockout">잠금(lockout)</dt><dd>의심 표시를 한 칸을 일정 시간 동안 따르지 않는 방어 규칙이다. 여기서는 10초다.</dd>
+    <dt id="term-gain">이득(gain)</dt><dd>방어를 켠 실행의 먹이 수에서 끈 실행의 먹이 수를 뺀 값이다.</dd>
     <dt id="term-pheromone">페로몬(pheromone)</dt><dd>개미가 길에 남기는 냄새 신호다. 여기서는 바닥 격자에 저장한 가상 값이다.</dd>
     <dt id="term-foraging">먹이 찾기(foraging)</dt><dd>먹이를 찾아 둥지로 가져오는 일이다.</dd>
     <dt id="term-detractor">방해 로봇(detractor)</dt><dd>거짓 흔적을 깔아 군집을 속이는 로봇이다.</dd>
