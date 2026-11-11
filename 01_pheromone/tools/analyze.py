@@ -42,6 +42,13 @@ def single_mock_flag(runs: list[dict]) -> bool:
     return flags.pop()
 
 
+def check_out_side(out: Path, mock: bool) -> None:
+    """Why: mock output must never land in results/real/, nor real output in results/mock/."""
+    wrong = "real" if mock else "mock"
+    if (PROJECT / "results" / wrong).resolve() in (out.resolve(), *out.resolve().parents):
+        raise SystemExit(f"stop: {S.COL_MOCK}={int(mock)} output may not go under results/{wrong}/")
+
+
 def select_cells(runs: list[dict]) -> dict:
     """Cell check: one complete run per cell. A duplicate keeps the latest complete run."""
     by_cell: dict[tuple, list[dict]] = defaultdict(list)
@@ -156,8 +163,9 @@ def draw_chart(path: Path, rows: list[G2Row], mock: bool) -> None:
     ax.set_ylabel("recovered loss share R(d)")
     n_seeds = max([r.n_seeds for r in shown] + [0])
     title = f"G2 recovered loss share, {n_seeds} seeds"
-    fig.suptitle(f"MOCK DATA: {title}" if mock else title)
-    fig.legend(loc="outside upper center", ncol=1)
+    ax.set_title(f"MOCK DATA: {title}" if mock else title)
+    # Legend below the axes: the title above stays readable (rules/figures.md, no overlap).
+    fig.legend(loc="outside lower center", ncol=1)
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
@@ -174,6 +182,7 @@ def main(argv: list[str]) -> int:
         raise SystemExit(f"stop: no run manifest under {args.root}")
     mock = single_mock_flag(runs)  # mixing guard: stops before anything is written
     out = args.out or PROJECT / "results" / ("mock" if mock else "real")
+    check_out_side(out, mock)
     out.mkdir(parents=True, exist_ok=True)
     cells = select_cells(runs)
     rows = g2_rows(food_by_cell(cells["chosen"]), S.DETRACTOR_COUNTS)

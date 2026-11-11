@@ -1,6 +1,6 @@
 """Stage reports and the summary page from saved outputs only.
 
-Usage: make_report.py --phase mvp1
+Usage: make_report.py --phase mvp1 | mvp2   (mvp2 stages live in report_mvp2.py)
 Reads manifests, check_log.txt, analyze_log.txt, summary.csv and g2_stats.csv.
 No number is typed here. A stage with no saved output is reported as skipped and
 the script goes on.
@@ -91,9 +91,9 @@ def bar_figure(path: Path, title: str, labels: list[str], series: dict[str, list
     ax.set_xticks(range(len(labels)), labels)
     ax.set_xlabel(xlabel)
     ax.set_ylabel(ylabel)
-    fig.suptitle(title)
-    if len(series) > 1:
-        fig.legend(loc="outside upper center", ncol=len(series))
+    ax.set_title(title)
+    if len(series) > 1:  # legend below the axes, clear of the title
+        fig.legend(loc="outside lower center", ncol=len(series))
     fig.savefig(path, dpi=150)
     plt.close(fig)
 
@@ -110,7 +110,8 @@ def img(src: str, alt: str) -> str:
 
 
 def generate_stage() -> Stage:
-    what = "Write 80 MOCK runs (fake data) that follow the log schema."
+    n_cells = len(S.DETRACTOR_COUNTS) * len(S.DEFENSES) * len(S.SEEDS)
+    what = f"Write {n_cells} MOCK runs (fake data) that follow the log schema."
     why = ("Milestone M1 shows the shape and the flow on mock data first. "
            "That serves goals G1 and G2 before any real pipeline exists.")
     key, title = "generate", "Stage 1: generate mock runs"
@@ -228,8 +229,11 @@ def analyze_stage() -> Stage:
 
 def main(argv: list[str]) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
-    ap.add_argument("--phase", required=True, choices=["mvp1"])
-    ap.parse_args(argv)
+    ap.add_argument("--phase", required=True, choices=["mvp1", "mvp2"])
+    args = ap.parse_args(argv)
+    if args.phase == "mvp2":
+        from report_mvp2 import run_phase  # late import: report_mvp2 uses helpers from this file
+        return run_phase()
     OUT.mkdir(parents=True, exist_ok=True)
     stages = [generate_stage(), check_stage(), analyze_stage()]
     for i, s in enumerate(stages, 1):

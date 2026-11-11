@@ -61,7 +61,8 @@ EVENT_NAMES = ("pickup", "drop", "follow_start", "peak", "suspect_add", "cone_ab
 
 ROLES = ("honest", "detractor")  # role prefixes hb_ and dt_ (DESIGN 2.1)
 STATES_HONEST = ("REST", "SEARCH", "FOLLOW", "END_SEARCH", "RETURN")
-STATES_DETRACTOR = ("REST", "GO_DECOY", "RETURN_LAY")
+# DESIGN 3.3: REST, GO_DECOY, wait 2 s at the decoy, RETURN_LAY. The wait gets its own name.
+STATES_DETRACTOR = ("REST", "GO_DECOY", "WAIT_DECOY", "RETURN_LAY")
 
 # manifest.json (DESIGN section 4). Tuples are the exact key sets.
 K_SCHEMA, K_MOCK, K_RUNID, K_PARAMS, K_LAYOUT, K_METRICS = (

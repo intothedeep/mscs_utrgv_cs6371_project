@@ -79,20 +79,24 @@ def stage_page(stage: Stage, step: int, total: int) -> str:
 
 def _pipeline_svg(stages: list[Stage]) -> str:
     """Boxes left to right: why a picture first, the flow is the point of MVP1."""
-    w, gap = 250, 60
-    parts = ['<svg viewBox="0 0 900 90" width="100%" role="img" aria-label="stage flow">',
+    gap = 60
+    per_row = len(stages) if len(stages) <= 4 else -(-len(stages) // 2)  # 8 stages: two rows of 4
+    w = (870 - (per_row - 1) * gap) // per_row  # 3 stages: 250, as before
+    rows = -(-len(stages) // per_row)
+    parts = [f'<svg viewBox="0 0 900 {90 + 80 * (rows - 1)}" width="100%" role="img" aria-label="stage flow">',
              '<defs><marker id="arr" markerWidth="8" markerHeight="8" refX="7" refY="4" '
              'orient="auto"><path d="M0,0 L8,4 L0,8 z" fill="currentColor"/></marker></defs>']
     for i, s in enumerate(stages):
-        x = 15 + i * (w + gap)
-        parts.append(f'<rect x="{x}" y="15" width="{w}" height="60" fill="var(--card)" '
+        x = 15 + (i % per_row) * (w + gap)
+        y = 80 * (i // per_row)  # 0 for a single row, so the 3-stage page is unchanged
+        parts.append(f'<rect x="{x}" y="{y + 15}" width="{w}" height="60" fill="var(--card)" '
                      f'stroke="var(--border)"/>')
-        parts.append(f'<text x="{x + 12}" y="40" style="fill:var(--foreground);font-size:14px">'
+        parts.append(f'<text x="{x + 12}" y="{y + 40}" style="fill:var(--foreground);font-size:14px">'
                      f'{i + 1}. {escape(s.key)}</text>')
         state = "skipped" if _is_skipped(s.status) else "ran"
-        parts.append(f'<text x="{x + 12}" y="60">status: {state}</text>')
-        if i < len(stages) - 1:
-            parts.append(f'<line x1="{x + w}" y1="45" x2="{x + w + gap - 4}" y2="45" '
+        parts.append(f'<text x="{x + 12}" y="{y + 60}">status: {state}</text>')
+        if i < len(stages) - 1 and (i + 1) % per_row != 0:
+            parts.append(f'<line x1="{x + w}" y1="{y + 45}" x2="{x + w + gap - 4}" y2="{y + 45}" '
                          f'stroke="currentColor" marker-end="url(#arr)"/>')
     parts.append("</svg>")
     return "".join(parts)

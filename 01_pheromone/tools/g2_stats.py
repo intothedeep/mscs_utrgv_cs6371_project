@@ -58,7 +58,7 @@ def _row(d: int, base: np.ndarray, off: np.ndarray, on: np.ndarray,
     loss_b = mean_b - mean_off
     loss = float(base.mean() - off.mean())
     l_lo, l_hi = _interval(loss_b)
-    if l_lo <= 0 <= l_hi:  # DESIGN 4.2: do not report R(d) when the loss may be 0
+    if not l_lo > 0:  # DESIGN 4.2: resolved only when the whole interval is above 0 (L > 0)
         return G2Row(d, n, float(off.mean()), float(on.mean()), loss, l_lo, l_hi,
                      gain, g_lo, g_hi, NAN, NAN, NAN, False, f"loss not resolved at {d}")
     with np.errstate(divide="ignore", invalid="ignore"):
