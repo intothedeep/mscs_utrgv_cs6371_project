@@ -69,3 +69,4 @@
 2026-11-12 plan: cycle counters M3 to M8 set to 1/2; M8-02, M8-04 in progress (PLAN.md)
 2026-11-12 plan: exit lines M3-1 (seed 6), M6-2 (800 runs), M8-1 (cost_of_trust.md Table 1) fixed, P-13, P-14 (TASKS.md)
 2026-11-12 plan: phase order cited to D-061 on M5 line and stub, P-7 (PLAN.md)
+2026-11-12 M8: report review fixes applied and render checked, M8-02 and M8-04 closed, project closed (results/report.html)

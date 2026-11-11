@@ -28,23 +28,44 @@ svg line, svg path { stroke: var(--foreground); fill: none; }
 
 <div class="panel sec" id="result">
 <p class="label">Result first</p>
-<p><b>Research question 1: Yes, with a trade-off. Confirm-twice with a 10 s lockout (arm k2t10) removes the no-attack cost, 0.125 [−0.975, 1.15] food items per run, and keeps the gain at 2 detractors above 0, 2.75 [0.40, 4.975]. Confirm-twice cuts the gain at 2 detractors from 5.05 (arm k1t10) to 2.75.</b> Seeds 221 to 260, 40 seeds. Source: <code>real/v5/verdict.json</code>, <code>real/v5/g2_stats.csv</code>.</p>
+<p><b>Research question 1: Yes, by the pre-registered rule. Confirm-twice with a 10 s lockout (arm k2t10) has no resolved no-attack cost: 0.125 [−0.975, 1.15] food items per run. The interval includes 0, and at most 0.975 food is lost. The gain at 2 detractors is above 0: 2.75 [0.40, 4.975].</b> Reported, not judged: the confirm-count main effect lowers the gain at 2 detractors, −2.7875 [−4.475, −1.1625]. Seeds 221 to 260, 40 seeds. Source: <code>real/v5/verdict.json</code>, <code>real/v5/g2_stats.csv</code>.</p>
 <p><b>Research question 2: The two defenses differ. The identifier-based adapted arm beats the best defense without identifiers (arm k1t10) at 2 detractors by 4.375 [2.25, 6.45] food items per run. It pays by isolating honest robots: 9.05 per run when no attacker is present.</b> Seeds 321 to 360, 40 seeds. Source: <code>real/id_arm/verdict.json</code>.</p>
-<p><b>Research question 3: No for v5. The gain per honest robot falls from 0.273 (20 robots, 2 detractors) to 0.0275 (40 robots, 4 detractors). The difference is −0.246 [−0.411, −0.085]. The no-attack cost per robot holds, −0.010 [−0.056, 0.036]. For v3 the result is not resolved.</b> Seeds 401 to 430, 30 seeds. Source: <code>real/scale/verdict.json</code>.</p>
+<p><b>Research question 3: No for v5. The gain per honest robot falls from 0.273 (20 robots, 2 detractors) to 0.0275 (40 robots, 4 detractors). The difference is −0.246 [−0.411, −0.085]. That is worse than v5 at N = 20. It is not shown worse than v3: v5 drop minus v3 drop is −0.100 [−0.230, 0.032]. For v3 alone the result is not resolved.</b> The no-attack cost per robot difference is not resolved, −0.010 [−0.056, 0.036]. Seeds 401 to 430, 30 seeds. Source: <code>real/scale/verdict.json</code>.</p>
 <p><b>Headline stays v3 (D-026): recovered loss share R(2) = 0.07 [−0.02, 0.15] at 2 detractors. No gain was resolved on 10 seeds.</b> Defense v2 (the lockout) failed its pre-registration (D-033). Source: <code>real/g2_stats.csv</code>, <code>real/v2/verdict.json</code>.</p>
 <p class="abbr">Gain G(d) = food collected with the defense on minus food collected with the defense off, at d detractors, per run. Intervals are 95 % paired bootstrap intervals. Negative at d = 0 means food lost with no attacker. Research question status: <code>../RQ.md</code>, all three answered (D-051, D-054, D-055).</p>
+</div>
+
+<div class="panel sec" id="verdicts">
+<h2>Verdict table</h2>
+<p>Each track has one judged contrast, taken from its pre-registration. Every other interval in this report is reported, not judged (D-059). Those intervals are unadjusted and descriptive.</p>
+<p class="cap"><b>Table 1.</b> One row per track. Values [95 % interval] are food items per run unless stated.</p>
+<table>
+<tr><th>Track</th><th>Prereg file</th><th>Judged contrast</th><th>Seeds, n</th><th>Value [95 %]</th><th>Pass rule</th><th>Verdict</th><th>D-row</th></tr>
+<tr><td>v3 baseline</td><td>no verdict file. Goal G2 measure (D-004)</td><td>recovered loss share R(2)</td><td>1 to 10, 10</td><td>0.07 [−0.02, 0.15]</td><td>report R for d = 1, 2, 4 with 10-seed error bars</td><td>null, no gain resolved</td><td>D-026</td></tr>
+<tr><td>v2 lockout</td><td><code>prereg/defense_v2_lockout.md</code></td><td>G(2) and the d = 0 cost, t_lock 10</td><td>11 to 30, 20</td><td>G(2) 4.05 [0.85, 7.25]. Cost −6.7 [−9.7, −3.85]</td><td>G(2) lower bound above 0, and the cost upper bound not below 0</td><td><b>FAIL</b></td><td>D-033</td></tr>
+<tr><td>M5 confirm-twice</td><td><code>prereg/defense_v5.md</code></td><td>G(2) and the d = 0 cost, arm k2t10</td><td>221 to 260, 40</td><td>G(2) 2.75 [0.40, 4.975]. Cost 0.125 [−0.975, 1.15]</td><td>same rule as v2</td><td><b>PASS</b></td><td>D-051, D-057</td></tr>
+<tr><td>M6 identifier arm</td><td><code>prereg/defense_id_arm.md</code></td><td>F(2, id) minus F(2, k1t10)</td><td>321 to 360, 40</td><td>4.375 [2.25, 6.45]</td><td>interval excludes 0</td><td><b>differs</b></td><td>D-054</td></tr>
+<tr><td>M7 scale</td><td><code>prereg/scale.md</code></td><td>gain per robot, N = 40 minus N = 20, per arm</td><td>401 to 430, 30</td><td>v3 −0.1458 [−0.3175, 0.0234]. v5 −0.2458 [−0.4108, −0.085]</td><td>interval excludes 0</td><td>v3 not resolved. <b>v5 scales worse</b>, worse than itself at N = 20</td><td>D-055</td></tr>
+</table>
+<p class="abbr">Sources: <code>real/g2_stats.csv</code>, <code>real/v2/verdict.json</code>, <code>real/v5/verdict.json</code>, <code>real/id_arm/verdict.json</code>, <code>real/scale/verdict.json</code>.</p>
+<div class="fig">
+<img src="real/final/fig_cost_vs_gain.png" alt="Cost at d = 0 against gain at d = 2">
+<p class="cap"><b>Figure 1.</b> Cost at 0 detractors (x) against gain at 2 detractors (y) per arm, with 95 % intervals. Colour is the rule, shape is the seed block, so compare within one marker shape. Why: it sets every arm on one plane, and the arm that sits closest to zero cost and the top gain depends on the block. Source: <code>real/final</code>.</p>
+<p class="abbr">Labels: circle = M5 confirm, seeds 221 to 260. Square = M6 confirm, seeds 321 to 360. v3 = confirm count 1, no lockout. k1t10 = confirm count 1, lockout 10 s. k2t0 = confirm count 2, no lockout. v5 = confirm count 2, lockout 10 s. id = identifier adapted arm. Only the M6 id minus k1t10 contrast at 2 detractors is judged.</p>
+</div>
 </div>
 
 <div class="panel sec" id="steps">
 <p class="label">Contents</p>
 <ol>
+<li><a href="#verdicts">Verdict table and comparison chart</a></li>
 <li><a href="#why">Why: mission, vision, Prof. Lu's line and future work</a></li>
 <li><a href="#setup">Setup: arena, robots, attack, five defenses</a></li>
 <li><a href="#box1">Step 1 of 5: v3 baseline (null)</a></li>
 <li><a href="#box2">Step 2 of 5: v2 lockout (FAIL and its root cause)</a></li>
 <li><a href="#box3">Step 3 of 5: M5 v5 confirm-twice (PASS, the 2 x 2 trade-off)</a></li>
 <li><a href="#box4">Step 4 of 5: M6 identifier adapted arm (differs, the honest-isolation cost)</a></li>
-<li><a href="#box5">Step 5 of 5: M7 scale (v5 scales worse)</a></li>
+<li><a href="#box5">Step 5 of 5: M7 scale (v5 scales worse than itself at N = 20)</a></li>
 <li><a href="#cost">Cost of trust</a></li>
 <li><a href="#failed">What failed and why</a></li>
 <li><a href="#limits">Limitations</a></li>
@@ -81,7 +102,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><th>Defense idea</th><td>A robot that reaches a trail end and finds no food for 15 s marks a suspect point. A mask of 0.4 m and a cone of 10° over 1.0 m keep it off that point (D-018).</td></tr>
 </table>
 
-<p class="cap"><b>Table 1.</b> The five defenses and the information each needs. Arm names are code labels. The k value is the confirm count. The t value is the lockout time in seconds.</p>
+<p class="cap"><b>Table 2.</b> The five defenses and the information each needs. Arm names are code labels. The k value is the confirm count. The t value is the lockout time in seconds.</p>
 <table>
 <tr><th>Arm</th><th>Confirm count, lockout</th><th>Messages per decision</th><th>Robot identifiers</th><th>Shared store</th><th>Per-robot memory</th><th>Central component</th></tr>
 <tr><td>off (baseline, no defense)</td><td>not applicable</td><td>0</td><td>no</td><td>no</td><td>none</td><td>none</td></tr>
@@ -91,11 +112,11 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>v5 = k2t10</td><td>2, 10 s</td><td>0</td><td>no</td><td>no</td><td>same 16 points, a point is pending below count 2, plus a 10 s lockout</td><td>none</td></tr>
 <tr><td>id (identifier adapted arm)</td><td>not applicable</td><td>0 in simulation. A real swarm would need a nest server or broadcast (inference)</td><td>yes, an owner identifier per grid cell</td><td>yes, a trail store in the loop functions</td><td>none, the controller suspect rule is off</td><td>yes, the loop functions act as a central trail store</td></tr>
 </table>
-<p class="abbr">Sources: <code>../research/cost_of_trust.md</code> Table 1, <code>../prereg/defense_v5.md</code> arm table. The id row is a draft design, marked inference in the memo.</p>
+<p class="abbr">Sources: <code>../research/cost_of_trust.md</code> Table 1,<code>../prereg/defense_v5.md</code> arm table. The id row is a draft design, marked inference in the memo.</p>
 
 <div class="fig">
 <div class="pair"><img src="real/mvp3/demo/d2_def0_10.png" alt="Demo frame, mid run"><img src="real/mvp3/demo/d2_def0_19.png" alt="Demo frame, late run"></div>
-<p class="cap"><b>Figure 1.</b> Two frames of one demo run at 2 detractors with the defense off, frame 10 of 21 (left) and frame 19 of 21 (right). Why: they show true pheromone (green tint) and false pheromone (red tint) laid on the same floor. Source: <code>real/mvp3/demo</code>.</p>
+<p class="cap"><b>Figure 2.</b> Two frames of one demo run at 2 detractors with the defense off, frame 10 of 21 (left) and frame 19 of 21 (right). Why: they show true pheromone (green tint) and false pheromone (red tint) laid on the same floor. Source: <code>real/mvp3/demo</code>.</p>
 <p class="abbr">Floor legend: green tint = true pheromone, red tint = false pheromone (DESIGN §2.2). Capture times are not stated in the source pages.</p>
 </div>
 </div>
@@ -109,7 +130,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><th>Why</th><td>Goal G2 asks how much of the lost food the defense wins back. Goal G1 asks for 80 logged runs.</td></tr>
 <tr><th>Data</th><td>Seeds 1 to 10, 10 seeds. 4 detractor counts x 2 defense states x 10 seeds = 80 of 80 runs logged. Real simulation logs.</td></tr>
 </table>
-<p class="cap"><b>Table 2.</b> Food collected per run, defense off and on, with gain and recovered loss share R(d). Seeds 1 to 10.</p>
+<p class="cap"><b>Table 3.</b> Food collected per run, defense off and on, with gain and recovered loss share R(d). Seeds 1 to 10.</p>
 <table class="num">
 <tr><th>Detractors d</th><th>Food off</th><th>Food on</th><th>Loss L(d)</th><th>Gain G(d) [95 % interval]</th><th>Recovered share R(d) [95 % interval]</th></tr>
 <tr><td>0</td><td>75.8</td><td>73.9</td><td>not defined</td><td>−1.9 [−5.0, 1.5]</td><td>not defined</td></tr>
@@ -119,22 +140,23 @@ The mission copies these three words: scale, change, learn.</td></tr>
 </table>
 <div class="fig">
 <img src="real/g2_recovered_share.png" alt="Recovered loss share by detractor count">
-<p class="cap"><b>Figure 2.</b> Recovered loss share of v3 at 1, 2 and 4 detractors. Why: every interval includes 0, so no recovery is resolved on 10 seeds. Source: <code>real/g2_stats.csv</code>.</p>
+<p class="cap"><b>Figure 3.</b> Recovered loss share of v3 at 1, 2 and 4 detractors. Why: every interval includes 0, so no recovery is resolved on 10 seeds. Source: <code>real/g2_stats.csv</code>.</p>
 <p class="abbr">R(d) = gain divided by loss. R = 1 is full recovery.</p>
 </div>
-<p><b>Reading.</b> The v3 result is the G2 answer and it is not edited (D-026). It is null for seeds 1 to 10 only. The failure analysis shows more. On 30 seeds of v3-equal code the no-attack cost is −4.73 [−6.70, −2.80]. The 10 seeds did not resolve a cost that was there all along. On 40 seeds (seeds 321 to 360) the same rule resolves a gain at 2 detractors, 2.025 [0.125, 3.975], and a no-attack cost, −6.25 [−8.1, −4.3744]. Seed blocks differ, so these numbers are never subtracted from each other. Sources: <code>real/failure_analysis.md</code>, <code>real/final/arm_contrasts.csv</code>.</p>
+<p><b>Reading.</b> The v3 result is the G2 answer and it is not edited (D-026). It is null for seeds 1 to 10 only. Other blocks give the same rule other results, reported, not judged. Seeds 11 to 30 (t_lock 0 control): no-attack cost −6.15 [−8.25, −4.05]. Seeds 321 to 360: gain at 2 detractors 2.025 [0.125, 3.975] and no-attack cost −6.25 [−8.1, −4.3744]. The failure analysis pools seeds 1 to 30 into −4.73 [−6.70, −2.80]. That pooled value is post hoc, because two blocks and two code versions were joined after both were seen. Seed blocks differ, so these numbers are never subtracted from each other. Sources: <code>real/failure_analysis.md</code>, <code>real/final/arm_contrasts.csv</code>.</p>
 </div>
 
 <!-- Step 2 -->
 <div class="step" id="box2">
 <p class="label">Step 2 of 5</p>
 <h2>v2 lockout: FAIL, and why</h2>
+<p><b>Post-hoc design, confirmed on new seeds.</b> The design follows the null v3 result (D-026), so it is confirmed on seeds 11 to 30, which no earlier step used.</p>
 <table>
 <tr><th style="width:90px">What</th><td>Defense v2 adds a lockout. After a cone abort a robot may not follow a trail again for t_lock seconds (D-028).</td></tr>
-<tr><th>Why</th><td>v3 saved time at decoys but won back no food. Robots re-followed a learned false trail within 0.6 s.</td></tr>
+<tr><th>Why</th><td>v3 saved time at decoys but won back no food. Robots re-followed a learned false trail after about 0.6 to 0.7 s.</td></tr>
 <tr><th>Data</th><td>Tuning seeds 107 to 116, 80 runs, picked t_lock = 10 s. Confirmation seeds 11 to 30, 20 seeds, 320 runs, used once. Control t_lock = 0 on the same seeds.</td></tr>
 </table>
-<p class="cap"><b>Table 3.</b> v2 verdict under its pre-registration. Seeds 11 to 30.</p>
+<p class="cap"><b>Table 4.</b> v2 verdict under its pre-registration. Seeds 11 to 30.</p>
 <table class="num">
 <tr><th>Line</th><th>Value [95 % interval]</th><th>Reading</th></tr>
 <tr><td>Gain at 2 detractors, t_lock 10</td><td>4.05 [0.85, 7.25]</td><td>passes the threshold</td></tr>
@@ -143,6 +165,17 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>Lockout alone at 0 detractors (10 s minus 0 s, defense on)</td><td>−0.55 [−3.45, 2.30]</td><td>includes 0, not resolved</td></tr>
 <tr><td>Picked against t_lock 0 at 2 detractors, defense on</td><td>1.7 [−1.0, 4.45]</td><td>includes 0, not resolved</td></tr>
 </table>
+<p class="cap"><b>Table 5.</b> Diagnostics that motivated the lockout, defense v3 (seeds 1 to 10, 10 seeds). Values per run at 2 detractors, defense off then on.</p>
+<table class="num">
+<tr><th>Measure</th><th>Defense off</th><th>Defense on</th></tr>
+<tr><td>Time in SEARCH (s)</td><td>2354.0</td><td>3143.6</td></tr>
+<tr><td>Time in END_SEARCH (s)</td><td>2007.2</td><td>1455.2</td></tr>
+<tr><td>Time in FOLLOW (s)</td><td>4284.5</td><td>4105.1</td></tr>
+<tr><td>False-trail FOLLOW seconds</td><td>1875.3</td><td>494.4 before learning that decoy, 1118.9 after</td></tr>
+<tr><td>Gap from cone abort to the next follow, mean (s)</td><td>not applicable</td><td>0.582 over 4057 aborts</td></tr>
+<tr><td>Share of those gaps at most 5 s</td><td>not applicable</td><td>0.990</td></tr>
+</table>
+<p class="abbr">Source: <code>real/defense_diagnostics.csv</code>. The gap mean is 0.568 (0 detractors), 0.748 (1) and 0.649 (4) s in the other rows.</p>
 <div class="fig">
 <svg viewBox="0 0 950 250" role="img" aria-label="Causal chain of the no-attack cost">
 <rect x="10" y="10" width="210" height="80"/>
@@ -168,9 +201,9 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <text x="20" y="175">Result: pickups −7.2 per run [−9.35, −5.2], carrying time −247.8 s [−307.3, −191.8]</text>
 <text x="20" y="196">No-attack cost −6.15 [−8.25, −4.05] food per run (t_lock 0, seeds 11 to 30)</text>
 </svg>
-<p class="cap"><b>Figure 3.</b> The measured causal chain of the no-attack cost at d = 0. Why: it locates where the food is lost. Source: <code>real/failure_analysis.md</code>.</p>
+<p class="cap"><b>Figure 4.</b> The measured causal chain of the no-attack cost at d = 0. Why: it locates where the food is lost. Source: <code>real/failure_analysis.md</code>.</p>
 </div>
-<p><b>Reading.</b> The pre-registered verdict is FAIL (D-033). The failure fired on the base defense, not on the lockout. The lockout adds no resolved cost. The cause is wrong suspects at crowded real sources: 14.45 of 14.6 wrong suspects per run sit nearest a real source, and 102.55 of 102.6 cone aborts come from those points. No retry on seeds 11 to 30. Full chain in <a href="#failed">What failed and why</a>. Sources: <code>real/v2/verdict.json</code>, <code>real/failure_analysis.md</code>.</p>
+<p><b>Reading.</b> The pre-registered verdict is FAIL (D-033). The failure fired on the base defense, not on the lockout. The lockout adds no resolved cost. The cause is wrong suspects at crowded real sources: 14.45 of 14.6 wrong suspects per run sit nearest a real source, and 102.55 of 102.6 cone aborts come from those points. No retry on seeds 11 to 30. Pairing limit (risk R11): robot starts differ across cells, so the pairing on seed is partial. The layout stream is shared. Full chain in <a href="#failed">What failed and why</a>. Sources: <code>real/v2/verdict.json</code>, <code>real/failure_analysis.md</code>.</p>
 </div>
 
 <!-- Step 3 -->
@@ -182,7 +215,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><th>Why</th><td>Research question 1. A crowd fails a real source once. A decoy fails every visit. A second failure should tell them apart. Only a 2 x 2 shows the lockout share.</td></tr>
 <tr><th>Data</th><td>Kill check before code (D-046): predicted wrong confirmed points at d = 0 are 1.70 per run [1.20, 2.20], against a kill line of 7.2. Mechanism check on seeds 201 to 210, 40 runs. Confirmation on seeds 221 to 260, 40 seeds, 5 arms x 4 detractor counts x 40 seeds = 800 runs, check 0 failed.</td></tr>
 </table>
-<p class="cap"><b>Table 4.</b> Mechanism check, seeds 201 to 210. Active wrong points per run (the count reaches k).</p>
+<p class="cap"><b>Table 6.</b> Mechanism check, seeds 201 to 210. Active wrong points per run (the count reaches k).</p>
 <table class="num">
 <tr><th>Detractors d</th><th>Arm</th><th>Active points at real sources</th><th>Active points at decoys</th><th>Cone aborts</th><th>Food</th></tr>
 <tr><td>0</td><td>k1t10</td><td>11.90</td><td>0.00</td><td>27.60</td><td>68.40</td></tr>
@@ -190,7 +223,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>2</td><td>k1t10</td><td>4.80</td><td>36.60</td><td>103.30</td><td>44.90</td></tr>
 <tr><td>2</td><td>k2t10</td><td>0.30</td><td>18.80</td><td>48.30</td><td>42.40</td></tr>
 </table>
-<p class="cap"><b>Table 5.</b> Gain G(d) of each arm against the defense off, food per run [95 % interval]. Seeds 221 to 260.</p>
+<p class="cap"><b>Table 7.</b> Gain G(d) of each arm against the defense off, food per run [95 % interval]. Seeds 221 to 260.</p>
 <table class="num">
 <tr><th>Arm</th><th>d = 0</th><th>d = 2</th><th>d = 4</th></tr>
 <tr><td>k1t0 (v3 rule)</td><td>−2.7 [−4.5, −0.85]</td><td>4.575 [2.325, 6.825]</td><td>2.725 [0.2, 5.225]</td></tr>
@@ -198,26 +231,21 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>k2t0</td><td>−0.25 [−1.2, 0.65]</td><td>1.3 [−1.275, 3.8]</td><td>2.1 [−0.225, 4.4006]</td></tr>
 <tr class="flag"><td>k2t10 (v5, primary arm)</td><td>0.125 [−0.975, 1.15]</td><td>2.75 [0.4, 4.975]</td><td>5.0 [2.7744, 7.0]</td></tr>
 </table>
-<p class="cap"><b>Table 6.</b> Main effects of the 2 x 2 [95 % interval]. E_k = effect of k = 2 against k = 1. E_t = effect of the 10 s lockout against none. I = interaction.</p>
+<p class="cap"><b>Table 8.</b> Main effects of the 2 x 2 [95 % interval]. E_k = effect of k = 2 against k = 1. E_t = effect of the 10 s lockout against none. I = interaction. Reported, not judged.</p>
 <table class="num">
 <tr><th>Detractors d</th><th>E_k</th><th>E_t</th><th>I</th></tr>
 <tr><td>0</td><td>3.0625 [1.5375, 4.625]</td><td>−0.2375 [−1.3375, 0.825]</td><td>1.225 [−0.65, 3.075]</td></tr>
 <tr><td>2</td><td>−2.7875 [−4.475, −1.1625]</td><td>0.9625 [−0.4128, 2.3628]</td><td>0.975 [−1.625, 3.65]</td></tr>
 </table>
-<div class="fig">
-<img src="real/final/fig_cost_vs_gain.png" alt="Cost at d = 0 against gain at d = 2">
-<p class="cap"><b>Figure 4.</b> Cost at 0 detractors (x) against gain at 2 detractors (y) for each arm, with 95 % intervals. Why: the ideal arm sits at the top right, and the plot shows that no arm gets both. Source: <code>real/final</code>.</p>
-<p class="abbr">Labels: M5 confirm (circles) = seeds 221 to 260 arms k1t0, k1t10, k2t0, k2t10. M6 confirm (squares) = seeds 321 to 360 arms v3, k1t10, v5, id. id = identifier adapted arm. v5 = k2t10. k1t10 and k2t10 = confirm count k, lockout 10 s.</p>
-</div>
-<p><b>Reading.</b> The verdict is PASS for the primary arm k2t10 (D-051). Its gain interval is above 0 and its no-attack cost interval includes 0. Two readings follow.</p>
+<p>Chart: the circles in <a href="#verdicts">Figure 1</a> are this block (seeds 221 to 260).</p>
+<p><b>Reading.</b> The verdict is PASS for the primary arm k2t10 (D-051). Its gain interval is above 0 and its no-attack cost interval includes 0. The cost is not resolved: at most 0.975 food is lost. The main effects are reported, not judged.</p>
 <ul>
-<li>Confirm-twice removes the no-attack cost: E_k at d = 0 is +3.0625 [1.5375, 4.625].</li>
-<li>Confirm-twice also lowers the gain at d = 2: E_k at d = 2 is −2.7875 [−4.475, −1.1625]. D-051 says it halves the gain.</li>
+<li>The confirm-count main effect E_k is resolved both ways. At d = 0 E_k is +3.0625 [1.5375, 4.625], a lower cost. At d = 2 E_k is −2.7875 [−4.475, −1.1625], a lower gain.</li>
 <li>The lockout main effect E_t includes 0 at both counts: −0.2375 [−1.3375, 0.825] at d = 0 and 0.9625 [−0.4128, 2.3628] at d = 2. It is not resolved.</li>
-<li>The confirm-count main effect E_k is resolved both ways: it removes the cost at d = 0 and lowers the gain at d = 2.</li>
 <li>D-057 corrects one clause of D-051. "The lockout raises the gain at every d" is not supported. The rest of D-051 stands.</li>
+<li>D-058 corrects D-052 and D-053. Arm k2t10 is not the only arm without a measured d = 0 cost. Arm k2t0 also has an interval that includes 0, −0.25 [−1.2, 0.65].</li>
 </ul>
-<p>The best arm without identifiers by the D-050 rule is k1t10. Its mean food at d = 2 on seeds 221 to 260 is 46.1, then k1t0 45.6, then k2t10 43.8 (D-052). Sources: <code>real/v5/verdict.json</code>, <code>real/v5/mechanism.md</code>, <code>real/v5/g2_stats.csv</code>.</p>
+<p>The best arm without identifiers by the D-050 rule is k1t10. This is a rule pick, not a resolved difference. Its mean food at d = 2 on seeds 221 to 260 is 46.1, then k1t0 45.6, then k2t10 43.8 (D-052). Sources: <code>real/v5/verdict.json</code>, <code>real/v5/mechanism.md</code>, <code>real/v5/g2_stats.csv</code>.</p>
 </div>
 
 <!-- Step 4 -->
@@ -227,9 +255,9 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <table>
 <tr><th style="width:90px">What</th><td>An identifier-based arm adapted from Luna and Lu 2024 to our floor grid (D-040). It keeps a shared trail store. It clusters trail ends with density-based spatial clustering of applications with noise (distance 0.3 m, minimum points 2). It checks travel time with a margin of 5.4. It isolates a creator after 5 strikes.</td></tr>
 <tr><th>Why</th><td>Research question 2 and the vision chart. How far does more information (identifiers, a shared store) go beyond a no-identifier defense?</td></tr>
-<tr><th>Data</th><td>Arm check on seeds 301 to 310 (D-043). Confirmation on seeds 321 to 360, 40 seeds, 5 arms x 4 detractor counts x 40 seeds = 800 runs, check 0 failed. The comparison arm k1t10 was fixed by rule before the M6 data (D-050, D-052).</td></tr>
+<tr><th>Data</th><td>Arm check on seeds 301 to 310 (D-043). Confirmation on seeds 321 to 360, 40 seeds, 5 arms x 4 detractor counts x 40 seeds = 800 runs, check 0 failed. The comparison arm k1t10 was fixed by rule before the M6 runs (D-050, D-052).</td></tr>
 </table>
-<p class="cap"><b>Table 7.</b> Gain G(d) against the defense off, food per run [95 % interval]. Seeds 321 to 360. Defense-off food: 81.4, 58.3, 43.85, 32.625 at d = 0, 1, 2, 4.</p>
+<p class="cap"><b>Table 9.</b> Gain G(d) against the defense off, food per run [95 % interval]. Seeds 321 to 360. Defense-off food: 81.4, 58.3, 43.85, 32.625 at d = 0, 1, 2, 4.</p>
 <table class="num">
 <tr><th>Arm</th><th>d = 0</th><th>d = 1</th><th>d = 2</th><th>d = 4</th></tr>
 <tr><td>v3</td><td>−6.25 [−8.1, −4.3744]</td><td>−0.425 [−3.0, 2.075]</td><td>2.025 [0.125, 3.975]</td><td>4.675 [2.325, 6.95]</td></tr>
@@ -239,10 +267,10 @@ The mission copies these three words: scale, change, learn.</td></tr>
 </table>
 <div class="fig">
 <img src="real/final/fig_m6_food.png" alt="Food by arm and detractor count">
-<p class="cap"><b>Figure 5.</b> Mean food per run by arm at 0, 1, 2 and 4 detractors, with 95 % intervals. Why: the id arm sits above every no-identifier arm at 1, 2 and 4 detractors. Source: <code>real/final</code>.</p>
+<p class="cap"><b>Figure 5.</b> Mean food per run by arm at 0, 1, 2 and 4 detractors, with 95 % intervals. Why: it shows the point estimates of all arms on one axis. Only the id minus k1t10 contrast at 2 detractors is judged. Source: <code>real/final</code>.</p>
 <p class="abbr">Labels: off = defense off. v3 = confirm count 1, no lockout. k1t10 = confirm count 1, lockout 10 s. v5 = confirm count 2, lockout 10 s. id = identifier adapted arm.</p>
 </div>
-<p class="cap"><b>Table 8.</b> Robots isolated per run by the id arm. Seeds 321 to 360.</p>
+<p class="cap"><b>Table 10.</b> Robots isolated per run by the id arm. Seeds 321 to 360.</p>
 <table class="num">
 <tr><th>Detractors d</th><th>Detractors isolated</th><th>Detractors isolated at run end</th><th>Honest robots isolated</th></tr>
 <tr><td>0</td><td>0.0</td><td>0.0</td><td>9.05</td></tr>
@@ -255,25 +283,26 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <p class="cap"><b>Figure 6.</b> Honest robots and detractors isolated per run by the id arm, one dot per run. Why: the honest-robot dots form two groups, one near 0 and one from about 13 to 20, so the mean hides two behaviors. Source: <code>real/final</code>.</p>
 <p class="abbr">Labels: id = identifier adapted arm. Black bar = mean over 40 runs. Group description read by eye from the plot.</p>
 </div>
-<p><b>Reading.</b> The verdict is "differs" (D-054). The id arm beats k1t10 at d = 2 by 4.375 [2.25, 6.45]. The arm worked: 0 of 40 seeds at d = 2 had no detractor isolated, so the failure rule did not fire. The price is trust in honest robots. The id arm isolates 9.05 honest robots per run at d = 0 and 15.925 at d = 2, out of 20. v5 keeps the lowest no-attack cost, −1.025 [−2.175, 0.025] on this block and 0.125 [−0.975, 1.15] on the M5 block. See Figure 4 for both blocks side by side. Sources: <code>real/id_arm/verdict.json</code>, <code>real/id_arm/contrast.csv</code>, <code>real/final/arm_contrasts.csv</code>.</p>
+<p><b>Reading.</b> The verdict is "differs" (D-054). The id arm beats k1t10 at d = 2 by 4.375 [2.25, 6.45]. The arm worked: 0 of 40 seeds at d = 2 had no detractor isolated, so the failure rule did not fire. The price is trust in honest robots. The id arm isolates 9.05 honest robots per run at d = 0 and 15.925 at d = 2, out of 20. v5 has the smallest no-attack cost point estimate, −1.025 [−2.175, 0.025] on this block and 0.125 [−0.975, 1.15] on the M5 block. No paired interval compares it with the other arms. The arm check on seeds 301 to 310 showed the same pattern: at d = 2, 9 of 10 seeds isolated 16 to 19 honest robots, and all 10 isolated both detractors (<code>real/id_arm/arm_check.csv</code>). The judged gain was measured with this isolation level. See Figure 1 for both blocks, compared within one marker shape. Sources: <code>real/id_arm/verdict.json</code>, <code>real/id_arm/contrast.csv</code>, <code>real/final/arm_contrasts.csv</code>.</p>
 </div>
 
 <!-- Step 5 -->
 <div class="step" id="box5">
 <p class="label">Step 5 of 5</p>
-<h2>M7, scale: v5 scales worse</h2>
+<h2>M7, scale: v5 scales worse than itself at N = 20</h2>
 <table>
 <tr><th style="width:90px">What</th><td>The same 5 x 5 m arena with 20 or 40 honest robots (N). Detractors are 10 %: 2 at N = 20 and 4 at N = 40. Frozen values are not re-tuned at 40.</td></tr>
 <tr><th>Why</th><td>Research question 3 and the mission word "scale". Doubled density also tests the crowding root cause (D-042).</td></tr>
-<tr><th>Data</th><td>Seeds 401 to 430, 30 seeds. Arms off, v3, v5 (v5 fixed by rule, D-053). 3 arms x 2 team sizes x 2 detractor levels x 30 seeds = 360 runs, check 0 failed. The identifier arm is not scaled.</td></tr>
+<tr><th>Data</th><td>Seeds 401 to 430, 30 seeds. Arms off, v3, v5 (v5 fixed by rule before any M6 or M7 result, D-053. D-058 corrects the stated reason: k2t0 also has a d = 0 interval that includes 0. The pick stays). 3 arms x 2 team sizes x 2 detractor levels x 30 seeds = 360 runs, check 0 failed. The identifier arm is not scaled.</td></tr>
 </table>
-<p class="cap"><b>Table 9.</b> Gain per honest robot, G/N, in food items per robot [95 % interval of the N = 40 minus N = 20 difference]. Seeds 401 to 430.</p>
+<p class="cap"><b>Table 11.</b> Gain per honest robot, G/N, in food items per robot [95 % interval of the N = 40 minus N = 20 difference]. Seeds 401 to 430.</p>
 <table class="num">
 <tr><th>Arm</th><th>N = 20, d = 2</th><th>N = 40, d = 4</th><th>Difference [95 % interval]</th><th>Verdict</th></tr>
 <tr><td>v3</td><td>0.2083</td><td>0.0625</td><td>−0.1458 [−0.3175, 0.0234]</td><td>not resolved</td></tr>
-<tr class="flag"><td>v5</td><td>0.2733</td><td>0.0275</td><td>−0.2458 [−0.4108, −0.085]</td><td>scales worse</td></tr>
+<tr class="flag"><td>v5</td><td>0.2733</td><td>0.0275</td><td>−0.2458 [−0.4108, −0.085]</td><td>scales worse, worse than itself at N = 20</td></tr>
 </table>
-<p class="cap"><b>Table 10.</b> Other lines, reported with no pass or fail. Seeds 401 to 430.</p>
+<p class="abbr">Not shown worse than v3: v5 drop minus v3 drop is −0.100 [−0.230, 0.032] (<code>real/scale/root_cause.md</code>). Reported, not judged.</p>
+<p class="cap"><b>Table 12.</b> Other lines, reported with no pass or fail. Seeds 401 to 430.</p>
 <table class="num">
 <tr><th>Line</th><th>v3</th><th>v5</th></tr>
 <tr><td>No-attack cost per robot, N = 20 and N = 40</td><td>−0.225 and −0.0467</td><td>0.0217 and 0.0117</td></tr>
@@ -283,45 +312,45 @@ The mission copies these three words: scale, change, learn.</td></tr>
 </table>
 <div class="fig">
 <img src="real/final/fig_scale.png" alt="Gain per robot at two team sizes">
-<p class="cap"><b>Figure 7.</b> Gain per honest robot at 20 robots with 2 detractors and at 40 robots with 4 detractors, for v3 and v5. Why: the v5 line falls toward 0, and its interval at 40 robots includes 0. Source: <code>real/final</code>.</p>
-<p class="abbr">Labels: v3 = confirm count 1, no lockout. v5 = confirm count 2, lockout 10 s. N = number of honest robots.</p>
+<p class="cap"><b>Figure 7.</b> Gain per honest robot at 20 robots with 2 detractors and at 40 robots with 4 detractors, for v3 and v5. Why: the v5 mean falls from 0.2733 to 0.0275, a drop of −0.2458 [−0.4108, −0.085], and the v3 drop is not resolved. Source: <code>real/final</code>.</p>
+<p class="abbr">Labels: v3 = confirm count 1, no lockout. v5 = confirm count 2, lockout 10 s. N = number of honest robots. The error bars come from the figure script. Their values are not saved in a table.</p>
 </div>
-<p><b>Reading.</b> The M7 verdict is "v3 not resolved, v5 scales worse" (D-055). Congestion does not explain it. Defense-off food per robot at no attack is 3.9533 at N = 20 and 2.4183 at N = 40. The ratio is 0.6117, above the 0.5 line. The no-attack cost per robot of v5 holds. The gain per robot does not. The cause is private confirmation, see <a href="#m7-root-cause">the M7 root cause</a> (D-056). Sources: <code>real/scale/verdict.json</code>, <code>real/scale/contrast.csv</code>.</p>
+<p><b>Reading.</b> The M7 verdict is "v3 not resolved, v5 scales worse" (D-055). "Scales worse" means worse than itself at N = 20. The congestion rule did not fire. Defense-off food per robot at no attack is 3.9533 at N = 20 and 2.4183 at N = 40. The ratio is 0.6117, above the 0.5 line. The no-attack cost per robot difference of v5 is not resolved, −0.01 [−0.0558, 0.0358]. The gain per robot falls. The mechanism-level cause is private confirmation, see <a href="#m7-root-cause">the M7 root cause</a> (D-056). Sources: <code>real/scale/verdict.json</code>, <code>real/scale/contrast.csv</code>.</p>
 </div>
 
 <div class="panel sec" id="cost">
 <h2>Cost of trust</h2>
 <p>This section sets what each defense needs beside what it cost on our testbed. It runs no new experiments. Every number is copied from a saved file.</p>
-<p class="cap"><b>Table 11.</b> Information each defense needs. Literature rows are read from the papers named. Our rows are from our design files.</p>
+<p class="cap"><b>Table 13.</b> Information each defense needs. Literature rows are read from the papers named. Our rows are from our design files.</p>
 <table>
 <tr><th>Defense</th><th>Messages per decision</th><th>Robot identifiers</th><th>Shared store</th><th>Per-robot memory</th><th>Central component</th></tr>
 <tr><td>Blockchain swarm (Strobel et al. 2018)</td><td>One vote transaction every 5 ticks. About 160 bytes per transaction against 2 or 4 bytes classically</td><td>Yes, a public key per robot</td><td>Yes, a blockchain copy per robot</td><td>Full chain copy, about 10 MB or 4 MB per 15 min run</td><td>Setup only</td></tr>
 <tr><td>Luna and Lu 2024, robust mitigation</td><td>Not stated. Trails with creator identifiers must reach one place (inference)</td><td>Yes, a creator identifier per waypoint</td><td>Yes (inference)</td><td>Not stated who holds strikes and travel times</td><td>Not stated, implied (inference)</td></tr>
 <tr><td>Luna and Lu 2024, quarantine paper</td><td>Not stated in the abstract</td><td>Not stated in the abstract</td><td>Not stated. Regions merge by distance to save storage</td><td>Quarantine regions around fakes</td><td>Not stated in the abstract</td></tr>
 <tr><td>Cautionary pheromone (Aswale et al. 2022)</td><td>0</td><td>No</td><td>No, a layer in the same grid</td><td>A patience value per ant</td><td>None</td></tr>
-<tr><td>Our v3, k1t10, k2t0, v5</td><td>0</td><td>No</td><td>No</td><td>16-point suspect queue, see Table 1</td><td>None</td></tr>
+<tr><td>Our v3, k1t10, k2t0, v5</td><td>0</td><td>No</td><td>No</td><td>16-point suspect queue, see Table 2</td><td>None</td></tr>
 <tr><td>Our id arm</td><td>0 in simulation</td><td>Yes</td><td>Yes</td><td>None</td><td>Yes</td></tr>
 </table>
-<p class="cap"><b>Table 12.</b> Measured cost on our testbed. G(0) = no-attack cost. G(2) = gain at 2 detractors. Food items per run [95 % interval]. Never subtract across blocks.</p>
+<p class="cap"><b>Table 14.</b> Measured cost on our testbed. G(0) = no-attack cost. G(2) = gain at 2 detractors. Food items per run [95 % interval]. Never subtract across blocks.</p>
 <table class="num">
-<tr><th>Arm</th><th>Seeds</th><th>G(0)</th><th>G(2)</th><th>Honest robots isolated per run, d = 0 and d = 2</th></tr>
-<tr><td>v3 rule (k1t0)</td><td>1 to 10</td><td>−1.9 [−5.0, 1.5]</td><td>2.3 [−0.7, 5.2]</td><td>not applicable</td></tr>
-<tr><td>v3 rule (t_lock 0 control)</td><td>11 to 30</td><td>−6.15 [−8.25, −4.05]</td><td>2.35 [−1.9, 6.35]</td><td>not applicable</td></tr>
-<tr><td>k1t0</td><td>221 to 260</td><td>−2.7 [−4.5, −0.85]</td><td>4.575 [2.325, 6.825]</td><td>not applicable</td></tr>
-<tr><td>v3</td><td>321 to 360</td><td>−6.25 [−8.1, −4.3744]</td><td>2.025 [0.125, 3.975]</td><td>not applicable</td></tr>
-<tr><td>k1t10 (v2)</td><td>11 to 30</td><td>−6.7 [−9.7, −3.85]</td><td>4.05 [0.85, 7.25]</td><td>not applicable</td></tr>
-<tr><td>k1t10</td><td>221 to 260</td><td>−3.55 [−5.4, −1.725]</td><td>5.05 [2.025, 7.975]</td><td>not applicable</td></tr>
-<tr><td>k1t10</td><td>321 to 360</td><td>−6.225 [−8.275, −4.2494]</td><td>4.475 [2.15, 6.7506]</td><td>not applicable</td></tr>
-<tr><td>k2t10 (v5)</td><td>221 to 260</td><td>0.125 [−0.975, 1.15]</td><td>2.75 [0.4, 4.975]</td><td>not applicable</td></tr>
-<tr><td>v5</td><td>321 to 360</td><td>−1.025 [−2.175, 0.025]</td><td>2.725 [0.675, 4.875]</td><td>not applicable</td></tr>
-<tr class="flag"><td>id</td><td>321 to 360</td><td>−3.625 [−5.375, −2.025]</td><td>8.85 [6.625, 11.1]</td><td>9.05 and 15.925</td></tr>
+<tr><th>Arm</th><th>Seeds</th><th>F(0, off)</th><th>F(0, on)</th><th>G(0)</th><th>G(2)</th><th>Honest robots isolated per run, d = 0 and d = 2</th></tr>
+<tr><td>v3 rule (k1t0)</td><td>1 to 10</td><td>75.8</td><td>73.9</td><td>−1.9 [−5.0, 1.5]</td><td>2.3 [−0.7, 5.2]</td><td>not applicable</td></tr>
+<tr><td>v3 rule (t_lock 0 control)</td><td>11 to 30</td><td>81.35</td><td>75.2</td><td>−6.15 [−8.25, −4.05]</td><td>2.35 [−1.9, 6.35]</td><td>not applicable</td></tr>
+<tr><td>k1t0</td><td>221 to 260</td><td>77.55</td><td>74.85</td><td>−2.7 [−4.5, −0.85]</td><td>4.575 [2.325, 6.825]</td><td>not applicable</td></tr>
+<tr><td>v3</td><td>321 to 360</td><td>81.4</td><td>75.15</td><td>−6.25 [−8.1, −4.3744]</td><td>2.025 [0.125, 3.975]</td><td>not applicable</td></tr>
+<tr><td>k1t10 (v2)</td><td>11 to 30</td><td>81.35</td><td>74.65</td><td>−6.7 [−9.7, −3.85]</td><td>4.05 [0.85, 7.25]</td><td>not applicable</td></tr>
+<tr><td>k1t10</td><td>221 to 260</td><td>77.55</td><td>74.0</td><td>−3.55 [−5.4, −1.725]</td><td>5.05 [2.025, 7.975]</td><td>not applicable</td></tr>
+<tr><td>k1t10</td><td>321 to 360</td><td>81.4</td><td>75.175</td><td>−6.225 [−8.275, −4.2494]</td><td>4.475 [2.15, 6.7506]</td><td>not applicable</td></tr>
+<tr><td>k2t10 (v5)</td><td>221 to 260</td><td>77.55</td><td>77.675</td><td>0.125 [−0.975, 1.15]</td><td>2.75 [0.4, 4.975]</td><td>not applicable</td></tr>
+<tr><td>v5</td><td>321 to 360</td><td>81.4</td><td>80.375</td><td>−1.025 [−2.175, 0.025]</td><td>2.725 [0.675, 4.875]</td><td>not applicable</td></tr>
+<tr class="flag"><td>id</td><td>321 to 360</td><td>81.4</td><td>77.775</td><td>−3.625 [−5.375, −2.025]</td><td>8.85 [6.625, 11.1]</td><td>9.05 and 15.925</td></tr>
 </table>
-<p class="abbr">Sources: <code>real/final/arm_contrasts.csv</code>, <code>real/id_arm/verdict.json</code>, <code>../research/cost_of_trust.md</code>. The memo marks the M6 gain cells "not in file". The final contrast table now holds them, so they are filled here. The memo is stale on those cells.</p>
+<p class="abbr">Sources: <code>real/final/arm_contrasts.csv</code>, <code>real/id_arm/verdict.json</code>, <code>../research/cost_of_trust.md</code>. Only the id minus k1t10 contrast at 2 detractors is judged. All other intervals are reported, not judged.</p>
 <p><b>Reading.</b></p>
 <ol>
 <li>More information buys detection. Strobel needs keys and a ledger. Luna and Lu need creator identifiers and one trail store.</li>
-<li>Low information was not free on our testbed. The v3 rule lost food at no attack on every block with enough seeds.</li>
-<li>Confirm-twice removed that cost on seeds 221 to 260. The gain at 2 detractors stayed above 0.</li>
+<li>Low information was not free on our testbed. The v3 rule has a negative no-attack point estimate on every block, from −1.9 to −6.25. The defense-off baseline F(0, off) also moves between blocks, from 75.8 to 81.4.</li>
+<li>Confirm-twice left no resolved no-attack cost on seeds 221 to 260 (0.125 [−0.975, 1.15]) and on seeds 321 to 360 (−1.025 [−2.175, 0.025]). The gain at 2 detractors stayed above 0 on both.</li>
 <li>On seeds 321 to 360 the id arm beat k1t10 at 2 detractors by 4.375 [2.25, 6.45].</li>
 <li>The id arm pays in honest isolations, 9.05 per run at no attack.</li>
 </ol>
@@ -336,12 +365,12 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <li>Saved time moved into searching. Pickups did not rise clearly at any detractor count (seeds 1 to 10).</li>
 <li>After a cone abort a robot re-enters the follow state in 0.59 to 0.71 s. It follows the learned false trail again.</li>
 <li>False-trail follow seconds fall only 14 to 18 % with the defense on.</li>
-<li>The lockout breaks this loop. Lockout alone at d = 4: +3.25 food [0.9, 5.55]. At d = 2: +1.7 [−1.0, 4.45].</li>
+<li>At d = 4 the lockout alone added 3.25 food [0.9, 5.55]. At d = 2 it added 1.7 [−1.0, 4.45], not resolved. The lockout main effect includes 0 at d = 0 and d = 2 (D-057).</li>
 <li>Part of F1 is also the wrong-suspect cost below. Its size at d > 0 is a linear-scaling inference, not a measurement.</li>
 </ul>
 
 <h2>F2. The v2 lockout cost 6.7 food at no attack</h2>
-<p class="cap"><b>Table 13.</b> Candidate causes of the no-attack cost. Per run, t_lock 0, d = 0, seeds 11 to 30.</p>
+<p class="cap"><b>Table 15.</b> Candidate causes of the no-attack cost. Per run, t_lock 0, d = 0, seeds 11 to 30.</p>
 <table>
 <tr><th>Candidate</th><th>Measurement</th><th>Verdict</th></tr>
 <tr><td>Cone aborts on true trails</td><td>102.6 aborts, 102.55 from a source point, 102.0 within 1.5 m of a source</td><td>supported</td></tr>
@@ -351,28 +380,29 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>Crowding at real sources</td><td>2.14 robots near a failed peak against 1.48 near a pickup</td><td>supported as an association, not shown causal</td></tr>
 <tr><td>Peak offset</td><td>0.41 m against 0.32 m</td><td>not supported as the main cause</td></tr>
 </table>
-<p><b>Root cause (supported at d = 0).</b> The end test cannot tell a crowded true source from a decoy. About 1 peak in 4 at a real source ends with no food in 15 s. The test makes each such peak a suspect. The mask then hides the source. Memory has no expiry below 16 points, so a wrong point stays for the run. See Figure 3. Depletion is ruled out by design. Source: <code>real/failure_analysis.md</code>.</p>
+<p><b>Root cause (supported at d = 0).</b> The end test cannot tell a crowded true source from a decoy. About 1 peak in 4 at a real source ends with no food in 15 s. The test makes each such peak a suspect. The mask then hides the source. Memory has no expiry below 16 points, so a wrong point stays for the run. See Figure 4. Depletion is ruled out by design. Source: <code>real/failure_analysis.md</code>.</p>
 
-<h2>F3. v5 scales worse from 20 to 40 honest robots</h2>
+<h2>F3. v5 gain per robot falls from 20 to 40 honest robots (worse than itself at N = 20)</h2>
 <div id="m7-root-cause" class="panel">
 <p class="label">Root cause of the M7 result</p>
 <p><b>Root cause (D-056): private, same-robot confirmation does not scale with robot density.</b> Defense v5 needs the same robot to fail twice at a decoy. Visits per decoy stay about equal from N = 20 to N = 40, but they spread over twice the robots. So each robot meets each decoy less often. Decoy peaks per robot per decoy fall from 3.55 to 1.98 (defense off). The protected robot-time share (cover_time) falls from 0.244 to 0.126. Source: <code>real/scale/root_cause.md</code>.</p>
-<p class="cap"><b>Table 16.</b> Verdict per candidate cause of the M7 result. Seeds 401 to 430. Numbers are N = 40 minus N = 20 differences [95 % interval].</p>
+<p class="cap"><b>Table 16.</b> Verdict per candidate cause of the M7 result. Seeds 401 to 430. Numbers are N = 40 minus N = 20 differences [95 % interval]. Reported, not judged.</p>
 <table>
 <tr><th>Candidate</th><th>Key number</th><th>Verdict</th></tr>
 <tr><td>(a) Slower or rarer confirmation per decoy</td><td>cover_time −0.118 [−0.134, −0.102]. False follow seconds saved per robot +12.29 [6.76, 17.82] (less saved). v5 over v3 share of robots with a decoy point active −0.210 [−0.260, −0.163]</td><td><b>supported</b></td></tr>
-<tr><td>(b) Attack per decoy doubles</td><td>Trail refresh +2.25 [1.63, 2.83]. At fixed N = 20, gain per robot is 0.138 at d = 2 and 0.250 at d = 4, so it rises</td><td>not supported</td></tr>
+<tr><td>(b) Attack per decoy doubles</td><td>Trail refresh +2.25 [1.63, 2.83]. Fixed N = 20, seeds 221 to 260 (not a paired contrast): gain per robot 0.138 at d = 2 and 0.250 at d = 4. The point estimate rises</td><td>not supported</td></tr>
 <tr><td>(c) Crowding raises wrong source suspects</td><td>Wrong source points activated −0.036 [−0.061, −0.013] at d = 0 and −0.019 [−0.038, −0.003] at 10 % detractors</td><td>not supported</td></tr>
 <tr><td>(d) Loss per robot shrinks, so less to recover</td><td>Loss per robot −0.766 [−0.948, −0.580]. Drop from loss −0.107 [−0.182, −0.043]. Drop from recovered share −0.139 [−0.243, −0.032]</td><td>unclear by the rule, a real part shared with v3</td></tr>
 <tr><td>(e) Lockout side effects grow with density</td><td>Lockout seconds after a true-trail abort −7.18 [−9.03, −5.44]. v5 drop minus v3 drop −0.100 [−0.230, 0.032]</td><td>not supported</td></tr>
 <tr><td>(f) Saved time does not become food</td><td>v5 saves less time (+12.29), so (a) applies</td><td>not supported for v5</td></tr>
 </table>
 <p>Pickups gained per robot fall from 0.247 to 0.011. The recovered share falls from 0.140 to 0.023.</p>
+<p><b>Disclosure from the memo.</b> The verdict rules for (b) and (c) were written after some numbers were seen. Those two verdicts are not blind.</p>
 <p><b>Limit stated by the memo.</b> The food-level contrast "v5 drop minus v3 drop" is −0.100 [−0.230, 0.032]. It is not resolved. The cause is resolved at the mechanism level, not as a separate food number. Candidates (a) and (b) are confounded inside the M7 runs, because detractors per decoy rise from 1 to 2 with N. No k1t10 or k2t0 arm exists at N = 40.</p>
 </div>
 
 <h2>Not a failure verdict, but a cost</h2>
-<p>The id arm isolated honest robots at every detractor count (Table 8). Its verdict is "differs" and its failure rule did not fire.</p>
+<p>The id arm isolated honest robots at every detractor count (Table 10). Its verdict is "differs" and its failure rule did not fire.</p>
 </div>
 
 <div class="panel sec" id="limits">
@@ -381,12 +411,14 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <li>Crowding (risk R10). Detractors are added on top of the 20 honest robots, so d = 4 means 24 robots. A small crowding effect is possible (D-005).</li>
 <li>Decoy cap (D-009). At most 2 decoys. Going from d = 2 to d = 4 raises the trail refresh rate, not the decoy count.</li>
 <li>Adapted, not replicated (D-040). The id arm follows Luna and Lu 2024 on a floor grid. It is not their waypoint system.</li>
-<li>Full texts unread. The Luna and Lu 2024 quarantine paper and detection paper were read as abstracts only. Their identifier, message and store needs are unknown (Table 11).</li>
+<li>Full texts unread. The Luna and Lu 2024 quarantine paper and detection paper were read as abstracts only. Their identifier, message and store needs are unknown (Table 13).</li>
 <li>Quarantine arm not run (D-041). The cautionary pheromone arm was not run either.</li>
 <li>Frozen values. Defense values were tuned at 20 robots and not re-tuned at 40.</li>
 <li>Robots rest at the nest boundary (D-024). The nest test is by position (D-008).</li>
 <li>Simulation only, one arena, one attack shape.</li>
-<li>Seed blocks differ between tracks. Their off baselines differ too. Rows from different blocks are never subtracted.</li>
+<li>Cross-block spread. The defense-off baseline F(0, off) runs from 75.8 to 81.4 across seed blocks (Table 14). The v3-rule no-attack cost differs by block, from −1.9 to −6.25. Every verdict is within one block and paired on seed, so the spread changes no verdict (D-061). No cross-block test was run. Rows from different blocks are never subtracted.</li>
+<li>Pairing (risk R11). Robot starts differ across cells, so pairing on seed is partial. The layout stream is shared.</li>
+<li>Run count in M6. 5 roots x 160 runs = 800 runs, because D-052 added k1t10. The pre-registration root list names 4 roots.</li>
 <li>Crowding as the cause is an association. It is not shown causal.</li>
 </ul>
 </div>
@@ -404,7 +436,7 @@ The mission copies these three words: scale, change, learn.</td></tr>
 
 <div class="panel sec" id="reading">
 <h2>Reading guide</h2>
-<p class="cap"><b>Table 14.</b> Seven papers, in reading order.</p>
+<p class="cap"><b>Table 17.</b> Seven papers, in reading order.</p>
 <table>
 <tr><th>#</th><th>Paper</th><th>Why read it</th></tr>
 <tr><td>1</td><td>Hecker and Moses 2015, "Beyond pheromones" (Swarm Intelligence)</td><td>The central-place foraging algorithm, the honest baseline of the line.</td></tr>
@@ -422,14 +454,14 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <h2>Method and rigour</h2>
 <ul>
 <li><b>Pre-registration.</b> Each track committed its criteria before its first run: <code>../prereg/defense_v2_lockout.md</code>, <code>../prereg/defense_v5.md</code>, <code>../prereg/defense_id_arm.md</code>, <code>../prereg/scale.md</code>.</li>
-<li><b>One statistic.</b> A paired percentile bootstrap on seed, 10,000 resamples, 95 % interval, for every verdict.</li>
+<li><b>One statistic.</b> A paired percentile bootstrap on seed, 10,000 resamples, 95 % interval, for every verdict. Each track judges one contrast (<a href="#verdicts">verdict table</a>). Every other interval is unadjusted, descriptive and reported, not judged (D-059). Percentile intervals can run narrow at small n.</li>
 <li><b>Verdicts by script.</b> Each track ends in a committed <code>verdict.json</code>. A failed verdict gets a root-cause memo (goal G3, D-036).</li>
-<li><b>Choices before data.</b> The comparison arm for M6 (D-050) and the scaled arm for M7 (D-053) were named by rule before the data existed. No retry after a fail (D-033).</li>
+<li><b>Choices before data.</b> The comparison arm for M6 (D-050) and the scaled arm for M7 (D-053) were named by rule. D-050 was written before the M5 verdict was computed, and it selects on M5 data while M6 tests on fresh seeds. D-053 was written before any M6 or M7 result. No retry after a fail (D-033).</li>
 <li><b>Invariance checks.</b> Version v4: 8 of 8 cells equal v3 on seed 1. Version v5: pass on 2 cells, strict. Version v6: byte-equal, pass. Every confirm run set: check 0 failed.</li>
 <li><b>Honest failures.</b> v2 and the 10-seed v3 stay in the report as null or fail results.</li>
 <li><b>Decision log.</b> 57 decisions, D-001 to D-057, in <a href="../DECISIONS.md">DECISIONS.md</a>.</li>
 </ul>
-<p class="cap"><b>Table 15.</b> Held-out seeds. Each confirm block was used once.</p>
+<p class="cap"><b>Table 18.</b> Held-out seeds. Each confirm block was used once.</p>
 <table>
 <tr><th>Seeds</th><th>Used for</th></tr>
 <tr><td>1 to 10</td><td>80-run sweep, v3 (goals G1, G2)</td></tr>
@@ -442,7 +474,8 @@ The mission copies these three words: scale, change, learn.</td></tr>
 <tr><td>301 to 310</td><td>M6 arm check</td></tr>
 <tr><td>321 to 360</td><td>M6 confirmation</td></tr>
 <tr><td>401 to 430</td><td>M7 scale confirmation</td></tr>
-<tr><td>900</td><td>M6 smoke runs, a throwaway block (D-048)</td></tr>
+<tr><td>900</td><td>M6 and M7 smoke runs, a throwaway block (D-048)</td></tr>
+<tr><td>1 and 11</td><td>Invariance reruns (exempt from the one-use rule)</td></tr>
 </table>
 <p class="abbr">Sources: D-029, D-043, D-048, D-010. Links: <a href="index.html">results index</a>, <a href="../PLAN.md">plan</a>, <a href="../RQ.md">research questions</a>.</p>
 </div>

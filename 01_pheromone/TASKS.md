@@ -378,12 +378,12 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M8 = T-E + T-F". No runs. Headline
   - Static: `research/cost_of_trust.md` Table 1 (P-13). Rows: blockchain, TAROS, ICCCR, cautionary pheromone, v3, k1t10, v5, ID arm.
   - Static: columns: messages, IDs, shared store, per-robot memory, measured d = 0 cost (ours only, read from verdict files).
   - Static: ICCCR (T-C, D-041) is a row only. Cells without a source say "not reported".
-- [~] M8-02 → M8 → Vision: final report HTML (developer for the script, main session runs it). In final edit. The main session closes it after the report fix and the render check
+- [x] M8-02 → M8 → Vision: final report HTML (developer for the script, main session runs it). Done 2026-11-12: review fixes applied (D-057 to D-061), Chrome render checked, no overlap, 6 of 6 images resolve. `results/report.html`
   - Static: one comparison chart: no-ID arms beside the ID arm (Vision, D-035). Every number read from saved verdict and stats files.
   - Static: one failure section per failed verdict, linking its root-cause memo. Includes the M4 section (M4-06).
   - Static: future work: dynamic food, a learned suspect test, quarantine regions.
   - Static: uses `skills/html-theme/theme.css`. Rendered once in headless Chrome per `rules/answering.md` §3.
 - [x] M8-03 → M8: slides outline (sonnet-writer, from M8-02). Done: `results/slides_outline.md`
   - Static: `results/slides_outline.md`, one line per slide, each slide names its source figure or table.
-- [~] M8-04 → M8: project-end review (reviewer, system-architect, data-analyst). Cycle 1 written: `results/reviews/project_end_review.md`. The main session closes it after the report fix and the render check
+- [x] M8-04 → M8: project-end review (reviewer, system-architect, data-analyst). Cycle 1 written: `results/reviews/project_end_review.md`. Closed 2026-11-12: 3 reviews written, every issue fixed or recorded (D-058 to D-061). No reruns needed
   - Gate: final verdict and open items list, per `.claude/CLAUDE.md` Workflow step 4 "Project end".

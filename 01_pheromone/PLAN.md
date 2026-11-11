@@ -68,7 +68,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Que
 
 ### Task list: split out (2026-11-11)
 
-> Current state (2026-11-12): M1 to M7 tasks done. Gates M3 to M7 closed by the project-end review (D-061). Total 0 open, 2 in progress (M8-02, M8-04). <!-- see TASKS.md -->
+> Current state (2026-11-12): M1 to M7 tasks done. Gates M3 to M7 closed by the project-end review (D-061). Total 0 open, 0 in progress. Project closed 2026-11-12. <!-- see TASKS.md -->
 > Gating fact: the main session closes M8-02 and M8-04 after the report fix and the render check. M8-04 ran before M8-02 closed. D-061 covers the order (P-7).
 > Detail: [TASKS.md](./TASKS.md)
 
