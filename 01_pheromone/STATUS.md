@@ -30,3 +30,4 @@
 2026-11-11 decisions: D-030 defense v2 in new run roots, code v4, no schema change (DECISIONS.md)
 2026-11-11 decisions: D-031 main session runs defense v2 multi-seed runs locally (DECISIONS.md)
 2026-11-11 decisions: D-032 defense v2 does not block M3, end 2026-11-21 (DECISIONS.md)
+2026-11-11 M4: v4 invariance holds (8 of 8 cells equal v3 seed 1), v2 tuning 80 runs picks t_lock 10 s (results/real/tuning_v2/pick.json)
