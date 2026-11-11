@@ -3,6 +3,7 @@
 
 #include <array>
 #include <cstddef>
+#include <vector>
 
 /*
  * Two-layer pheromone grid (DESIGN section 2). Pure: no simulator header,
@@ -37,7 +38,14 @@ namespace pheromone
            its value and f_amount, so a busy trail does not build up.
            A cell whose centre is left of f_min_x is skipped: no deposit in the nest
            (x < nest edge), also for the footprint cells beside the robot. */
-        void Deposit(ELayer e_layer, double f_x, double f_y, double f_amount, double f_min_x);
+        void Deposit(ELayer e_layer, double f_x, double f_y, double f_amount, double f_min_x,
+                     std::vector<int> *p_won = nullptr);
+        /* p_won (ID arm only, M6): gets the index of each cell whose value this deposit raised. */
+        /* Cell index (y * GRID_SIZE + x) holding (x, y), or -1 outside the arena. */
+        static int CellIndexOf(double f_x, double f_y);
+        /* One layer in one cell by index, and the way to zero it (ID arm isolation, M6). */
+        double ValueAt(ELayer e_layer, int n_cell) const;
+        void ZeroCell(ELayer e_layer, int n_cell);
         /* Sum of both layers in the cell holding (x, y). 0 outside the arena. */
         double Probe(double f_x, double f_y) const;
         /* One layer in that cell, for floor paint and ground truth. */

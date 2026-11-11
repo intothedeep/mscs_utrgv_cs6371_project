@@ -13,7 +13,7 @@
 namespace
 {
     /* Bumped by hand with a CHANGELOG.md row (rules/measurement.md 2.1). */
-    const char *CODE_VERSION = "v5";
+    const char *CODE_VERSION = "v6";
     /* EState order. The last three are detractor states (tools/schema.py STATES_DETRACTOR). */
     const char *STATE_NAMES[] = {"REST", "SEARCH", "FOLLOW", "END_SEARCH", "RETURN",
                                  "GO_DECOY", "WAIT_DECOY", "RETURN_LAY"};
@@ -34,6 +34,9 @@ void CPheromoneLoopFunctions::OpenLogger(TConfigurationNode &t_node)
     sInfo.decoysUsed = static_cast<unsigned>(m_vecActiveDecoys.size());
     sInfo.radius = pheromone::SPOT_RADIUS_M;
     m_cLogger.Open(sInfo);
+    /* The ID arm sidecar sits beside the four schema files (DESIGN_M6 section 5). */
+    if (m_eMode == MODE_ID)
+        m_strDefenseLogPath = sInfo.root + "/" + sInfo.runid + "/defense_log.csv";
 }
 
 void CPheromoneLoopFunctions::LogStep()

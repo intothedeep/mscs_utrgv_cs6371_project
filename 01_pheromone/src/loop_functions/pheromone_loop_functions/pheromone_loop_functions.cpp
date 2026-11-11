@@ -33,7 +33,10 @@ CPheromoneLoopFunctions::CPheromoneLoopFunctions() : m_pcFloor(NULL),
                                                      m_unRepaintEvery(0),
                                                      m_unCollectedFood(0),
                                                      m_unWastedRobotTicks(0),
-                                                     m_bDecoysAssigned(false) {}
+                                                     m_bDecoysAssigned(false),
+                                                     m_eMode(MODE_LEGACY),
+                                                     m_fIdMargin(1.5),
+                                                     m_fHalfLifeS(60.0) {}
 
 void CPheromoneLoopFunctions::Init(TConfigurationNode &t_node)
 {
@@ -47,6 +50,8 @@ void CPheromoneLoopFunctions::Init(TConfigurationNode &t_node)
         GetNodeAttribute(tPh, "probe_radius_m", m_fProbeRadius);
         GetNodeAttribute(tPh, "nest_edge_x", m_fNestEdgeX);
         GetNodeAttribute(tPh, "repaint_every", m_unRepaintEvery);
+        m_fHalfLifeS = fHalfLife;
+        ConfigureDefenseMode(tPh); /* before OpenLogger: the sidecar path depends on the mode */
 
         m_pcFloor = &GetSpace().GetFloorEntity();
         m_pcGrid.reset(new CPheromoneGrid(CPheromoneGrid::EvaporationFactor(
@@ -79,6 +84,7 @@ void CPheromoneLoopFunctions::Reset()
 {
     /* A GUI reset would append to the open run files, so close the log first (manifest: complete false). */
     m_cLogger.Close();
+    m_pcId.reset(); /* built again in the next PreStep */
     m_pcGrid->Clear();
     m_unCollectedFood = 0;
     m_unWastedRobotTicks = 0;
@@ -145,6 +151,8 @@ void CPheromoneLoopFunctions::UpdateRobotPreStep(CFootBotEntity &c_robot, CPhero
         {
             sFood.HasFoodItem = true; /* the source stays full */
             m_cLogger.LogEvent(GetSpace().GetSimulationClock(), c_robot.GetId(), "pickup", fX, fY);
+            if (m_pcId)
+                m_pcId->NotePickup(m_pcId->IndexOf(c_robot.GetId()), fX, fY);
         }
     }
 
@@ -157,6 +165,8 @@ void CPheromoneLoopFunctions::UpdateRobotPreStep(CFootBotEntity &c_robot, CPhero
         sReading.probe[i] = m_pcGrid->Probe(fX + m_fProbeRadius * std::cos(fAngle),
                                             fY + m_fProbeRadius * std::sin(fAngle));
     }
+    if (m_pcId)
+        m_pcId->NoteProbeOwner(m_pcId->IndexOf(c_robot.GetId()), fX, fY, cYaw.GetValue());
 }
 
 /* D-009: detractor j lures to active decoy j mod n_decoys (d = 1, 2, 4 -> decoys 1, 2, 2).
@@ -180,6 +190,8 @@ void CPheromoneLoopFunctions::PreStep()
 {
     if (!m_bDecoysAssigned)
         AssignDecoys();
+    if (m_eMode == MODE_ID && !m_pcId)
+        SetUpIdArm();
     m_pcGrid->Evaporate();
     ForEachFootBot([this](CFootBotEntity &c_robot, CPheromoneForager &c_controller)
                    { UpdateRobotPreStep(c_robot, c_controller); });
@@ -192,10 +204,20 @@ void CPheromoneLoopFunctions::PostStep()
         CPheromoneForager::SDepositRequest &sRequest = c_controller.GetDepositRequest();
         const CVector3 &cPos = c_robot.GetEmbodiedEntity().GetOriginAnchor().Position;
         /* hb_ writes the true layer, dt_ the false layer. No deposit in the nest. */
+        const pheromone::ELayer eLayer = IsHonest(c_robot.GetId()) ? pheromone::LAYER_TRUE : pheromone::LAYER_FALSE;
         if (sRequest.active && cPos.GetX() >= m_fNestEdgeX)
-            m_pcGrid->Deposit(IsHonest(c_robot.GetId()) ? pheromone::LAYER_TRUE : pheromone::LAYER_FALSE,
-                              cPos.GetX(), cPos.GetY(), sRequest.amount, m_fNestEdgeX);
+        {
+            if (m_pcId) /* ID arm: the deposit filter and the owner record (M6) */
+                m_pcId->Deposit(static_cast<int>(GetSpace().GetSimulationClock()), m_pcId->IndexOf(c_robot.GetId()),
+                                eLayer, cPos.GetX(), cPos.GetY(), sRequest.amount, m_fNestEdgeX);
+            else
+                m_pcGrid->Deposit(eLayer, cPos.GetX(), cPos.GetY(), sRequest.amount, m_fNestEdgeX);
+        }
+        else if (m_pcId)
+            m_pcId->EndDepositRun(m_pcId->IndexOf(c_robot.GetId()));
         sRequest.active = false; });
+    if (m_pcId)
+        StepIdArm(); /* after every deposit, before the log (DESIGN_M6 Figure 1) */
     LogStep(); /* after every deposit, so the layer sums are final for this tick */
     if (m_unRepaintEvery > 0 && GetSpace().GetSimulationClock() % m_unRepaintEvery == 0)
         m_pcFloor->SetChanged();
@@ -203,6 +225,8 @@ void CPheromoneLoopFunctions::PostStep()
 
 void CPheromoneLoopFunctions::PostExperiment()
 {
+    if (m_pcId)
+        m_pcId->WriteEndState(static_cast<int>(GetSpace().GetSimulationClock()));
     m_cLogger.Close();
     LOG << "food_collected " << m_unCollectedFood << std::endl;
 }

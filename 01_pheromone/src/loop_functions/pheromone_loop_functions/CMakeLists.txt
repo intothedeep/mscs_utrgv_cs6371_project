@@ -4,7 +4,14 @@ link_directories(${CMAKE_BINARY_DIR}/controllers/pheromone_forager)
 set(pheromone_loop_functions_SOURCES
   pheromone_grid.cpp
   food_field.cpp
+  owner_grid.cpp
+  trail_store.cpp
+  trail_clusters.cpp
+  id_defense.cpp
+  defense_log.cpp
+  id_arm.cpp
   pheromone_loop_functions.cpp
+  pheromone_loop_functions_id.cpp
   pheromone_loop_functions_log.cpp
   run_logger.cpp
   run_info_reader.cpp)

@@ -8,6 +8,7 @@
 #include "pheromone_grid.h"
 #include "food_field.h"
 #include "run_logger.h"
+#include "id_arm.h"
 #include <functional>
 #include <memory>
 
@@ -40,6 +41,19 @@ private:
     void LogStep();
     void OpenLogger(TConfigurationNode &t_node);
     void AssignDecoys();
+    /* M6 ID arm (pheromone_loop_functions_id.cpp). It runs only when defense_mode is "id". */
+    void ConfigureDefenseMode(TConfigurationNode &t_pheromone);
+    void SetUpIdArm();
+    void StepIdArm();
+
+    enum EDefenseMode
+    {
+        MODE_LEGACY = 0, /* no defense_mode attribute: behaves as v4 */
+        MODE_OFF,
+        MODE_V3,
+        MODE_V5,
+        MODE_ID
+    };
 
     CFloorEntity *m_pcFloor;
     std::unique_ptr<pheromone::CPheromoneGrid> m_pcGrid;
@@ -55,6 +69,12 @@ private:
     pheromone::CRunLogger m_cLogger;
     bool m_bDecoysAssigned;
     UInt64 m_unWastedRobotTicks; /* integers, divided once: no float drift in the cumulative sum */
+
+    EDefenseMode m_eMode;
+    double m_fIdMargin;   /* travel-time margin, <pheromone id_margin>, D-048 D1 */
+    double m_fHalfLifeS;
+    std::string m_strDefenseLogPath; /* empty without <logger> */
+    std::unique_ptr<pheromone::CIdArm> m_pcId; /* null unless defense_mode is "id" */
 };
 
 #endif

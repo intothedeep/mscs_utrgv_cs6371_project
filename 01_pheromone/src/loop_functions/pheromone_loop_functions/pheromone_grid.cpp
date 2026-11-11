@@ -33,7 +33,8 @@ namespace pheromone
         return (nCell < 0 || nCell >= GRID_SIZE) ? -1 : nCell;
     }
 
-    void CPheromoneGrid::Deposit(ELayer e_layer, double f_x, double f_y, double f_amount, double f_min_x)
+    void CPheromoneGrid::Deposit(ELayer e_layer, double f_x, double f_y, double f_amount, double f_min_x,
+                                std::vector<int> *p_won)
     {
         int nCx = CellOf(f_x), nCy = CellOf(f_y);
         if (nCx < 0 || nCy < 0)
@@ -47,8 +48,26 @@ namespace pheromone
                 if (ARENA_MIN + (nX + 0.5) * CELL_M < f_min_x)
                     continue; /* cell centre inside the nest */
                 double &fCell = m_aLayers[e_layer][nY * GRID_SIZE + nX];
+                if (p_won && f_amount > fCell)
+                    p_won->push_back(nY * GRID_SIZE + nX);
                 fCell = std::max(fCell, f_amount);
             }
+    }
+
+    int CPheromoneGrid::CellIndexOf(double f_x, double f_y)
+    {
+        int nX = CellOf(f_x), nY = CellOf(f_y);
+        return (nX < 0 || nY < 0) ? -1 : nY * GRID_SIZE + nX;
+    }
+
+    double CPheromoneGrid::ValueAt(ELayer e_layer, int n_cell) const
+    {
+        return m_aLayers[e_layer][n_cell];
+    }
+
+    void CPheromoneGrid::ZeroCell(ELayer e_layer, int n_cell)
+    {
+        m_aLayers[e_layer][n_cell] = 0.0;
     }
 
     double CPheromoneGrid::Value(ELayer e_layer, double f_x, double f_y) const
