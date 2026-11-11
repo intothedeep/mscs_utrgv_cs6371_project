@@ -13,7 +13,7 @@
 namespace
 {
     /* Bumped by hand with a CHANGELOG.md row (rules/measurement.md 2.1). */
-    const char *CODE_VERSION = "v4";
+    const char *CODE_VERSION = "v5";
     /* EState order. The last three are detractor states (tools/schema.py STATES_DETRACTOR). */
     const char *STATE_NAMES[] = {"REST", "SEARCH", "FOLLOW", "END_SEARCH", "RETURN",
                                  "GO_DECOY", "WAIT_DECOY", "RETURN_LAY"};

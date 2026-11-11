@@ -68,6 +68,11 @@ void CPheromoneForager::SParams::Init(TConfigurationNode &t_params, Real f_tps)
     Real fLockSeconds = 0.0f;
     GetNodeAttributeOrDefault(tDef, "t_lock", fLockSeconds, fLockSeconds);
     LockTicks = static_cast<UInt32>(fLockSeconds * f_tps + 0.5f);
+    /* v5 confirm-twice (D-039). Optional, so a v4 file without it still loads. 1 = v4 behaviour. */
+    ConfirmK = 1;
+    GetNodeAttributeOrDefault(tDef, "confirm_k", ConfirmK, ConfirmK);
+    if (ConfirmK < 1)
+        THROW_ARGOSEXCEPTION("defense confirm_k must be at least 1");
 
     TConfigurationNode &tNest = GetNode(t_params, "nest");
     Real fX, fY;

@@ -38,7 +38,7 @@
                    probe_radius_m="0.15" decoy_reach_m="0.2" t_wait="2"
                    follow_enabled="true" />
         <defense enabled="false" r_merge="0.3" n_mem="16" r_suspect="0.4"
-                 alpha_cone_deg="15" d_cone="1.0" t_lock="0" />
+                 alpha_cone_deg="15" d_cone="1.0" t_lock="0" confirm_k="1" />
         <nest edge_x="-1.0" centre_x="-1.5" centre_y="0.0" />
       </params>
     </pheromone_forager_controller>

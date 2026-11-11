@@ -22,6 +22,7 @@ PARAM_SITES: dict[str, tuple[str, str]] = {
     "d_cone": (f"{_CTRL}/defense", "d_cone"),
     "enabled": (f"{_CTRL}/defense", "enabled"),
     "t_lock": (f"{_CTRL}/defense", "t_lock"),  # v4 lockout seconds (D-028)
+    "confirm_k": (f"{_CTRL}/defense", "confirm_k"),  # v5 failures before a point acts (D-039)
 }
 
 

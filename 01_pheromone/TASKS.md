@@ -241,7 +241,7 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M5 = T-A". Runner: main session, l
 
 ### M5 exit (runnable)
 
-1. `results/real/v5/step0_kill.md` exists and states "go v5" or "switch to A'" by the kill rule (M5-01).
+1. `results/real/v5_killcheck.md` exists and states "go v5" or "switch to A'" by the kill rule (M5-01).
 2. Invariance: v5 with k = 1 gives the saved v4 `food_collected` on 2 cells (M5-05).
 3. The mechanism-check table for seeds 201 to 210 exists (M5-06). Reported only, no pick.
 4. `check_runs.py` exits 0 on the M5 confirm root: 800 complete runs, seeds 221 to 260 (M5-07).
@@ -260,12 +260,12 @@ Spec: `decisions/2026-11-11_fable_tracks.md` "M5 = T-A". Runner: main session, l
   - Static: a design section names k (fixed 2) and `t_lock` (0 or 10 s), or A' if M5-01 says switch.
   - Static: it states the schema impact. A needed schema change sends the slice back to M1 (DESIGN §5).
   - Static: it names the 5 arms: off, and (k 1 or 2) x (`t_lock` 0 or 10).
-- [ ] M5-03 → M5: code v5 and tools (developer)
+- [x] M5-03 → M5: code v5 and tools (developer)
   - Static: `CHANGELOG.md` has a v5 row. `code_version` is `v5`. k is a `<defense>` attribute and is in manifest params.
   - Static: run tools take seed blocks as CLI options. They refuse seeds 1 to 30, 101 to 116, and any block outside 201 to 210 and 221 to 260.
   - Static: run tools exit nonzero if the M5 prereg has no git commit. The invariance rerun (M5-05) is exempt from this check and the seed check.
   - Static: a judge script reads saved runs only and writes `results/real/v5/verdict.json`.
-- [ ] M5-04 → M5 → RQ1: prereg (developer writes, main session commits)
+- [x] M5-04 → M5 → RQ1: prereg (developer writes, main session commits)
   - Static: `prereg/defense_v5.md` holds the 4 lines of `rules/measurement.md` §1, copied from the source "M5 = T-A".
   - Static: metric G(2) = F(2, v5) − F(2, off), seeds 221 to 260, paired bootstrap 10,000, 95 %.
   - Static: threshold G(2) lower bound > 0. Failure: G(2) interval includes 0, or the d = 0 cost upper bound < 0.

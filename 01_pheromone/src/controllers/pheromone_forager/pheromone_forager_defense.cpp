@@ -24,6 +24,12 @@ void CPheromoneForager::AddSuspect(const CVector2 &c_point)
         m_vecSuspects.erase(m_vecSuspects.begin());
 }
 
+/* v5: a point acts (mask, cone) once it holds Count >= confirm_k failures. confirm_k 1 = v4. */
+bool CPheromoneForager::IsActive(const SSuspect &s_suspect) const
+{
+    return s_suspect.Count >= m_sParams.ConfirmK;
+}
+
 /* Rule 4: a reading taken within r_suspect of a suspect point is read as 0. */
 void CPheromoneForager::MaskSuspects()
 {
@@ -33,7 +39,7 @@ void CPheromoneForager::MaskSuspects()
     auto cIsSuspect = [this](const CVector2 &c_point)
     {
         for (const SSuspect &sSuspect : m_vecSuspects)
-            if ((sSuspect.Pos - c_point).Length() <= m_sParams.RSuspect)
+            if (IsActive(sSuspect) && (sSuspect.Pos - c_point).Length() <= m_sParams.RSuspect)
                 return true;
         return false;
     };
@@ -54,6 +60,8 @@ bool CPheromoneForager::IsConeHit() const
         return false;
     for (const SSuspect &sSuspect : m_vecSuspects)
     {
+        if (!IsActive(sSuspect))
+            continue;
         const CVector2 cToSuspect = sSuspect.Pos - m_cPos;
         if (cToSuspect.Length() <= m_sParams.DCone &&
             Abs((cToSuspect.Angle() - m_cYaw).SignedNormalize()) <= m_sParams.AlphaCone)
