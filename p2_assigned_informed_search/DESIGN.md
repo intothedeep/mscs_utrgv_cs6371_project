@@ -4,7 +4,7 @@
 - Task: `../docs/Autonomous_Mobile_Robot_Programming_Final Project 2.pdf` (cited as [TASK]).
 - Code facts: `research/baseline_code_map.md` (cited as `BCM §n`, or file:line with the short names `ctrl.cpp`, `lf.cpp`, `base.cpp`).
 - Literature: `research/informed_search_survey.md` (source IDs `S-IS-n`).
-- Measured facts: "main session smoke, 2026-11-12" (baseline build in `02_informed_search_assigned/build_baseline/`, one run, seed 1).
+- Measured facts: "main session smoke, 2026-11-12" (baseline build in `p2_assigned_informed_search/build_baseline/`, one run, seed 1).
 - Pattern reused: `../01_pheromone/` tools (schema, mock runs, check, sweep, analyze, report). Its controller is not reused.
 - Words used below:
   - "Baseline" = the professor's central-place foraging algorithm (CPFA) code at commit `9480f2e`, unchanged.
@@ -311,7 +311,7 @@ Each tactic is one switch. Each enters only through tuning on tuning seeds (§6.
 ### 4.1 Source layout and the switch
 
 ```
-Figure 5. Code layout, under 02_informed_search_assigned/
+Figure 5. Code layout, under p2_assigned_informed_search/
 
  vendor/Collision_Free_CPFA/   git-ignored clone at 9480f2e, never edited
         │ copy once
@@ -474,7 +474,7 @@ Table 6. Method parameters (start value first, all inference)
 ### 6.4 Run layout
 
 ```
-02_informed_search_assigned/
+p2_assigned_informed_search/
   runs/<set>/<runid>/            runid = <YYYYMMDD-HHMMSS>_<arm>_<dist>_s<seed>
     run.argos                    generated experiment file (seed, arm, distribution, stamps)
     results/                     created by the harness, vendor files land here

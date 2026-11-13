@@ -1,13 +1,13 @@
 > Completed items live in `_archive/` (cold storage, do not read unless
 > investigating history). This doc holds the active + planned log only.
 
-# Decisions: 02_informed_search_assigned
+# Decisions: p2_assigned_informed_search
 
 - Owner rule: Fable picks the best option and logs it here (repo-root `CLAUDE.md`, 2026-11-12).
 
 | ID | Date | Decision | Why (line served) | Rejected | Decided by | Evidence | Supersedes |
 | --- | --- | --- | --- | --- | --- | --- | --- |
-| D-001 | 2026-11-12 | Build Final Project 2 in `02_informed_search_assigned/`. Baseline is `Collision_Free_CPFA` commit `9480f2e`, cloned to `vendor/` and never edited | Constraints | edit the vendor clone in place (breaks invariance check) | owner (folder name), Fable (layout) | `README.md` | none |
+| D-001 | 2026-11-12 | Build Final Project 2 in `p2_assigned_informed_search/`. Baseline is `Collision_Free_CPFA` commit `9480f2e`, cloned to `vendor/` and never edited | Constraints | edit the vendor clone in place (breaks invariance check) | owner (folder name), Fable (layout) | `README.md` | none |
 | D-002 | 2026-11-12 | Main session builds and runs locally: one core, `timeout`, sequential, all evaluation runs included | Constraints | owner runs all (slow gates), smoke only | owner | repo-root `CLAUDE.md` Execution | none |
 | D-003 | 2026-11-12 | Mission: find ground no robot has searched, so the swarm collects more in 12 minutes. Keep server cost small as swarms and arenas grow | Mission | architect draft without the score (grade is ranked by score) | Fable, owner-delegated | DESIGN.md §0, assignment PDF p. 3 | none |
 | D-004 | 2026-11-12 | Vision: one page shows 3-distribution box plots with % improvement over original CPFA and its interval, a query-cost vs arena-size chart beside the student grid, and a cause for each failure | Vision | none | Fable, owner-delegated | DESIGN.md §0 hand-back | none |
@@ -21,3 +21,9 @@
 | D-012 | 2026-11-12 | G1 verdict at 80 m only (the professor's example scale). Larger arenas are reported, not judged | G1 | judge "80 m and larger" (more ways to fail on sizes the assignment never names) | Fable, owner-delegated | DESIGN.md §5.2 | none |
 | D-013 | 2026-11-12 | Accept pm proposal: `tools/collect_runs.py` builds `runs.csv` from run folders | G2 | analysis reads run folders directly (duplicates parsing in every tool) | Fable, owner-delegated | PLAN.md Open items | none |
 | D-014 | 2026-11-12 | Accept pm proposal: the vendor arm writes header-only `queries.csv` and `points.csv`, so every run has the same file set | G2 (one schema) | arm-specific file sets (checks branch per arm) | Fable, owner-delegated | PLAN.md Open items | none |
+| D-015 | 2026-11-12 | Header-only files: `points.csv` is header-only for `vendor` and `cpfa` (switch off uploads nothing). `queries.csv` is header-only for `vendor` only (`cpfa` logs one row per nest decision, M2-03) | G2 (one schema) | `points.csv` rows for `cpfa` (fake uploads in mock runs, contradicts M2-03) | Fable, owner-delegated | TASKS.md M2-03, D-014 | none |
+| D-016 | 2026-11-12 | Branch shares: `fallback_random` counts into `share_random`, so the 4 shares sum to 1. `n_queries` counts rows with non-empty `nodes_visited` | G2 | a 5th share column (schema change for a rare branch) | Fable, owner-delegated | `tools/schema.py` `SHARE_COLUMN_OF_BRANCH` | none |
+| D-017 | 2026-11-12 | Folder renamed to `p2_assigned_informed_search/` (was `02_informed_search_assigned/`). Path references updated in every doc | Constraints | none | owner | owner message 2026-11-12 | none |
+| D-018 | 2026-11-12 | Add the spiral-page hybrid rule (spiral, switch to random walk when crowded) as one tuning candidate only, next to T4 spiral. Its exact form goes into `DESIGN.md` §3.6 and the S2 tuning plan before the S2 pre-registration | RQ3, G2 | leave it out (owner wants it tried); make it default (no evidence) | owner ("ok"), Fable (candidate only) | `../site/en/projects/spiral-search.html` | none |
+| D-019 | 2026-11-12 | Report text explains the server with the irrigation analogy: unvisited cell = dry cell, reservation = assignment. No code | Vision | none | owner ("ok") | `../site/en/projects/irrigation.html` | none |
+| D-020 | 2026-11-12 | Mock report page keeps the name `index.html` (M1 exit 7). Every other mock file name ends `_MOCK` | G2 | rename to `index_MOCK.html` (breaks M1 exit 7 path) | Fable, owner-delegated | `tools/report.py` | none |

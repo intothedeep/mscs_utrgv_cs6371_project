@@ -2,7 +2,7 @@
 > investigating history). Split detail, if any, is linked from stubs below;
 > a stub's state is the truth if it and the detail disagree.
 
-# Plan: 02_informed_search_assigned (informed search for CPFA swarms)
+# Plan: p2_assigned_informed_search (informed search for CPFA swarms)
 
 ## Mission block
 
@@ -71,7 +71,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Que
 
 ### Task list: split out (2026-11-12)
 
-> Current state (2026-11-12): 0 of 5 milestones closed. 49 open (M1 10, M2 11, M3 10, M4 9, M5 9), 0 in progress. <!-- see TASKS.md -->
+> Current state (2026-11-12): 0 of 5 milestones closed. 38 open (M1 1, M2 11, M3 8, M4 9, M5 9), 11 done (M1-01..08, M1-10, M3-01, M3-02), 0 in progress. <!-- see TASKS.md -->
 > Gating fact: M1 opens first. M3-01 to M3-03 (pure code) may start during M1 and M2 (DESIGN §7).
 > Detail: [TASKS.md](./TASKS.md)
 

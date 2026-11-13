@@ -8,7 +8,11 @@ __pycache__/
 01_pheromone/mock/runs/
 # macOS folder metadata
 .DS_Store
-# 02_informed_search_assigned: vendored baseline (clone, not tracked)
-02_informed_search_assigned/vendor/
-02_informed_search_assigned/build_baseline/
-02_informed_search_assigned/runs/
+# p2_assigned_informed_search: vendored baseline (clone, not tracked)
+p2_assigned_informed_search/vendor/
+p2_assigned_informed_search/build_baseline/
+p2_assigned_informed_search/runs/
+# p2_assigned_informed_search: mock runs and our build (PLAN "Fixed paths")
+p2_assigned_informed_search/mock/runs/
+p2_assigned_informed_search/build_ours/
+p2_assigned_informed_search/.venv/

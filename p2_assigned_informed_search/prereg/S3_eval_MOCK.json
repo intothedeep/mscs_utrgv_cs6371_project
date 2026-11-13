@@ -1,0 +1,75 @@
+{
+  "mock": true,
+  "title": "MOCK S3 evaluation criteria (MVP1 pipeline test only, never cited by a real verdict)",
+  "mock_note": "MOCK DATA. Values copy DESIGN.md 6.2 items 1 to 8 so analyze.py can run on mock runs. The real file is prereg/S3_eval.json (task M4-05), same keys.",
+  "schema_version": 1,
+  "source": "DESIGN.md 6.1, 6.2, 6.7; DECISIONS.md D-006, D-011",
+  "task": "TASKS.md M1-10",
+  "set": "S3",
+  "set_role": "primary (F1-a, nest radius XML 0.25, D-006). S4 (F1-b) is the sensitivity set and gets its own file",
+
+  "primary_metric": {
+    "column": "collected",
+    "at_sim_time_s": 720,
+    "source_file": "results/<real|mock>/runs.csv"
+  },
+
+  "primary_contrast": {
+    "treatment_arm": "qmap",
+    "control_arm": "cpfa",
+    "per": "distribution",
+    "distributions": ["random", "powerlaw", "clustered"],
+    "pairing": "seed",
+    "seeds": {"first": 2001, "last": 2050},
+    "n_pairs": 50
+  },
+
+  "improvement": {
+    "formula": "100 * (mean_qmap - mean_cpfa) / mean_cpfa",
+    "kind": "ratio_of_means",
+    "unit": "percent"
+  },
+
+  "decision_rule": {
+    "only_rule": true,
+    "statistic": "improvement",
+    "interval": "percentile_bootstrap",
+    "interval_level": 0.95,
+    "n_resamples": 10000,
+    "resample_unit": "seed_index",
+    "paired": true,
+    "bootstrap_seed": 20261112,
+    "rng": "numpy.random.default_rng"
+  },
+
+  "verdict": {
+    "improves": "ci_low > 0",
+    "worse": "ci_high < 0",
+    "not resolved": "otherwise"
+  },
+
+  "reported_not_decisive": {
+    "wilcoxon_signed_rank": {
+      "alternative": "two-sided",
+      "method": "normal approximation with tie correction, numpy only (D-011)"
+    },
+    "holm_adjusted_p": {"over": "3 distributions"},
+    "medians": true,
+    "note": "Printed beside the verdict in improvement.csv. Never part of the verdict."
+  },
+
+  "multiplicity": {
+    "verdicts": "3 separate verdicts, one per distribution",
+    "report_line": "One line next to the table says the 3 verdicts are separate."
+  },
+
+  "noise_line": {
+    "sigma_source": {"set": "S1", "arm": "cpfa", "column": "collected", "per": "distribution", "statistic": "standard deviation"},
+    "detectable_paired_difference": "2.8 * sigma_diff / sqrt(n_pairs)",
+    "multiplier": 2.8,
+    "multiplier_basis": "80 % power, alpha 0.05, two-sided",
+    "sigma_diff_stand_in": "sqrt(2) * sigma",
+    "sigma_diff_note": "sigma_diff is unknown before S3. sqrt(2) * sigma is the conservative stand-in.",
+    "reported": "beside each result"
+  }
+}

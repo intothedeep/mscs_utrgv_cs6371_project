@@ -29,7 +29,7 @@ Source: assignment PDF [S-IS-1], read in full (3 pages).
 | Score setting | 10 × 10 m arena, collection zone radius 0.25 m, 256 resources, 24 robots, 12 min |
 | Distributions | Random, Powerlaw, Clustered. 50 runs each |
 | Comparison | Box plots vs the original CPFA. Percentage improvement in collected resources. Teams ranked by score |
-| Baseline code | `MARSLab-UTRGV/Collision_Free_CPFA` (pinned in `02_informed_search_assigned/README.md`) |
+| Baseline code | `MARSLab-UTRGV/Collision_Free_CPFA` (pinned in `p2_assigned_informed_search/README.md`) |
 
 ```
 robot returns ──> server ──> pick unvisited region ──> robot searches there
@@ -195,4 +195,4 @@ New sources:
 [S-IS-8] A Frontier-Based Approach for Autonomous Exploration | https://dblp.dagstuhl.de/rec/conf/cira/Yamauchi97.html | published: 1997, CIRA pp. 146 to 151 | accessed: 2026-11-12 | type: aggregator | note: search snippet only
 [S-IS-9] A distributed deterministic spiral search algorithm for swarms | https://researchr.org/publication/FrickeHGTM16 | published: 2016, IROS 2016 pp. 4430 to 4436, DOI 10.1109/IROS.2016.7759652 | accessed: 2026-11-12 | type: aggregator | note: search snippet of the listing only
 [S-IS-10] Enhanced Foraging in Robot Swarms Using Collective Lévy Walks | https://ebooks.iospress.nl/pdf/doi/10.3233/FAIA200090 | published: 2020, ECAI 2020, FAIA 325 pp. 171 to 178 | accessed: 2026-11-12 | type: paper | note: fetch summary of the page, no numbers
-[S-IS-11] Collision_Free_CPFA experiment files | local: `02_informed_search_assigned/vendor/Collision_Free_CPFA/experiments/` at commit `9480f2e3` | published: 2026-05-01 commit | accessed: 2026-11-12 | type: official | note: XML attributes read with grep
+[S-IS-11] Collision_Free_CPFA experiment files | local: `p2_assigned_informed_search/vendor/Collision_Free_CPFA/experiments/` at commit `9480f2e3` | published: 2026-05-01 commit | accessed: 2026-11-12 | type: official | note: XML attributes read with grep

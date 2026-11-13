@@ -1,0 +1,12 @@
+[project]
+name = "informed-search"
+version = "0.1.0"
+description = "Informed search for CPFA swarms: run tools (schema, mock, check, collect, analysis, reports)"
+requires-python = ">=3.12"
+dependencies = [
+    "numpy>=2.0",
+    "matplotlib>=3.9",
+]
+
+[tool.uv]
+python-downloads = "never"   # Python comes from pyenv (.python-version)

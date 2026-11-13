@@ -1,7 +1,7 @@
 > Completed items live in `_archive/` (cold storage, do not read unless
 > investigating history). This doc holds the active + planned log only.
 
-# Research questions: 02_informed_search_assigned
+# Research questions: p2_assigned_informed_search
 
 | ID | Question | Serves | Status | Evidence | Opened | Changed | By |
 | --- | --- | --- | --- | --- | --- | --- | --- |

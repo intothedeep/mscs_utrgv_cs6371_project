@@ -3,7 +3,7 @@
 - Scope: the professor's Central-Place Foraging Algorithm (CPFA) code for Final Project 2.
 - Simulator: Autonomous Robots Go Swarming (ARGoS) 3.0.0-beta59, installed under `/usr/local`.
 - Method: code reading only. Nothing was built or run.
-- Root of every relative path below: `02_informed_search_assigned/vendor/Collision_Free_CPFA/`.
+- Root of every relative path below: `p2_assigned_informed_search/vendor/Collision_Free_CPFA/`.
 - Short forms used in citations:
   - `ctrl.cpp` = `source/CPFA/CPFA_controller.cpp`
   - `ctrl.h` = `source/CPFA/CPFA_controller.h`
@@ -494,4 +494,4 @@ open_questions:
 [S-BCM-2] BCLab-UNM CPFA-ARGoS: source/Base/BaseController.cpp | https://raw.githubusercontent.com/BCLab-UNM/CPFA-ARGoS/master/source/Base/BaseController.cpp | published: master branch | accessed: 2026-11-12 | type: official | note: read through a fetch summary, verification partial
 [S-BCM-3] CMake 4.0 Release Notes | https://cmake.org/cmake/help/v4.0/release/4.0.html | published: CMake 4.0 | accessed: 2026-11-12 | type: official | note: removal of compatibility below 3.5, CMAKE_POLICY_VERSION_MINIMUM, quoted in place
 [S-BCM-4] ARGoS 3: src/core/simulator/simulator.cpp | https://raw.githubusercontent.com/ilpincy/argos3/master/src/core/simulator/simulator.cpp | published: master branch | accessed: 2026-11-12 | type: official | note: InitFramework seed logic, master not beta59
-[S-BCM-5] Collision_Free_CPFA vendored clone, commit 9480f2e | `02_informed_search_assigned/vendor/Collision_Free_CPFA/` | published: commit 9480f2e | accessed: 2026-11-12 | type: official | note: code read in place, file:line cited per claim
+[S-BCM-5] Collision_Free_CPFA vendored clone, commit 9480f2e | `p2_assigned_informed_search/vendor/Collision_Free_CPFA/` | published: commit 9480f2e | accessed: 2026-11-12 | type: official | note: code read in place, file:line cited per claim

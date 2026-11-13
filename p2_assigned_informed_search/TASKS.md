@@ -1,7 +1,7 @@
 > Split from `PLAN.md` (rules/docs.md §1). The PLAN.md stub is the truth if
 > the two disagree; update both in the same edit.
 
-# Tasks: 02_informed_search_assigned
+# Tasks: p2_assigned_informed_search
 
 Mission block, task format, run forms and fixed paths: [PLAN.md](./PLAN.md).
 Roles: developer (code, static AC only), data-analyst (pre-registrations, memos), sonnet-writer (prose), product-manager (D-rows, living docs), main session (every build and run, D-002).
@@ -24,12 +24,12 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
 
 ### Tactic: schema first, mock fills it (kill: a column the mock cannot fill without changing DESIGN §6.5)
 
-- [ ] M1-01 → M1: Python project files and `.gitignore` (developer, U1 part)
-  - Static: `02_informed_search_assigned/pyproject.toml` per `rules/development/python.md`: `[tool.uv] python-downloads = "never"`. Dependencies numpy and matplotlib only (D-011).
-  - Static: `submodule_project/.gitignore` adds `02_informed_search_assigned/mock/runs/` and `02_informed_search_assigned/build_ours/`. Existing lines for `vendor/`, `build_baseline/`, `runs/` stay. `prereg/`, `results/`, `src/` are not ignored.
+- [x] M1-01 → M1: Python project files and `.gitignore` (developer, U1 part)
+  - Static: `p2_assigned_informed_search/pyproject.toml` per `rules/development/python.md`: `[tool.uv] python-downloads = "never"`. Dependencies numpy and matplotlib only (D-011).
+  - Static: `submodule_project/.gitignore` adds `p2_assigned_informed_search/mock/runs/` and `p2_assigned_informed_search/build_ours/`. Existing lines for `vendor/`, `build_baseline/`, `runs/` stay. `prereg/`, `results/`, `src/` are not ignored.
   - Gate: main session runs `uv sync` once before M1 exit 1.
   - Depends on: none.
-- [ ] M1-02 → M1: `tools/schema.py` (developer, U1)
+- [x] M1-02 → M1: `tools/schema.py` (developer, U1)
   - Static: `SCHEMA_VERSION = 1`. `RUNS_COLUMNS` lists the DESIGN §6.5 columns in table order.
   - Static: `QUERIES_COLUMNS` lists DESIGN §5.1 columns. `FORAGE_COLUMNS = ["minute", "collected"]`. `POINTS_COLUMNS = ["t_s", "robot", "x", "y"]`.
   - Static: `RUN_FILES` lists the 6 files of DESIGN §6.4 (`run.argos`, `stdout.log`, `manifest.json`, `forage_per_minute.csv`, `queries.csv`, `points.csv`).
@@ -39,21 +39,21 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
   - Static: `METRICS_TAG` = the prefix of the one `stdout.log` line our build prints with run totals. `SCORE_PATTERN` cannot match it.
   - Static: no other file in `tools/` holds a column literal (grep each name of `RUNS_COLUMNS` in `tools/*.py`, only `schema.py` matches).
   - Depends on: M1-01.
-- [ ] M1-03 → M1: `tools/check_runs.py` (developer, U1, DESIGN §6.6)
+- [x] M1-03 → M1: `tools/check_runs.py` (developer, U1, DESIGN §6.6)
   - Static: `check_runs.py <root>` checks items 1 to 6 of DESIGN §6.6. Item 5 and 6 run only for S3 and S4 runs.
   - Static: header-only `queries.csv` and `points.csv` pass only when manifest `arm` = `vendor` (PLAN open item).
   - Static: runid prefix `MOCK_` exactly when `mock` = 1. Runid matches `schema.RUNID_PATTERN`.
   - Static: exits nonzero on any failure and prints run, file and column or key. Prints the missing-cell list for item 4.
   - Gate: M1 exit 2 and 6.
   - Depends on: M1-02.
-- [ ] M1-04 → M1: `tools/collect_runs.py` (developer, pm proposal, PLAN open item)
+- [x] M1-04 → M1: `tools/collect_runs.py` (developer, pm proposal, PLAN open item)
   - Static: `collect_runs.py <root> --out <csv>` reads each run folder and writes one row per run with exactly `schema.RUNS_COLUMNS`.
   - Static: non-applying columns are empty, not 0 (DESIGN §6.5). `share_*` come from `queries.csv` `branch` rows. `ops_per_query_*` come from `nodes_visited`.
   - Static: refuses an `--out` path outside `results/mock/` for mock roots and outside `results/real/` for real roots.
   - Static: the same code path serves mock and real (no `if mock` branch for column values).
   - Gate: M1 exit 3.
   - Depends on: M1-02.
-- [ ] M1-05 → M1: `tools/make_mock_runs.py` (developer, U2)
+- [x] M1-05 → M1: `tools/make_mock_runs.py` (developer, U2)
   - Static: writes only under `mock/runs/`. A different root makes it exit nonzero before writing.
   - Static: S1 = arm `cpfa` × 3 distributions × seeds 1001 to 1030. S3 = arms `cpfa`, `qmap` × 3 distributions × seeds 2001 to 2050.
   - Static: each run folder holds the 6 `schema.RUN_FILES`. `run.argos` and `stdout.log` are stub text that starts `MOCK`. `mock` = 1 in the manifest.
@@ -62,7 +62,7 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
   - Static: mock `qmap` means differ by distribution (one up, one flat, one down), so all 3 verdict words can appear.
   - Gate: M1 exit 1 and 2.
   - Depends on: M1-02.
-- [ ] M1-06 → M1: `tools/analyze.py` statistics (developer, U3, DESIGN §6.2 items 3 to 8)
+- [x] M1-06 → M1: `tools/analyze.py` statistics (developer, U3, DESIGN §6.2 items 3 to 8)
   - Static: improvement = `100 · (mean_qmap − mean_cpfa) / mean_cpfa`. 95 % percentile bootstrap, 10,000 resamples of the seed index, paired, fixed bootstrap seed.
   - Static: verdict per distribution: `improves`, `worse`, `not resolved` by the interval rule only.
   - Static: Wilcoxon signed-rank in numpy (normal approximation, tie correction), Holm over 3 distributions, medians, detectable size from S1 σ. These go to `improvement.csv` only, never into the verdict (D-011).
@@ -72,14 +72,14 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
   - Static: resample count, bootstrap seed, interval level and verdict rule are read from the criteria file passed by `--criteria`. None is typed in the script.
   - Gate: M1 exit 4 and 5.
   - Depends on: M1-04, M1-10.
-- [ ] M1-07 → M1: `tools/analyze.py` figures and `tools/plot_style.py` (developer, U3, DESIGN §6.7)
+- [x] M1-07 → M1: `tools/analyze.py` figures and `tools/plot_style.py` (developer, U3, DESIGN §6.7)
   - Static: `plot_style.py` holds the arm → color map (`cpfa` gray) and the font list of `rules/figures.md` §5. Every figure imports it.
   - Static: `fig_boxplot_3dist`: 3 distributions on one x axis, `cpfa` gray and `qmap` colored, 50 points overlaid. % improvement and interval above each pair.
   - Static: `fig_paired_diff`: mean paired difference per distribution, 95 % interval, zero line. `fig_branch_shares`: departures per branch, both arms.
   - Static: legend outside, above the axes (`fig.legend(loc="outside upper center")`, `layout="constrained"`). Mock titles contain "MOCK DATA".
   - Gate: M1 exit 4. Main session opens each PNG and checks no overlap.
   - Depends on: M1-06.
-- [ ] M1-08 → M1: `tools/report.py` (developer, U4)
+- [x] M1-08 → M1: `tools/report.py` (developer, U4)
   - Static: `--phase <name>` reads saved outputs only (manifests, `runs.csv`, check and analyze logs, figures). No number is typed into the script.
   - Static: one report per stage with the fields of `.claude/CLAUDE.md` "System build phasing", one figure and one table.
   - Static: a stage with no saved output is reported as skipped with the reason. The script continues.
@@ -89,7 +89,7 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
 - [ ] M1-09 → M1: M1 gate run (main session)
   - Gate: M1 exit 1 to 7 run in order. Command lines and exit codes go into `results/mock/mvp1/gate_log.txt`.
   - Depends on: M1-01 to M1-08, M1-10.
-- [ ] M1-10 → M1: mock criteria file `prereg/S3_eval_MOCK.json` (data-analyst)
+- [x] M1-10 → M1: mock criteria file `prereg/S3_eval_MOCK.json` (data-analyst)
   - Static: same keys as DESIGN §6.2 items 1 to 8, values from DESIGN §6.2. Top-level `"mock": true` and "MOCK" in its title field.
   - Static: M4-05 later writes the real `prereg/S3_eval.json` with the same keys. The mock file is never cited by a real verdict.
   - Depends on: none.
@@ -198,12 +198,12 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
 
 ### Tactic: one pure map module, two structures, one query rule (kill: R6 above)
 
-- [ ] M3-01 → M3: `visit_map` interface and option A (developer, U8 part 1)
+- [x] M3-01 → M3: `visit_map` interface and option A (developer, U8 part 1)
   - Static: `src/source/InformedSearch/visit_map.{h,cpp}` include no ARGoS header (grep `argos3` returns nothing).
   - Static: one interface: `InsertBatch`, `Reserve`, `NearestAvailable`, `Clear`, size getters, an operation counter.
   - Static: A = fine uniform grid, ring search. Query rule of DESIGN §3.1 (box distance, row then column tie, cell centre, nest disk and forage range excluded).
   - Depends on: none (may start during M1).
-- [ ] M3-02 → M3: option B region quadtree (developer, U8 part 2, DESIGN §3.3)
+- [x] M3-02 → M3: option B region quadtree (developer, U8 part 2, DESIGN §3.3)
   - Static: node = 16 bytes (`first_child`, `t_last`, `t_res_until`, `a_min`). Insert splits, sets `t_last`, recomputes `a_min`, merges per §3.3.
   - Static: `NearestAvailable` is best-first by box distance, skips `a_min > now`, applies the same tie rule as A.
   - Static: merge can be switched off (benchmark structure 6).
