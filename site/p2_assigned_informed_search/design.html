@@ -1,0 +1,311 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>방법 설명: 쿼드트리 지도와 예약 | 과제 프로젝트 2</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><b>한국어</b> | <a href="en/design.html" hreflang="en">English</a></p>
+
+<nav class="topnav">
+  <a href="index.html">← 개요(overview)</a>
+  <a href="../index.html">후보 조사 목록(index)</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">과제 프로젝트 2 / 방법 설명</div>
+  <h1>방법 설명: 쿼드트리 지도와 예약<br><span class="muted" style="font-size:15px;font-weight:400">Method: quadtree map and reservation</span></h1>
+  <div class="lead">
+    <p><strong>결론: 서버가 방문 기록을 쿼드트리(<a class="t" href="#term-quadtree">quadtree</a>)에 모은다. 로봇은 가장 가까운 빈 곳을 목표로 받고, 그 곳은 예약된다.</strong></p>
+    <p>왜: 기준선(<a class="t" href="#term-baseline">baseline</a>)은 로봇을 벽의 무작위 점으로 보낸다. 그래서 같은 곳을 다시 찾는다.</p>
+    <p>상태: 이 방법은 설계만 끝났다. 시뮬레이션에 연결하지 않았다. 측정 결과는 없다 (9절).</p>
+  </div>
+  <ol class="toc">
+    <li><a href="#s1">1 문제와 이유</a></li>
+    <li><a href="#s2">2 구조도</a></li>
+    <li><a href="#s3">3 한 번 나갈 때의 5단계</a></li>
+    <li><a href="#s4">4 선택지 A, B, C</a></li>
+    <li><a href="#s5">5 기준선 코드의 훅</a></li>
+    <li><a href="#s6">6 충실도 결정 F1에서 F4</a></li>
+    <li><a href="#s7">7 실험 절차</a></li>
+    <li><a href="#s8">8 비유와 혼합 후보</a></li>
+    <li><a href="#s9">9 결과</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="s1">
+  <h2>1 문제와 이유</h2>
+  <ul>
+    <li>과제의 문제: 방문한 점이 40만 개까지 쌓인다. 서버가 매번 전부 훑으면 비싸다 (개요 표 2).</li>
+    <li>교수님 석사 학생의 격자(<a class="t" href="#term-grid">grid</a>) 방법의 한계: 경기장이 크면 칸이 커진다.</li>
+    <li>기준선 코드를 읽어 얻은 사실 다섯 개가 설계를 정했다 (출처: baseline_code_map.md, DESIGN.md 1절).</li>
+  </ul>
+  <table class="t">
+    <caption>표 1. 기준선 코드의 사실과 설계에 준 영향</caption>
+    <thead><tr><th class="c">번호</th><th>사실</th><th>설계에 준 영향</th></tr></thead>
+    <tbody>
+      <tr><td class="c">1</td><td>"무작위 위치"는 균일한 점이 아니라 벽 위의 점이다</td><td>새 목표가 벽보다 나을 수 있다</td></tr>
+      <tr><td class="c">2</td><td>무작위 갈래는 페로몬(<a class="t" href="#term-pheromone">pheromone</a>) 목록이 비었을 때만 돈다</td><td>지도 갈래를 어디에 끼울지 정해야 한다 (3절 단계 4)</td></tr>
+      <tr><td class="c">3</td><td>목표 없이 떠난 로봇은 약 1 m에서 2 m 안에 탐색으로 바꾼다 (추정, inference)</td><td>목표만 바꾸면 도착하지 못한다. 출발 규칙도 바꾼다 (단계 5)</td></tr>
+      <tr><td class="c">4</td><td>먹이를 집을 때마다 균일한 점에 하나가 다시 생긴다</td><td>지도는 방문 여부가 아니라 방문 시각을 둔다</td></tr>
+      <tr><td class="c">5</td><td>먹이는 탐색 중에만, 0.5초마다, 반지름 0.13 m 안에서 감지한다</td><td>지도의 최소 칸은 약 0.3125 m로 정한다</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">측정한 값은 하나뿐이다. 기준선 한 번 실행에서 5.67초, 먹이 245개 수집 (STATUS.md). 로봇당 약 10번 나간 셈이다 (추정, inference).</p>
+</section>
+
+<section id="s2">
+  <h2>2 구조도</h2>
+  <figure>
+    <svg viewBox="0 0 1000 330" role="img" aria-label="로봇이 점을 기록하고, 둥지에서 올리고, 쿼드트리 지도가 가장 가까운 빈 칸을 찾고 예약해 목표로 보내는 흐름">
+      <defs><marker id="ar" markerWidth="8" markerHeight="8" refX="7" refY="4" orient="auto"><path d="M0 0 L8 4 L0 8 z" fill="#444"/></marker></defs>
+      <text class="b" x="20" y="22" font-size="14">그림 1. 로봇 한 번 나갈 때 새 방법이 하는 일 (계획)</text>
+      <rect x="20" y="36" width="22" height="12" fill="#fff" stroke="#222" stroke-width="3"/><text class="m" x="50" y="46" font-size="12">새로 더하는 단계 (각진 상자)</text>
+      <rect x="330" y="36" width="22" height="12" rx="6" fill="#ececec" stroke="#8a8a8a" stroke-dasharray="4 3"/><text class="m" x="360" y="46" font-size="12">기준선에 이미 있는 단계 (둥근 점선 상자)</text>
+      <g font-size="13">
+        <rect x="20" y="90" width="170" height="110" fill="#fff" stroke="#222" stroke-width="3"/>
+        <text class="b" x="32" y="114">1 기록</text><text class="m" x="32" y="136">탐색 중 2초마다</text><text class="m" x="32" y="154">위치를 적는다</text><text class="m" x="32" y="172">버퍼 100개</text>
+        <rect x="222" y="90" width="170" height="110" fill="#fff" stroke="#222" stroke-width="3"/>
+        <text class="b" x="234" y="114">2 올리기</text><text class="m" x="234" y="136">둥지에 오면</text><text class="m" x="234" y="154">버퍼를 서버로</text><text class="m" x="234" y="172">보내고 비운다</text>
+        <rect x="424" y="90" width="170" height="110" fill="#fff" stroke="#222" stroke-width="3"/>
+        <text class="b" x="436" y="114">3 쿼드트리 지도</text><text class="m" x="436" y="136">칸마다 시각 둘</text><text class="m" x="436" y="154">삽입 비용은</text><text class="m" x="436" y="172">나무 깊이만큼</text>
+        <rect x="626" y="90" width="170" height="110" fill="#fff" stroke="#222" stroke-width="3"/>
+        <text class="b" x="638" y="114">4 선택과 예약</text><text class="m" x="638" y="136">가장 가까운 빈 칸</text><text class="m" x="638" y="154">을 고르고</text><text class="m" x="638" y="172">그 칸을 예약</text>
+        <rect x="828" y="90" width="152" height="110" rx="22" fill="#ececec" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="5 4"/>
+        <text class="b" x="842" y="114">5 이동</text><text class="m" x="842" y="136">출발 단계가</text><text class="m" x="842" y="154">목표로 간다</text><text class="m" x="842" y="172">(규칙 수정)</text>
+      </g>
+      <line x1="190" y1="145" x2="220" y2="145" stroke="#444" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="392" y1="145" x2="422" y2="145" stroke="#444" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="594" y1="145" x2="624" y2="145" stroke="#444" stroke-width="2" marker-end="url(#ar)"/>
+      <line x1="796" y1="145" x2="826" y2="145" stroke="#444" stroke-width="2" marker-end="url(#ar)"/>
+      <path d="M904 200 L904 262 L105 262 L105 202" fill="none" stroke="#8a8a8a" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#ar)"/>
+      <text class="m c" x="505" y="282" font-size="12">목표에 도착해 탐색하면서 다시 1 기록으로 돌아간다</text>
+      <line x1="20" y1="222" x2="190" y2="222" stroke="#555" stroke-width="2"/><text class="m" x="20" y="240" font-size="12">로봇 쪽</text>
+      <line x1="222" y1="222" x2="796" y2="222" stroke="#555" stroke-width="2"/><text class="m" x="222" y="240" font-size="12">둥지의 서버 쪽 (로봇은 둥지에 있을 때만 닿는다)</text>
+      <line x1="828" y1="222" x2="980" y2="222" stroke="#555" stroke-width="2"/><text class="m" x="828" y="240" font-size="12">로봇 쪽</text>
+      <text class="m" x="20" y="316" font-size="12">단계 3과 4는 서버의 새 호출 둘이다. 삽입은 올릴 때, 질의는 목표를 고를 때 한다.</text>
+    </svg>
+    <figcaption>그림 1. 새 단계와 기준선 단계가 어디서 이어지는지 보인다. 왜: 기준선은 목표를 벽의 무작위 점으로 정하므로, 서버가 목표를 정해 주면 같은 곳을 덜 찾는다.
+      <span class="ab">약어: 없음. 출처: DESIGN.md 그림 1, 3.1절. 단계 1에서 5는 아직 시뮬레이션에 연결하지 않았다 (계획).</span></figcaption>
+  </figure>
+  <figure>
+    <svg viewBox="0 0 1000 400" role="img" aria-label="쿼드트리가 미방문 공간은 큰 칸으로 두고 경계만 잘게 나눈 그림">
+      <text class="b" x="20" y="22" font-size="14">그림 2. 쿼드트리 지도 예 (10 m 경기장, 설명용 값)</text>
+      <rect x="40" y="40" width="320" height="320" fill="#fff" stroke="#222" stroke-width="2"/>
+      <!-- NW leaf unvisited, SW leaf unvisited: white. NE split -->
+      <line x1="200" y1="40" x2="200" y2="360" stroke="#222" stroke-width="2"/>
+      <line x1="40" y1="200" x2="360" y2="200" stroke="#222" stroke-width="2"/>
+      <!-- NE quadrant 200..360 x, 40..200 y, split into 80s -->
+      <line x1="280" y1="40" x2="280" y2="200" stroke="#444" stroke-width="1.5"/>
+      <line x1="200" y1="120" x2="360" y2="120" stroke="#444" stroke-width="1.5"/>
+      <rect x="280" y="40" width="80" height="80" fill="#c9c9c9"/>
+      <!-- NE bottom-left (200..280,120..200) split into 40s -->
+      <line x1="240" y1="120" x2="240" y2="200" stroke="#666" stroke-width="1"/>
+      <line x1="200" y1="160" x2="280" y2="160" stroke="#666" stroke-width="1"/>
+      <rect x="200" y="120" width="40" height="40" fill="#c9c9c9"/>
+      <rect x="240" y="160" width="40" height="40" fill="#c9c9c9"/>
+      <rect x="240" y="120" width="40" height="40" fill="#fff3a0"/>
+      <!-- SE quadrant 200..360 x, 200..360 y split into 80s -->
+      <line x1="280" y1="200" x2="280" y2="360" stroke="#444" stroke-width="1.5"/>
+      <line x1="200" y1="280" x2="360" y2="280" stroke="#444" stroke-width="1.5"/>
+      <rect x="200" y="200" width="80" height="80" fill="#c9c9c9"/>
+      <rect x="280" y="280" width="80" height="80" fill="#c9c9c9"/>
+      <text class="m c" x="120" y="124" font-size="13">미방문</text><text class="m c" x="120" y="142" font-size="13">5 m 칸 하나</text>
+      <text class="m c" x="120" y="284" font-size="13">미방문</text><text class="m c" x="120" y="302" font-size="13">5 m 칸 하나</text>
+      <rect x="400" y="60" width="16" height="12" fill="#fff" stroke="#222"/><text class="m" x="424" y="71" font-size="13">미방문 (사용 가능)</text>
+      <rect x="400" y="86" width="16" height="12" fill="#c9c9c9" stroke="#222"/><text class="m" x="424" y="97" font-size="13">방문함 (사용 불가)</text>
+      <rect x="400" y="112" width="16" height="12" fill="#fff3a0" stroke="#222"/><text class="m" x="424" y="123" font-size="13">예약됨 (사용 불가)</text>
+      <text class="b" x="400" y="170" font-size="13">노드 하나: 16바이트</text>
+      <text class="m" x="400" y="192" font-size="13">첫 자식 번호, t_last, t_res_until, a_min</text>
+      <text class="m" x="400" y="214" font-size="13">a_min = 하위 칸 중 가장 이른 사용 가능 시각</text>
+      <text class="m" x="400" y="236" font-size="13">질의는 a_min이 지금보다 늦은 가지를 건너뛴다</text>
+      <text class="m" x="400" y="270" font-size="13">최소 칸 0.3125 m, 깊이 5 (10 m 경기장)</text>
+      <text class="m" x="400" y="292" font-size="13">방문한 네 칸이 모이면 부모 칸 하나로 합친다</text>
+    </svg>
+    <figcaption>그림 2. 큰 빈 땅은 칸 하나로 두고 경계만 잘게 나눈 모양이다. 왜: 칸 크기가 로봇이 다닌 길을 따르므로, 경기장이 커져도 칸이 커지지 않는다는 교수의 한계에 답한다.
+      <span class="ab">약어: 없음. 출처: DESIGN.md 그림 3, 3.3절. 칸 배치는 설명용 값(Illustrative values)이다. 측정값이 아니다.</span></figcaption>
+  </figure>
+</section>
+
+<section id="s3">
+  <h2>3 한 번 나갈 때의 5단계</h2>
+  <ol class="toc">
+    <li><a href="#a1">Step 1 기록</a></li>
+    <li><a href="#a2">Step 2 올리기</a></li>
+    <li><a href="#a3">Step 3 저장</a></li>
+    <li><a href="#a4">Step 4 선택과 예약</a></li>
+    <li><a href="#a5">Step 5 이동</a></li>
+  </ol>
+  <div class="steps">
+    <div class="step" id="a1"><div class="k">Step 1 of 5</div>
+      <p><b>기록 (로봇 쪽).</b> 탐색 중 2초마다 위치를 적는다. 직전 점과 같은 최소 칸이면 건너뛴다. 먹이를 집은 곳도 적는다.</p>
+      <p class="muted">왜: 점을 줄여도 방문과 미방문을 가를 수 있다 (과제 힌트 3). 버퍼는 선입선출 100개다. 2초는 시작 값이다 (추정, inference).</p></div>
+    <div class="step" id="a2"><div class="k">Step 2 of 5</div>
+      <p><b>올리기 (로봇 쪽).</b> 둥지에 돌아오면 버퍼를 올린 시각과 함께 서버로 보낸다. 그다음 버퍼를 비운다.</p>
+      <p class="muted">왜: 기준선이 페로몬을 올리는 자리와 같다. 새 통신 경로를 만들지 않는다.</p></div>
+    <div class="step" id="a3"><div class="k">Step 3 of 5</div>
+      <p><b>저장 (서버 쪽).</b> 칸마다 시각 둘을 둔다. <code>t_last</code>는 마지막 방문 시각이다. <code>t_res_until</code>은 예약이 끝나는 시각이다.</p>
+      <p>사용 가능 시각: <code>avail_at = max(t_last + T_stale, t_res_until)</code></p>
+      <p>칸은 <code>avail_at</code>이 지금 이하면 사용 가능하다.</p>
+      <p class="muted">왜: 먹이가 다시 생기므로 방문 비트 하나로는 모자란다. <code>T_stale</code>의 시작 값은 무한대다. 300초는 조정 후보다 (추정, inference).</p></div>
+    <div class="step" id="a4"><div class="k">Step 4 of 5</div>
+      <p><b>선택과 예약 (서버 쪽).</b> 로봇 위치에서 가장 가까운 사용 가능한 최소 칸을 찾는다. 거리가 같으면 행, 열 번호가 작은 칸이다. 목표는 그 칸의 중심이다.</p>
+      <p>결정 순서는 장소 충실도(<a class="t" href="#term-fidelity">site fidelity</a>), 페로몬, 지도 목표다. 지도 목표를 받으면 반지름 <code>r_res</code> 안의 칸을 <code>t_res</code>초 동안 예약한다.</p>
+      <p>사용 가능한 칸이 없으면 기준선의 무작위 위치로 돌아가고, 그 일을 기록한다.</p>
+      <p class="muted">왜: 예약은 24대가 같은 칸으로 몰리지 않게 한다. 교수의 학생 격자에는 예약이 없다. 시작 값은 1.0 m, 60초다 (추정, inference).</p></div>
+    <div class="step" id="a5"><div class="k">Step 5 of 5</div>
+      <p><b>이동 (로봇 쪽).</b> 지도 목표를 받은 로봇은 5초마다 하는 탐색 전환 검사를 건너뛴다. 목표까지 가서 무작위 걸음으로 탐색한다.</p>
+      <p class="muted">왜: 검사를 두면 로봇이 1 m에서 2 m 안에 탐색으로 바꾸어 목표에 닿지 못한다 (표 1의 사실 3). 새 표시 <code>isMapTarget</code>을 쓰는 까닭은, 기존 표시를 겹쳐 쓰면 안내 걸음까지 켜지기 때문이다.</p></div>
+  </div>
+</section>
+
+<section id="s4">
+  <h2>4 선택지 A, B, C</h2>
+  <p>풀려는 질문: 방문 기록을 어떤 구조로 두어야 서버가 빈 곳을 싸게 찾는가.</p>
+  <table class="t">
+    <caption>표 2. 세 선택지의 비교 (출처: DESIGN.md 3.2절에서 3.5절). 값은 경기장 80 m, 점 40만 개의 상한 추정(inference)이다. 벤치마크가 잰다</caption>
+    <thead><tr><th>항목</th><th>A: 촘촘한 격자</th><th>B: 쿼드트리 (선택)</th><th>C: 원판 군집</th></tr></thead>
+    <tbody>
+      <tr><td>구조</td><td>0.3125 m 칸의 균일 격자</td><td>필요한 곳만 쪼개는 나무</td><td>방문한 곳을 원판으로 묶음</td></tr>
+      <tr><td>메모리</td><td>65,536칸, 512 KB</td><td>방문 경계의 길이를 따라 커진다</td><td>원판 수를 따라 커진다</td></tr>
+      <tr><td>삽입</td><td>O(1)</td><td>O(깊이), 80 m에서 깊이 8</td><td>평균 O(1)</td></tr>
+      <tr><td>질의</td><td>링 탐색. 최악은 전체 칸</td><td>최선 우선 탐색. 연산 수를 기록한다</td><td>후보 표본 추출. 틈을 놓칠 수 있다</td></tr>
+      <tr><td>커지는 것</td><td>경기장 넓이</td><td>방문 경계</td><td>방문 넓이</td></tr>
+      <tr><td>완전성</td><td>예</td><td>예</td><td>아니오</td></tr>
+      <tr><td>코드 위험</td><td>낮음</td><td>중간</td><td>높음</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li><b>B를 고른 까닭(D-010).</b> 촘촘한 격자처럼 완전하다. 메모리와 질의 비용은 경기장 크기가 아니라 방문 경계를 따른다. 교수가 학생 격자에서 지적한 틈이 바로 이것이다.</li>
+    <li>C를 먼저 하지 않은 까닭: 완전성 경계가 없다. 난수를 더 쓴다. 비슷한 공개 방법이 Powerlaw에서 졌다. 수확 점수와 나선은 뒤의 전술로 남긴다.</li>
+    <li>A는 같은 인터페이스 뒤의 대체안이다. 경기장 10 m에서 A와 B는 같은 답을 낸다. 이점은 큰 경기장에서의 메모리와 질의 비용이다.</li>
+    <li>G1 판정은 80 m에서만 한다 (D-012). 지도 코드 A와 B는 작성만 했고 빌드하지 않았다.</li>
+  </ul>
+</section>
+
+<section id="s5">
+  <h2>5 기준선 코드의 훅</h2>
+  <p>훅(<a class="t" href="#term-hook">hook</a>)은 기준선 코드에 끼우는 새 호출이다. 모두 스위치 <code>InformedSearch</code>(기본 0) 뒤에 둔다.</p>
+  <table class="t">
+    <caption>표 3. 훅 위치 (출처: DESIGN.md 4.2절). 파일: ctrl.cpp는 <code>CPFA_controller.cpp</code>, lf.cpp는 <code>CPFA_loop_functions.cpp</code></caption>
+    <thead><tr><th>훅</th><th>위치</th><th>스위치 켜짐</th><th>스위치 꺼짐</th></tr></thead>
+    <tbody>
+      <tr><td>기록</td><td><code>Searching()</code>, ctrl.cpp:321-323</td><td>2초마다 점을 적는다</td><td>없음</td></tr>
+      <tr><td>올리기</td><td><code>Returning()</code> 둥지 갈래, ctrl.cpp:516 뒤</td><td>버퍼를 서버에 넣고 비운다</td><td>없음</td></tr>
+      <tr><td>선택</td><td><code>Returning()</code>, ctrl.cpp:526-544</td><td>무작위 갈래에서 <code>SetMapTarget()</code>을 부른다</td><td>기준선 순서</td></tr>
+      <tr><td>이동</td><td><code>Departing()</code>, ctrl.cpp:270-292</td><td>지도 목표면 전환 검사를 건너뛴다</td><td>기준선</td></tr>
+      <tr><td>초기화</td><td>lf.cpp:137-167, ctrl.cpp:112-137</td><td>지도, 버퍼, 표시를 비운다</td><td>기준선</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>스위치가 꺼지면 기준선 빌드와 같은 실행이 나와야 한다. 난수를 더 뽑지 않고, 컨트롤러가 읽는 상태를 쓰지 않는다.</li>
+    <li>불변 확인(<a class="t" href="#term-invariance">invariance check</a>): 시드 5개와 분포 3개, 15쌍의 수집 수가 모두 같아야 한다. 하나라도 다르면 평가를 시작하지 않는다.</li>
+    <li>기준선 저장소 복제본은 고치지 않는다. 우리 소스는 <code>src/</code>에 복사해 고친다 (D-001).</li>
+  </ul>
+</section>
+
+<section id="s6">
+  <h2>6 충실도 결정 F1에서 F4</h2>
+  <p>교수는 "원래" 중심지 먹이 찾기 알고리즘(central-place foraging algorithm)과의 절대 점수로 팀을 매긴다. 그래서 주 설정은 배포된 코드의 가장 평범한 읽기다. 더 엄격한 읽기는 민감도 세트로 전부 돌린다.</p>
+  <table class="t">
+    <caption>표 4. 충실도 결정 (출처: DESIGN.md 2절, DECISIONS.md D-006에서 D-009)</caption>
+    <thead><tr><th class="c">ID</th><th>문제</th><th>결정</th><th>왜</th></tr></thead>
+    <tbody>
+      <tr><td class="c">F1 (D-006)</td><td>코드가 파일 둥지 반지름에 1.82를 곱한다</td><td>파일 값 0.25(실제 0.456 m)를 주 설정으로 한다. 파일 값 0.137(실제 0.25 m)은 300개 민감도 세트로 돌린다</td><td>파일 값은 과제 파일이 드러낸 조절 값이다. 0.137은 글자 그대로의 0.25 m 형상이다</td></tr>
+      <tr><td class="c">F2 (D-007)</td><td>먹이를 집으면 하나가 다시 생긴다</td><td>두 팔 모두 유지한다</td><td>기준선의 동작이다. 지도가 방문 여부 대신 방문 시각을 두는 까닭이다</td></tr>
+      <tr><td class="c">F3 (D-008)</td><td>10 × 10 m 파라미터 파일은 Random 하나뿐이다</td><td>모든 분포와 두 팔에 같은 한 벌을 쓴다</td><td>24대와 256개가 과제 표와 맞는 유일한 파일이다</td></tr>
+      <tr><td class="c">F4 (D-009)</td><td>새 방법에는 새 파라미터가 있다</td><td>새 파라미터만 조정한다. 기준선 값 7개는 고정한다</td><td>기준선에는 이 손잡이가 없다. 기준선 값을 건드리면 기준선에도 같은 예산을 준다</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s7">
+  <h2>7 실험 절차</h2>
+  <p>풀려는 질문: 새 방법이 기준선보다 먹이를 더 모으는가. 결과를 보기 전에 판정 규칙을 정한다.</p>
+  <table class="t">
+    <caption>표 5. 실행 세트 (출처: DESIGN.md 6.1절). 실행 수는 계획이다</caption>
+    <thead><tr><th>세트</th><th>팔(arm)</th><th>시드</th><th class="n">실행</th><th>목적</th></tr></thead>
+    <tbody>
+      <tr><td>S0 불변 확인</td><td>vendor, cpfa(스위치 꺼짐)</td><td>3001에서 3005</td><td class="n">30 + 2</td><td>스위치가 꺼지면 같은가</td></tr>
+      <tr><td>S1 여유와 잡음</td><td>cpfa</td><td>1001에서 1030</td><td class="n">90</td><td>갈래 비율, 기준선 잡음</td></tr>
+      <tr><td>S2 조정</td><td>qmap 후보</td><td>1001에서 1010</td><td class="n">270</td><td>새 파라미터 고르기</td></tr>
+      <tr><td>S3 평가 (주)</td><td>cpfa, qmap 고정</td><td>2001에서 2050</td><td class="n">300</td><td>판정</td></tr>
+      <tr><td>S4 민감도</td><td>cpfa, qmap 고정</td><td>2001에서 2050</td><td class="n">300</td><td>둥지 반지름의 다른 읽기</td></tr>
+      <tr><td>S5 절제(<a class="t" href="#term-ablation">ablation</a>)</td><td>qmap에서 하나 뺌</td><td>2001에서 2050</td><td class="n">300 이하</td><td>효과가 어느 부분에서 오는가</td></tr>
+    </tbody>
+  </table>
+  <ol>
+    <li>평가 시드와 조정 시드는 겹치지 않는다. 두 팔은 같은 평가 시드 50개를 쓴다.</li>
+    <li>점수는 720초 때의 수집 수다. 개선율은 <code>100 · (평균_qmap − 평균_cpfa) / 평균_cpfa</code>다.</li>
+    <li>판정은 하나다. 시드 색인을 10,000번 다시 뽑는 짝지은 부트스트랩(<a class="t" href="#term-bootstrap">bootstrap</a>)의 95 % 구간이다.</li>
+    <li>분포마다 따로 판정한다. 구간의 아래 끝이 0보다 크면 개선, 위 끝이 0보다 작으면 악화, 아니면 해결되지 않음이다.</li>
+    <li>윌콕슨 검정(<a class="t" href="#term-wilcoxon">Wilcoxon signed-rank test</a>)과 홀름 보정(<a class="t" href="#term-holm">Holm adjustment</a>)은 곁에 보고한다. 판정에 쓰지 않는다.</li>
+    <li>판정 규칙은 평가 전에 사전 등록(<a class="t" href="#term-prereg">pre-registration</a>)한다. 첫 평가 실행 뒤에는 바꾸지 않는다.</li>
+  </ol>
+  <p class="muted">총 약 1,300회, 한 코어 순차로 약 2.2시간이다 (연기 시험에서 얻은 추정, inference). 개선이 없으면 원인 메모를 쓴다. 기준을 넓히지 않는다.</p>
+</section>
+
+<section id="s8">
+  <h2>8 비유와 혼합 후보</h2>
+  <h3 style="font-size:15px">정밀 관개 비유 (D-019)</h3>
+  <table class="t">
+    <caption>표 6. 서버와 관개의 대응 (출처: DECISIONS.md D-019, 관개 페이지). 비유일 뿐 코드는 없다</caption>
+    <thead><tr><th>정밀 관개</th><th>이 프로젝트</th></tr></thead>
+    <tbody>
+      <tr><td>마른 칸(dry cell)</td><td>아직 방문하지 않은 칸</td></tr>
+      <tr><td>배정(assignment)</td><td>예약(<a class="t" href="#term-reservation">reservation</a>)</td></tr>
+    </tbody>
+  </table>
+  <p>비유: 마른 칸에 물 줄 로봇을 배정하면 둘이 같은 칸으로 가지 않는다. 마찬가지로 빈 칸을 예약하면 24대가 한 곳으로 몰리지 않는다. 자세한 비유는 <a href="../projects/irrigation.html">정밀 관개 페이지</a>에 있다.</p>
+  <h3 style="font-size:15px">혼합 후보 (D-018)</h3>
+  <ul>
+    <li>나선 탐색 페이지의 혼합 규칙은 나선으로 걷다가 붐비면 무작위 걸음으로 바꾼다. <a href="../projects/spiral-search.html">나선 탐색 페이지</a>를 보라.</li>
+    <li>이 프로젝트는 그 규칙을 조정 후보 하나로만 더한다. 나선 전술 T4 곁에 둔다.</li>
+    <li>정확한 형태는 아직 정하지 않았다. 설계 문서와 조정 계획에 적은 뒤, 조정 사전 등록 전에 확정한다.</li>
+    <li>기본값은 꺼짐이다. 조정 시드에서 이기면 켠다. 근거는 아직 없다.</li>
+  </ul>
+</section>
+
+<section id="s9">
+  <h2>9 결과</h2>
+  <div class="lead">
+    <p><strong>아직 없음 (not yet).</strong> 평가 실행, 벤치마크, 개선율은 만들어지지 않았다.</p>
+    <p>있는 것은 기준선 한 번 실행뿐이다. 5.67초, 먹이 245개 수집, 시드 1 (STATUS.md). 새 방법의 값이 아니다.</p>
+  </div>
+  <p class="muted">모의(<a class="t" href="#term-mock">mock</a>) 출력은 도구가 도는지 보려는 가짜 데이터다. 이 페이지는 모의 값을 결과로 보이지 않는다.</p>
+</section>
+
+<div class="pager">
+  <a href="index.html">← 개요(overview)</a>
+  <a href="../index.html">후보 조사 목록(index)</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-baseline">기준선(baseline)</dt><dd>비교의 기준이 되는 원래 알고리즘이다. 여기서는 교수의 중심지 먹이 찾기 알고리즘(central-place foraging algorithm, CPFA) 코드를 고치지 않고 쓴 것이다.</dd>
+    <dt id="term-quadtree">쿼드트리(quadtree)</dt><dd>정사각형을 네 칸으로 나누고, 필요한 곳만 더 나누는 자료 구조다.</dd>
+    <dt id="term-grid">격자(grid)</dt><dd>경기장을 같은 크기 칸으로 나눈 지도다.</dd>
+    <dt id="term-pheromone">페로몬(pheromone)</dt><dd>먹이를 찾은 곳을 알리는 가상 신호다. 서버가 목록으로 가진다.</dd>
+    <dt id="term-fidelity">장소 충실도(site fidelity)</dt><dd>로봇이 마지막으로 먹이를 찾은 곳으로 다시 가는 행동이다.</dd>
+    <dt id="term-hook">훅(hook)</dt><dd>기존 코드의 정해진 자리에 끼우는 새 호출이다.</dd>
+    <dt id="term-invariance">불변 확인(invariance check)</dt><dd>스위치를 끈 우리 빌드가 원래 빌드와 같은 결과를 내는지 보는 확인이다.</dd>
+    <dt id="term-ablation">절제(ablation)</dt><dd>방법의 한 부분을 빼고 다시 돌려, 그 부분의 기여를 보는 실험이다.</dd>
+    <dt id="term-bootstrap">부트스트랩(bootstrap)</dt><dd>같은 표본에서 되풀이해 다시 뽑아 값의 범위를 구하는 방법이다. 짝지은 부트스트랩은 같은 시드의 두 팔 차이를 뽑는다.</dd>
+    <dt id="term-wilcoxon">윌콕슨 부호 순위 검정(Wilcoxon signed-rank test)</dt><dd>짝지은 값의 차이가 0인지 순위로 보는 검정이다.</dd>
+    <dt id="term-holm">홀름 보정(Holm adjustment)</dt><dd>여러 검정의 p값을 함께 보정하는 방법이다.</dd>
+    <dt id="term-prereg">사전 등록(pre-registration)</dt><dd>실행 전에 판정 규칙을 파일로 적어 두는 일이다.</dd>
+    <dt id="term-reservation">예약(reservation)</dt><dd>서버가 어떤 칸을 일정 시간 다른 로봇에게 주지 않는 표시다.</dd>
+    <dt id="term-mock">모의(mock)</dt><dd>진짜 결과가 아니라 모양을 확인하려고 만든 가짜 데이터다.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

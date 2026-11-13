@@ -1,0 +1,235 @@
+<!doctype html>
+<html lang="ko" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>과제 프로젝트 2: 먹이 찾기 군집을 위한 정보 기반 탐색 | CSCI 6371</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../assets/theme.css">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><b>한국어</b> | <a href="en/index.html" hreflang="en">English</a></p>
+
+<nav class="topnav">
+  <a href="../index.html">← 후보 조사 목록(index)</a>
+  <a href="design.html">방법 설명(design) →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">과제 프로젝트 2 / 교수가 정한 과제 / 100점</div>
+  <h1>과제 프로젝트 2: 먹이 찾기 군집을 위한 정보 기반 탐색<br><span class="muted" style="font-size:15px;font-weight:400">Assigned Project 2: Informed search for foraging swarms</span></h1>
+  <div class="lead">
+    <p><strong>결론: 설계와 계획은 끝났다. 1단계(M1) 도구를 작성 중이다. 실제 결과는 아직 없다.</strong></p>
+    <p>왜 하나: 로봇 군집(<a class="t" href="#term-swarm">swarm</a>)이 아무도 찾지 않은 곳을 서버(<a class="t" href="#term-server">server</a>)가 빠르게 알려 주면, 12분 안에 먹이를 더 모은다.</p>
+    <div class="chips">
+      <span class="chip">측정한 값은 하나뿐이다</span>
+      <span class="chip">기준선(<a class="t" href="#term-baseline">baseline</a>) 한 번 실행: 5.67초, 먹이 245개 수집</span>
+      <span class="chip">출처: STATUS.md (주 세션 연기 시험, smoke run)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#status">결과와 상태</a></li>
+    <li><a href="#s1">1 과제 문제</a></li>
+    <li><a href="#s2">2 실험 설정</a></li>
+    <li><a href="#s3">3 임무와 목표</a></li>
+    <li><a href="#s4">4 단계 M1에서 M5</a></li>
+    <li><a href="#s5">5 핵심 결정</a></li>
+    <li><a href="#s6">6 링크</a></li>
+    <li><a href="#terms">용어 부록</a></li>
+  </ol>
+</header>
+
+<section id="status">
+  <h2>결과와 상태 (2026-11-12)</h2>
+  <table class="t">
+    <caption>표 1. 지금 있는 것과 없는 것 (출처: STATUS.md, PLAN.md)</caption>
+    <thead><tr><th>항목</th><th>상태</th></tr></thead>
+    <tbody>
+      <tr><td>설계(design)</td><td>완료. 선택지 A, B, C를 비교하고 B를 골랐다 (D-010)</td></tr>
+      <tr><td>계획(plan)</td><td>완료. 단계 M1에서 M5까지 49개 과제</td></tr>
+      <tr><td>단계 M1 (모의 데이터 전체 흐름)</td><td>10개 중 9개 완료. 마지막 하나는 관문 실행(M1-09)이다</td></tr>
+      <tr><td>지도(map) 코드</td><td>쿼드트리(<a class="t" href="#term-quadtree">quadtree</a>)와 격자(<a class="t" href="#term-grid">grid</a>) 구현을 작성했다. 아직 빌드하지 않았다</td></tr>
+      <tr><td>기준선 실행</td><td>한 번. 5.67초, 먹이 245개. 시드(<a class="t" href="#term-seed">seed</a>) 1</td></tr>
+      <tr class="rowflag"><td>평가 결과</td><td><b>아직 없음.</b> 상자그림(<a class="t" href="#term-boxplot">box plot</a>)과 개선율은 단계 M5에서 만든다</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <svg viewBox="0 0 1000 300" role="img" aria-label="계획한 상자그림의 빈 틀. 값 없음">
+      <text class="b" x="20" y="22" font-size="14">그림 1. 평가 결과 상자그림의 빈 틀 (계획)</text>
+      <rect x="20" y="34" width="14" height="10" fill="var(--base)"/><text class="m" x="40" y="43" font-size="12">기준선(baseline)</text>
+      <rect x="220" y="34" width="14" height="10" fill="var(--s1)"/><text class="m" x="240" y="43" font-size="12">새 방법(our method)</text>
+      <line class="gr" x1="120" y1="90" x2="960" y2="90"/><line class="gr" x1="120" y1="150" x2="960" y2="150"/><line class="gr" x1="120" y1="210" x2="960" y2="210"/>
+      <line class="ax" x1="120" y1="64" x2="120" y2="250"/><line class="ax" x1="120" y1="250" x2="960" y2="250"/>
+      <text class="m c" x="250" y="270" font-size="12">Random</text>
+      <text class="m c" x="540" y="270" font-size="12">Powerlaw</text>
+      <text class="m c" x="830" y="270" font-size="12">Clustered</text>
+      <text class="b c" transform="translate(70 160) rotate(-90)" font-size="12">12분 수집량</text>
+      <text class="m c" x="540" y="160" font-size="14">값 없음. 단계 M5에서 채운다</text>
+    </svg>
+    <figcaption>그림 1. 과제가 요구한 상자그림 세 쌍의 자리다. 왜: 값을 보이기 전에 무엇을 낼지 정해 두면, 결과를 본 뒤 기준을 바꾸지 못한다.
+      <span class="ab">약어: 없음. 출처: 과제 PDF 3쪽, DESIGN.md 6.7절. 값은 계획이다.</span></figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 과제 문제</h2>
+  <ul>
+    <li>기준선은 중심지 먹이 찾기 알고리즘(<a class="t" href="#term-cpfa">central-place foraging algorithm, CPFA</a>)이다.</li>
+    <li>로봇은 둥지(<a class="t" href="#term-nest">nest</a>)를 떠나 먹이를 찾는다. 찾으면 페로몬(<a class="t" href="#term-pheromone">pheromone</a>) 지점을 서버에 남긴다.</li>
+    <li>먹이가 몰린 곳은 여러 번 방문한다. 다른 곳은 한 번도 방문하지 않는다.</li>
+    <li>방문한 점을 모두 서버에 보내면 점이 너무 많다. 서버가 매번 전부 훑으면 비용이 크다.</li>
+    <li>교수님 석사 학생의 격자 방법은 경기장이 크면 칸이 커진다. 그러면 효율이 떨어진다.</li>
+    <li>목표: 점을 더 효율적으로 정리해서 서버가 빈 곳을 빨리 찾게 한다. 그리고 점수를 올린다.</li>
+  </ul>
+  <table class="t">
+    <caption>표 2. 서버가 훑어야 할 점의 수 (출처: 과제 PDF 2쪽)</caption>
+    <thead><tr><th>단계</th><th>계산</th><th class="n">점 수</th></tr></thead>
+    <tbody>
+      <tr><td>로봇 한 대가 한 번 나갈 때</td><td>최대 기억 100개</td><td class="n">100</td></tr>
+      <tr><td>로봇 200대가 한 번 나갈 때</td><td>200 × 100</td><td class="n">20,000</td></tr>
+      <tr><td>시뮬레이션 전체, 평균 20번 나감</td><td>20,000 × 20</td><td class="n">400,000</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">설명용 값(Illustrative values): 200대는 과제가 든 예다. 실제 평가는 24대다 (표 3).</p>
+</section>
+
+<section id="s2">
+  <h2>2 실험 설정</h2>
+  <table class="t">
+    <caption>표 3. 과제의 실험 설정 (출처: 과제 PDF 3쪽, Table 1)</caption>
+    <thead><tr><th>항목</th><th>값</th></tr></thead>
+    <tbody>
+      <tr><td>경기장 크기</td><td>10 × 10 m</td></tr>
+      <tr><td>수집 구역(둥지) 반지름</td><td>0.25 m</td></tr>
+      <tr><td>자원 수</td><td>256</td></tr>
+      <tr><td>자원 분포(<a class="t" href="#term-distribution">resource distribution</a>)</td><td>Random, Powerlaw, Clustered</td></tr>
+      <tr><td>로봇 수</td><td>24</td></tr>
+      <tr><td>먹이 찾기 시간</td><td>12분</td></tr>
+      <tr><td>분포마다 실행 횟수</td><td>50</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>점수는 12분 동안 모은 먹이 수다. 교수는 팀끼리 점수를 비교해 성적을 매긴다.</li>
+    <li>상자그림 하나는 50번 실행의 값이다. 기준선과 비교해 개선율(%)을 보고한다.</li>
+    <li>반지름 0.25는 파일 값이다. 코드가 이 값에 1.82를 곱해 실제 반지름 0.456 m를 만든다 (코드 읽기에서 유도한 추정, inference). 결정 D-006이 이 읽기를 주 설정으로 정했다.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 임무, 비전, 목표</h2>
+  <table class="t">
+    <caption>표 4. 임무와 목표 (출처: PLAN.md 임무 블록, D-003에서 D-005)</caption>
+    <thead><tr><th>줄</th><th>내용</th></tr></thead>
+    <tbody>
+      <tr><td>임무(mission)</td><td>아무 로봇도 찾지 않은 곳을 찾아, 군집이 12분 동안 먹이를 더 모으게 한다. 군집과 경기장이 커져도 서버 비용을 작게 지킨다</td></tr>
+      <tr><td>비전(vision)</td><td>한 페이지에 세 분포의 상자그림, 기준선 대비 개선율과 구간, 격자와 나란한 비용 대 경기장 크기 차트를 둔다. 실패마다 원인을 적는다</td></tr>
+      <tr><td>목표 G1 (11-21까지)</td><td>벤치마크 판정. 경기장 80 m에서 B의 질의당 연산이 목록 전체 훑기의 1 % 이하이고, 같은 해상도의 격자보다 적다</td></tr>
+      <tr><td>목표 G2 (11-27까지)</td><td>평가 실행 300개를 끝낸다. 확인을 통과한 실행 수와 분포별 개선 표를 낸다</td></tr>
+      <tr><td>목표 G3 (11-27까지)</td><td>판정 파일 <code>verdict.json</code>을 커밋한다. 개선이 확인되지 않은 분포마다 원인 메모를 쓴다</td></tr>
+      <tr><td>연구 질문(research question) 1</td><td>지도 기반 목표 선택이 분포마다 12분 수집량을 바꾸는가</td></tr>
+      <tr><td>연구 질문 2</td><td>질의 비용이 방문한 넓이를 따르는가, 경기장 크기를 따르는가</td></tr>
+      <tr><td>연구 질문 3</td><td>효과가 목표 선택에서 오는가, 출발 규칙 변경에서 오는가</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">통과 여부는 중요하지 않다. 미리 정한 절차를 지킨다. 실패하면 원인을 적는다 (저장소 규칙).</p>
+</section>
+
+<section id="s4">
+  <h2>4 단계 M1에서 M5</h2>
+  <figure>
+    <svg viewBox="0 0 1000 250" role="img" aria-label="다섯 단계 M1에서 M5의 사다리와 현재 상태">
+      <text class="b" x="20" y="22" font-size="14">그림 2. 다섯 관문과 현재 상태 (2026-11-12)</text>
+      <rect x="20" y="40" width="14" height="10" fill="#fff3a0" stroke="#e6d24a"/><text class="m" x="40" y="49" font-size="12">진행 중</text>
+      <rect x="140" y="40" width="14" height="10" fill="#fff" stroke="#666"/><text class="m" x="160" y="49" font-size="12">시작 전</text>
+      <g font-size="13">
+        <rect x="20" y="70" width="170" height="130" fill="#fff3a0" stroke="#e6d24a" stroke-width="2"/>
+        <text class="b" x="30" y="92">M1 모의 흐름</text><text class="m" x="30" y="112">~11-14</text><text class="m" x="30" y="132">모의 데이터로</text><text class="m" x="30" y="150">전체 흐름 실행</text><text class="m" x="30" y="178">과제 9 / 10 완료</text>
+        <rect x="222" y="70" width="170" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="232" y="92">M2 기준선</text><text class="m" x="232" y="112">~11-18</text><text class="m" x="232" y="132">불변 확인</text><text class="m" x="232" y="150">여유 측정, 90회</text><text class="m" x="232" y="178">과제 0 / 11 완료</text>
+        <rect x="424" y="70" width="170" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="434" y="92">M3 지도와 벤치</text><text class="m" x="434" y="112">~11-21</text><text class="m" x="434" y="132">벤치마크 G1</text><text class="m" x="434" y="150">새 방법 연기 시험</text><text class="m" x="434" y="178">과제 2 / 10 완료</text>
+        <rect x="626" y="70" width="170" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="636" y="92">M4 조정과 고정</text><text class="m" x="636" y="112">~11-23</text><text class="m" x="636" y="132">조정 270회</text><text class="m" x="636" y="150">사전 등록 커밋</text><text class="m" x="636" y="178">과제 0 / 9 완료</text>
+        <rect x="828" y="70" width="152" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="838" y="92">M5 평가</text><text class="m" x="838" y="112">~11-27</text><text class="m" x="838" y="132">300 + 300회</text><text class="m" x="838" y="150">판정, 보고서</text><text class="m" x="838" y="178">과제 0 / 9 완료</text>
+      </g>
+      <text class="m" x="20" y="232" font-size="12">발표 창은 2026-11-30에 열린다. 앞 관문이 닫혀야 다음 관문이 열린다.</text>
+    </svg>
+    <figcaption>그림 2. 다섯 관문의 순서와 날짜, 과제 완료 수다. 왜: 지도 코드는 기준선 실행기와 여유 수치가 있어야 시뮬레이션에 들어간다.
+      <span class="ab">약어: M은 마일스톤(milestone). 출처: PLAN.md 2026-11-12 줄, DESIGN.md 7절.</span></figcaption>
+  </figure>
+  <table class="t">
+    <caption>표 5. 단계와 끝내는 조건 (출처: DESIGN.md 표 7, PLAN.md)</caption>
+    <thead><tr><th class="c">단계</th><th>최소 기능 제품(<a class="t" href="#term-mvp">minimum viable product, MVP</a>)</th><th>끝내는 조건</th></tr></thead>
+    <tbody>
+      <tr><td>M1</td><td>1단계: 모양(shape)</td><td>모의(<a class="t" href="#term-mock">mock</a>) 실행 390개가 확인을 통과한다. 모의 산출물이 모두 있다. 일부러 낸 오류 3개가 확인에서 걸린다</td></tr>
+      <tr><td>M2</td><td>2단계: 진짜 조각 하나</td><td>결정성이 성립한다. 불변 확인 15쌍이 모두 같다. 기준선 실행 90개가 통과한다</td></tr>
+      <tr><td>M3</td><td>3단계: 핵심 이전</td><td>벤치마크 파일이 있다. A와 B가 같은 칸을 돌려준다. 새 방법 연기 시험 3개가 통과한다</td></tr>
+      <tr><td>M4</td><td>3단계</td><td>조정 표와 고정 값이 기록된다. 사전 등록(<a class="t" href="#term-prereg">pre-registration</a>)을 평가 전에 커밋한다</td></tr>
+      <tr><td>M5</td><td>3단계</td><td>평가 300개가 끝난다. <code>verdict.json</code>을 커밋한다. 개선이 없는 분포마다 원인 메모를 쓴다</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">M1의 모의 실행 수: DESIGN.md 표 7은 300이라 쓰고, PLAN.md는 기준선 모의 90개를 더해 390이라 센다. 이 페이지는 PLAN.md를 따른다.</p>
+</section>
+
+<section id="s5">
+  <h2>5 핵심 결정</h2>
+  <table class="t">
+    <caption>표 6. 핵심 결정 요약 (출처: DECISIONS.md, 2026-11-12)</caption>
+    <thead><tr><th>ID</th><th>결정</th><th>왜</th></tr></thead>
+    <tbody>
+      <tr><td class="c">D-006</td><td>둥지 반지름은 파일 값 0.25를 주 설정으로 한다. 파일 값 0.137(실제 0.25 m)은 민감도 세트로 전부 돌린다</td><td>다른 팀이 가장 흔히 쓰는 읽기를 따른다</td></tr>
+      <tr><td class="c">D-007</td><td>자원 재생성(respawn)은 두 팔 모두 유지한다</td><td>기준선 코드를 바꾸지 않는다</td></tr>
+      <tr><td class="c">D-008</td><td>모든 분포에 10 × 10 m 파라미터 한 벌을 쓴다</td><td>10 × 10 m 파일이 그것뿐이다</td></tr>
+      <tr><td class="c">D-009</td><td>새 방법의 파라미터만 조정한다. 기준선 값 7개는 고정한다</td><td>공정한 비교</td></tr>
+      <tr><td class="c">D-010</td><td>선택지 B(쿼드트리)를 고른다. A(촘촘한 격자)는 같은 인터페이스 뒤의 대체안이다</td><td>메모리가 경기장 넓이가 아니라 방문 경계를 따른다</td></tr>
+      <tr><td class="c">D-011</td><td>통계는 numpy만 쓴다</td><td>의존성을 줄인다</td></tr>
+      <tr><td class="c">D-012</td><td>G1 판정은 80 m에서만 한다</td><td>과제가 든 예의 규모다</td></tr>
+      <tr><td class="c">D-018</td><td>나선 페이지의 혼합 규칙을 조정 후보 하나로만 더한다</td><td>소유자가 시험해 보기를 원했다</td></tr>
+      <tr><td class="c">D-019</td><td>보고서는 관개 비유로 서버를 설명한다</td><td>비전</td></tr>
+      <tr><td class="c">D-021</td><td>이 페이지들은 자기 폴더에 둔다</td><td>소유자 요청</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s6">
+  <h2>6 링크</h2>
+  <ul>
+    <li>방법 설명: <a href="design.html">design.html</a></li>
+    <li>관련 후보 페이지: <a href="../projects/spiral-search.html">나선 탐색</a> (혼합 후보, D-018), <a href="../projects/irrigation.html">정밀 관개</a> (비유, D-019)</li>
+    <li>저장소 문서: <a href="../../p2_assigned_informed_search/README.md">README.md</a>, <a href="../../p2_assigned_informed_search/DESIGN.md">DESIGN.md</a>, <a href="../../p2_assigned_informed_search/PLAN.md">PLAN.md</a>, <a href="../../p2_assigned_informed_search/DECISIONS.md">DECISIONS.md</a>, <a href="../../p2_assigned_informed_search/STATUS.md">STATUS.md</a>, <a href="../../p2_assigned_informed_search/RQ.md">RQ.md</a></li>
+    <li>조사 문서: <a href="../../p2_assigned_informed_search/research/baseline_code_map.md">baseline_code_map.md</a>, <a href="../../p2_assigned_informed_search/research/informed_search_survey.md">informed_search_survey.md</a></li>
+    <li>과제 PDF: <a href="../../docs/Autonomous_Mobile_Robot_Programming_Final%20Project%202.pdf">Final Project 2</a></li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="../index.html">← 후보 조사 목록(index)</a>
+  <a href="design.html">방법 설명(design) →</a>
+</div>
+
+<section id="terms">
+  <h2>용어 부록</h2>
+  <dl class="terms">
+    <dt id="term-cpfa">중심지 먹이 찾기 알고리즘(central-place foraging algorithm, CPFA)</dt><dd>로봇이 중앙 구역에서 나가 먹이를 찾고 다시 가져오는 알고리즘이다. 교수의 코드가 이것이다.</dd>
+    <dt id="term-baseline">기준선(baseline)</dt><dd>비교의 기준이 되는 원래 알고리즘이다. 여기서는 교수의 CPFA 코드를 고치지 않고 그대로 쓴 것이다.</dd>
+    <dt id="term-swarm">군집(swarm)</dt><dd>같은 규칙으로 움직이는 많은 로봇의 무리다. 여기서는 24대다.</dd>
+    <dt id="term-server">서버(server)</dt><dd>둥지에 있는 중앙 저장소다. 로봇이 둥지에 올 때만 정보를 주고받는다.</dd>
+    <dt id="term-nest">둥지(nest)</dt><dd>로봇이 먹이를 내려놓는 중앙 수집 구역이다.</dd>
+    <dt id="term-pheromone">페로몬(pheromone)</dt><dd>먹이를 찾은 곳을 알리는 가상 신호다. 서버가 목록으로 가진다.</dd>
+    <dt id="term-quadtree">쿼드트리(quadtree)</dt><dd>정사각형을 네 칸으로 나누고, 필요한 곳만 더 잘게 나누는 자료 구조다.</dd>
+    <dt id="term-grid">격자(grid)</dt><dd>경기장을 같은 크기 칸으로 나눈 지도다. 칸마다 방문 횟수나 시각을 둔다.</dd>
+    <dt id="term-seed">시드(seed)</dt><dd>난수의 시작 값이다. 시드가 같으면 같은 시뮬레이션이 나온다.</dd>
+    <dt id="term-boxplot">상자그림(box plot)</dt><dd>값의 중앙, 사분위 범위, 이상값을 상자로 보이는 그림이다.</dd>
+    <dt id="term-distribution">자원 분포(resource distribution)</dt><dd>먹이가 놓이는 방식이다. Random은 고르게, Powerlaw는 몇 큰 무더기와 많은 작은 무더기, Clustered는 몇 덩어리로 놓인다.</dd>
+    <dt id="term-mvp">최소 기능 제품(minimum viable product, MVP)</dt><dd>단계마다 끝까지 도는 가장 단순한 버전이다. 1단계는 모의 데이터로, 2단계는 진짜 조각 하나로 돈다.</dd>
+    <dt id="term-mock">모의(mock)</dt><dd>진짜 결과가 아니라 모양을 확인하려고 만든 가짜 데이터다. 이름에 MOCK이 붙는다.</dd>
+    <dt id="term-prereg">사전 등록(pre-registration)</dt><dd>실행 전에 판정 규칙을 파일로 적어 두는 일이다. 결과를 본 뒤에는 바꾸지 못한다.</dd>
+  </dl>
+</section>
+
+</div>
+</body>
+</html>

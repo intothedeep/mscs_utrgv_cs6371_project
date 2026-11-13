@@ -1,0 +1,214 @@
+<!doctype html>
+<html lang="en" data-theme="light">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=1040">
+<title>Assigned Project 2: Informed search for foraging swarms | CSCI 6371</title>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;700&family=IBM+Plex+Sans+KR:wght@400;500&display=swap">
+<link rel="stylesheet" href="../../assets/theme.css">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body>
+<div class="wrap">
+<p class="lang-switch"><a href="../index.html" hreflang="ko">한국어</a> | <b>English</b></p>
+
+<nav class="topnav">
+  <a href="../../en/index.html">← Candidate research index</a>
+  <a href="design.html">Method (design) →</a>
+</nav>
+
+<header style="display:flex;flex-direction:column;gap:12px">
+  <div class="label">Assigned Project 2 / set by the professor / 100 points</div>
+  <h1>Assigned Project 2: Informed search for foraging swarms</h1>
+  <div class="lead">
+    <p><strong>Result: design and plan are done. The milestone 1 tools are being written. There are no real results yet.</strong></p>
+    <p>Why: if the server tells a robot swarm where nobody has searched, the swarm collects more food in 12 minutes.</p>
+    <div class="chips">
+      <span class="chip">Only one value is measured</span>
+      <span class="chip">One baseline run: 5.67 seconds, 245 items collected</span>
+      <span class="chip">Source: STATUS.md (main-session smoke run)</span>
+    </div>
+  </div>
+  <ol class="toc">
+    <li><a href="#status">Result and status</a></li>
+    <li><a href="#s1">1 The assignment problem</a></li>
+    <li><a href="#s2">2 Experiment settings</a></li>
+    <li><a href="#s3">3 Mission and goals</a></li>
+    <li><a href="#s4">4 Milestones 1 to 5</a></li>
+    <li><a href="#s5">5 Key decisions</a></li>
+    <li><a href="#s6">6 Links</a></li>
+  </ol>
+</header>
+
+<section id="status">
+  <h2>Result and status (2026-11-12)</h2>
+  <table class="t">
+    <caption>Table 1. What exists and what does not (source: STATUS.md, PLAN.md)</caption>
+    <thead><tr><th>Item</th><th>State</th></tr></thead>
+    <tbody>
+      <tr><td>Design</td><td>Done. Options A, B and C were compared. B was picked (D-010)</td></tr>
+      <tr><td>Plan</td><td>Done. 49 tasks across milestones 1 to 5</td></tr>
+      <tr><td>Milestone 1 (all stages on mock data)</td><td>9 of 10 tasks done. The last one is the gate run (M1-09)</td></tr>
+      <tr><td>Map code</td><td>The quadtree and the grid are written. They are not built yet</td></tr>
+      <tr><td>Baseline run</td><td>One run. 5.67 seconds, 245 items. Seed 1</td></tr>
+      <tr class="rowflag"><td>Evaluation results</td><td><b>None yet.</b> The box plots and the improvement are made in milestone 5</td></tr>
+    </tbody>
+  </table>
+  <figure>
+    <svg viewBox="0 0 1000 300" role="img" aria-label="Empty frame of the planned box plot. No values">
+      <text class="b" x="20" y="22" font-size="14">Figure 1. Empty frame of the evaluation box plot (planned)</text>
+      <rect x="20" y="34" width="14" height="10" fill="var(--base)"/><text class="m" x="40" y="43" font-size="12">Baseline</text>
+      <rect x="140" y="34" width="14" height="10" fill="var(--s1)"/><text class="m" x="160" y="43" font-size="12">Our method</text>
+      <line class="gr" x1="120" y1="90" x2="960" y2="90"/><line class="gr" x1="120" y1="150" x2="960" y2="150"/><line class="gr" x1="120" y1="210" x2="960" y2="210"/>
+      <line class="ax" x1="120" y1="64" x2="120" y2="250"/><line class="ax" x1="120" y1="250" x2="960" y2="250"/>
+      <text class="m c" x="250" y="270" font-size="12">Random</text>
+      <text class="m c" x="540" y="270" font-size="12">Powerlaw</text>
+      <text class="m c" x="830" y="270" font-size="12">Clustered</text>
+      <text class="b c" transform="translate(64 160) rotate(-90)" font-size="12">Items in 12 min</text>
+      <text class="m c" x="540" y="160" font-size="14">No values. Filled in milestone 5</text>
+    </svg>
+    <figcaption>Figure 1. The place of the three box-plot pairs the assignment asks for. Why: fixing what to show before the values exist stops us from changing the criterion after we see the result.
+      <span class="ab">Abbreviations: none. Source: assignment PDF page 3, DESIGN.md section 6.7. The frame is a plan.</span></figcaption>
+  </figure>
+</section>
+
+<section id="s1">
+  <h2>1 The assignment problem</h2>
+  <ul>
+    <li>The baseline is the central-place foraging algorithm (CPFA).</li>
+    <li>A robot leaves the nest and searches for food. On a find, it leaves a pheromone waypoint on the server.</li>
+    <li>Robots visit food clusters many times. They never visit other places.</li>
+    <li>If every visited point goes to the server, there are too many points. A server that scans all of them each time pays a high cost.</li>
+    <li>The grid method of the professor's MS student has a limit. When the arena is large, the cells are large. Then it loses efficiency.</li>
+    <li>Goal: organize the points more efficiently, so the server finds empty places fast. Then raise the score.</li>
+  </ul>
+  <table class="t">
+    <caption>Table 2. Points the server must scan (source: assignment PDF page 2)</caption>
+    <thead><tr><th>Stage</th><th>Calculation</th><th class="n">Points</th></tr></thead>
+    <tbody>
+      <tr><td>One robot, one trip</td><td>memory of at most 100</td><td class="n">100</td></tr>
+      <tr><td>200 robots, one trip</td><td>200 × 100</td><td class="n">20,000</td></tr>
+      <tr><td>Whole simulation, 20 trips on average</td><td>20,000 × 20</td><td class="n">400,000</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Illustrative values: 200 robots is the assignment's example. The real evaluation uses 24 (Table 3).</p>
+</section>
+
+<section id="s2">
+  <h2>2 Experiment settings</h2>
+  <table class="t">
+    <caption>Table 3. Experiment settings of the assignment (source: assignment PDF page 3, Table 1)</caption>
+    <thead><tr><th>Item</th><th>Value</th></tr></thead>
+    <tbody>
+      <tr><td>Arena size</td><td>10 × 10 m</td></tr>
+      <tr><td>Collection zone (nest) radius</td><td>0.25 m</td></tr>
+      <tr><td>Number of resources</td><td>256</td></tr>
+      <tr><td>Resource distributions</td><td>Random, Powerlaw, Clustered</td></tr>
+      <tr><td>Number of robots</td><td>24</td></tr>
+      <tr><td>Foraging time</td><td>12 minutes</td></tr>
+      <tr><td>Runs in each distribution</td><td>50</td></tr>
+    </tbody>
+  </table>
+  <ul>
+    <li>The score is the number of items collected in 12 minutes. The professor compares the scores of the teams to set the grade.</li>
+    <li>One box plot holds the values of 50 runs. Report the percentage improvement over the baseline.</li>
+    <li>0.25 is the file value. The code multiplies it by 1.82, so the effective radius is 0.456 m (inference from reading the code). Decision D-006 made this reading the primary setting.</li>
+  </ul>
+</section>
+
+<section id="s3">
+  <h2>3 Mission, vision and goals</h2>
+  <table class="t">
+    <caption>Table 4. Mission and goals (source: PLAN.md mission block, D-003 to D-005)</caption>
+    <thead><tr><th>Line</th><th>Content</th></tr></thead>
+    <tbody>
+      <tr><td>Mission</td><td>Find ground no robot has searched, so the swarm collects more in 12 minutes. Keep the server cost small as swarms and arenas grow</td></tr>
+      <tr><td>Vision</td><td>One page shows the box plots of the three distributions, the percentage improvement over the baseline with its interval, and a query-cost versus arena-size chart beside the grid. Each failure has a cause</td></tr>
+      <tr><td>Goal G1 (by 11-21)</td><td>Benchmark verdict. At an arena of 80 m, option B takes at most 1 % of the operations of a full list scan per query, and fewer than a grid of the same resolution</td></tr>
+      <tr><td>Goal G2 (by 11-27)</td><td>Finish 300 evaluation runs. Report the runs that pass the checks and a per-distribution improvement table</td></tr>
+      <tr><td>Goal G3 (by 11-27)</td><td>Commit the verdict file <code>verdict.json</code>. Write a root-cause memo for each distribution with no confirmed improvement</td></tr>
+      <tr><td>Research question 1</td><td>Does map-based targeting change the 12-minute collection per distribution?</td></tr>
+      <tr><td>Research question 2</td><td>Does the query cost follow the visited area or the arena size?</td></tr>
+      <tr><td>Research question 3</td><td>Does the effect come from target choice or from the change to the departure rule?</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Pass or fail does not matter. Follow the procedure fixed in advance. Each failure gets a cause (repository rule).</p>
+</section>
+
+<section id="s4">
+  <h2>4 Milestones 1 to 5</h2>
+  <figure>
+    <svg viewBox="0 0 1000 250" role="img" aria-label="Ladder of five milestones and the current state">
+      <text class="b" x="20" y="22" font-size="14">Figure 2. Five gates and the current state (2026-11-12)</text>
+      <rect x="20" y="40" width="14" height="10" fill="#fff3a0" stroke="#e6d24a"/><text class="m" x="40" y="49" font-size="12">In progress</text>
+      <rect x="140" y="40" width="14" height="10" fill="#fff" stroke="#666"/><text class="m" x="160" y="49" font-size="12">Not started</text>
+      <g font-size="13">
+        <rect x="20" y="70" width="170" height="130" fill="#fff3a0" stroke="#e6d24a" stroke-width="2"/>
+        <text class="b" x="30" y="92">M1 mock flow</text><text class="m" x="30" y="112">by 11-14</text><text class="m" x="30" y="132">whole flow on</text><text class="m" x="30" y="150">mock data</text><text class="m" x="30" y="178">tasks 9 / 10 done</text>
+        <rect x="222" y="70" width="170" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="232" y="92">M2 baseline</text><text class="m" x="232" y="112">by 11-18</text><text class="m" x="232" y="132">invariance check</text><text class="m" x="232" y="150">headroom, 90 runs</text><text class="m" x="232" y="178">tasks 0 / 11 done</text>
+        <rect x="424" y="70" width="170" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="434" y="92">M3 map, bench</text><text class="m" x="434" y="112">by 11-21</text><text class="m" x="434" y="132">benchmark G1</text><text class="m" x="434" y="150">new-method smoke</text><text class="m" x="434" y="178">tasks 2 / 10 done</text>
+        <rect x="626" y="70" width="170" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="636" y="92">M4 tune, freeze</text><text class="m" x="636" y="112">by 11-23</text><text class="m" x="636" y="132">270 tuning runs</text><text class="m" x="636" y="150">commit criteria</text><text class="m" x="636" y="178">tasks 0 / 9 done</text>
+        <rect x="828" y="70" width="152" height="130" fill="#fff" stroke="#666" stroke-width="2"/>
+        <text class="b" x="838" y="92">M5 evaluate</text><text class="m" x="838" y="112">by 11-27</text><text class="m" x="838" y="132">300 + 300 runs</text><text class="m" x="838" y="150">verdict, report</text><text class="m" x="838" y="178">tasks 0 / 9 done</text>
+      </g>
+      <text class="m" x="20" y="232" font-size="12">The presentation window opens on 2026-11-30. A gate opens only when the one before it is closed.</text>
+    </svg>
+    <figcaption>Figure 2. The order, dates and task counts of the five gates. Why: the map code enters the simulation only after the baseline runner and the headroom numbers exist.
+      <span class="ab">Abbreviations: M is milestone. Source: PLAN.md line of 2026-11-12, DESIGN.md section 7.</span></figcaption>
+  </figure>
+  <table class="t">
+    <caption>Table 5. Milestones and exit criteria (source: DESIGN.md Table 7, PLAN.md)</caption>
+    <thead><tr><th class="c">Milestone</th><th>Minimum viable product (MVP) phase</th><th>Exit criterion</th></tr></thead>
+    <tbody>
+      <tr><td class="c">M1</td><td>Phase 1: shape</td><td>390 mock runs pass the check. All mock outputs exist. The 3 deliberate breakages fail the check</td></tr>
+      <tr><td class="c">M2</td><td>Phase 2: one real slice</td><td>Determinism holds. All 15 invariance pairs are equal. 90 baseline runs pass</td></tr>
+      <tr><td class="c">M3</td><td>Phase 3: core migrated</td><td>The benchmark files exist. A and B return the same cell. 3 new-method smoke runs pass</td></tr>
+      <tr><td class="c">M4</td><td>Phase 3</td><td>The tuning table and frozen values are recorded. The pre-registration is committed before evaluation</td></tr>
+      <tr><td class="c">M5</td><td>Phase 3</td><td>300 evaluation runs are done. <code>verdict.json</code> is committed. Each non-improving distribution has a root-cause memo</td></tr>
+    </tbody>
+  </table>
+  <p class="muted">Mock run count of M1: DESIGN.md Table 7 says 300. PLAN.md adds 90 mock baseline runs and counts 390. This page follows PLAN.md.</p>
+</section>
+
+<section id="s5">
+  <h2>5 Key decisions</h2>
+  <table class="t">
+    <caption>Table 6. Key decisions in short (source: DECISIONS.md, 2026-11-12)</caption>
+    <thead><tr><th>ID</th><th>Decision</th><th>Why</th></tr></thead>
+    <tbody>
+      <tr><td class="c">D-006</td><td>The file nest radius 0.25 is the primary setting. The file value 0.137 (effective 0.25 m) runs in full as a sensitivity set</td><td>It follows the reading other teams most likely use</td></tr>
+      <tr><td class="c">D-007</td><td>Keep resource respawn in both arms</td><td>The baseline code stays unchanged</td></tr>
+      <tr><td class="c">D-008</td><td>Use one parameter set of the 10 × 10 m file for every distribution</td><td>It is the only 10 × 10 m file</td></tr>
+      <tr><td class="c">D-009</td><td>Tune only the new method's parameters. The 7 baseline values stay fixed</td><td>Fair comparison</td></tr>
+      <tr><td class="c">D-010</td><td>Pick option B (quadtree). Option A (fine grid) stays as a fallback behind the same interface</td><td>Memory follows the visited boundary, not the arena area</td></tr>
+      <tr><td class="c">D-011</td><td>Statistics use numpy only</td><td>Fewer dependencies</td></tr>
+      <tr><td class="c">D-012</td><td>The G1 verdict is judged at 80 m only</td><td>It is the scale of the assignment's example</td></tr>
+      <tr><td class="c">D-018</td><td>Add the hybrid rule of the spiral page as one tuning candidate only</td><td>The owner wants it tried</td></tr>
+      <tr><td class="c">D-019</td><td>The report explains the server with the irrigation analogy</td><td>Vision</td></tr>
+      <tr><td class="c">D-021</td><td>These pages live in their own folder</td><td>Owner request</td></tr>
+    </tbody>
+  </table>
+</section>
+
+<section id="s6">
+  <h2>6 Links</h2>
+  <ul>
+    <li>Method: <a href="design.html">design.html</a></li>
+    <li>Related candidate pages: <a href="../../en/projects/spiral-search.html">spiral search</a> (hybrid candidate, D-018), <a href="../../en/projects/irrigation.html">precision irrigation</a> (analogy, D-019)</li>
+    <li>Repository documents: <a href="../../../p2_assigned_informed_search/README.md">README.md</a>, <a href="../../../p2_assigned_informed_search/DESIGN.md">DESIGN.md</a>, <a href="../../../p2_assigned_informed_search/PLAN.md">PLAN.md</a>, <a href="../../../p2_assigned_informed_search/DECISIONS.md">DECISIONS.md</a>, <a href="../../../p2_assigned_informed_search/STATUS.md">STATUS.md</a>, <a href="../../../p2_assigned_informed_search/RQ.md">RQ.md</a></li>
+    <li>Research notes: <a href="../../../p2_assigned_informed_search/research/baseline_code_map.md">baseline_code_map.md</a>, <a href="../../../p2_assigned_informed_search/research/informed_search_survey.md">informed_search_survey.md</a></li>
+    <li>Assignment PDF: <a href="../../../docs/Autonomous_Mobile_Robot_Programming_Final%20Project%202.pdf">Final Project 2</a></li>
+  </ul>
+</section>
+
+<div class="pager">
+  <a href="../../en/index.html">← Candidate research index</a>
+  <a href="design.html">Method (design) →</a>
+</div>
+
+</div>
+</body>
+</html>
