@@ -1,11 +1,11 @@
-# 01_pheromone: real run output and generated .argos files (PLAN "Fixed paths")
-01_pheromone/runs/
-01_pheromone/src/experiments/generated/
+# deprecated_01_pheromone: real run output and generated .argos files (PLAN "Fixed paths")
+deprecated_01_pheromone/runs/
+deprecated_01_pheromone/src/experiments/generated/
 # uv environment and bytecode created by `uv sync` and tool runs
-01_pheromone/.venv/
+deprecated_01_pheromone/.venv/
 __pycache__/
-01_pheromone/src/build/
-01_pheromone/mock/runs/
+deprecated_01_pheromone/src/build/
+deprecated_01_pheromone/mock/runs/
 # macOS folder metadata
 .DS_Store
 # p2_assigned_informed_search: vendored baseline (clone, not tracked)
