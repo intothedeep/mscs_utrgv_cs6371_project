@@ -8,3 +8,7 @@ __pycache__/
 01_pheromone/mock/runs/
 # macOS folder metadata
 .DS_Store
+# 02_informed_search: vendored baseline (clone, not tracked)
+02_informed_search/vendor/
+02_informed_search/build_baseline/
+02_informed_search/runs/
