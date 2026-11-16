@@ -1,0 +1,49 @@
+uv sync exit=0
+$ uv run python tools/make_mock_runs.py
+warning: `VIRTUAL_ENV=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+wrote 390 MOCK runs to /Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/submodule_project/p2_assigned_informed_search/mock/runs
+exit=0
+$ uv run python tools/check_runs.py mock/runs --log results/mock/mvp1/check.log
+warning: `VIRTUAL_ENV=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+SUMMARY runs=390 failed=0 problems=0
+exit=0
+$ uv run python tools/collect_runs.py mock/runs --out results/mock/runs.csv
+warning: `VIRTUAL_ENV=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+wrote 390 rows to results/mock/runs.csv
+exit=0
+$ uv run python tools/analyze.py --set S3 --criteria prereg/S3_eval_MOCK.json results/mock/runs.csv
+warning: `VIRTUAL_ENV=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+random: improves, improvement +7.53 % [+6.66, +8.40], pairs 50
+powerlaw: not resolved, improvement +0.08 % [-0.88, +1.03], pairs 50
+clustered: worse, improvement -6.34 % [-6.92, -5.77], pairs 50
+SUMMARY set=S3 distributions=3 missing=0 out=results/mock/S3
+exit=0
+$ uv run python tools/analyze.py --selfcheck
+warning: `VIRTUAL_ENV=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+selfcheck passed
+exit=0
+$ uv run python tools/report.py --phase mvp1
+warning: `VIRTUAL_ENV=/Users/tio/Documents/mscs_utrgv/mscs_utrgv_cs6371_robot/.venv` does not match the project environment path `.venv` and will be ignored; use `--active` to target the active environment instead
+stage 1 mock_runs: ran
+stage 2 check: ran
+stage 3 collect: ran
+stage 4 analyze: ran
+stage 5 cost_vs_arena: skipped (results/mock/bench/bench.csv does not exist (benchmark not built yet))
+wrote 5 stage reports and results/mock/mvp1/index.html
+exit=0
+step1 run dirs=     390 MOCK_prefixed=     390; step3 rows=390
+$ check_runs.py <scratchpad>/b1 (breakage)
+exit=1
+FAIL run=set S3 file=- column=arm=qmap distribution=clustered: 50 of 50 cells missing, seeds [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050]
+SUMMARY runs=1 failed=2 problems=8
+$ check_runs.py <scratchpad>/b2 (breakage)
+exit=1
+FAIL run=set S3 file=- column=arm=qmap distribution=clustered: 50 of 50 cells missing, seeds [2001, 2002, 2003, 2004, 2005, 2006, 2007, 2008, 2009, 2010, 2011, 2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025, 2026, 2027, 2028, 2029, 2030, 2031, 2032, 2033, 2034, 2035, 2036, 2037, 2038, 2039, 2040, 2041, 2042, 2043, 2044, 2045, 2046, 2047, 2048, 2049, 2050]
+SUMMARY runs=1 failed=2 problems=7
+$ check_runs.py <scratchpad>/b3 (breakage)
+exit=1
+FAIL run=/private/tmp/claude-501/-Users-tio-Documents-mscs-utrgv-mscs-utrgv-cs6371-robot/37b0c89a-c3e4-4f26-9f13-ad875c334080/scratchpad/m1gate/b3 file=manifest.json column=mock: root mixes 1 mock runs (MOCK_20261112-000000_cpfa_clustered_s2001, ...) and 1 real runs (MOCK_20261112-000000_cpfa_clustered_s2002, ...). The check stops
+SUMMARY runs=2 failed=1 problems=1
+FAIL run=MOCK_20261112-000000_cpfa_clustered_s2001 file=forage_per_minute.csv column=minute: expected column is missing
+FAIL run=MOCK_20261112-000000_cpfa_clustered_s2001 file=forage_per_minute.csv column=minute_renamed: unexpected column
+FAIL run=MOCK_20261112-000000_cpfa_clustered_s2001 file=stdout.log column=metrics.collected: is 341 but the score line says 340

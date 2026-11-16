@@ -1,0 +1,177 @@
+{
+  "title": "S1 headroom and baseline noise criteria (cpfa arm only)",
+  "schema_version": 1,
+  "mock": false,
+  "task": "TASKS.md M2-07",
+  "serves": "M2 -> S1 -> RQ1. The noise line feeds prereg/S3_eval.json (G2, G3)",
+  "source": "DESIGN.md 5.1, 6.1, 6.2 item 8, 6.3, 6.5, Table 8, Table 9 (R3, R4, R13); DECISIONS.md D-006, D-007, D-011, D-015, D-016, D-022, D-026, D-027; research/lu_papers_p2.md; research/applied_vs_not.md 4 P4, P5",
+  "runs_csv_schema_version": 2,
+  "written": "2026-11-16, before any S1 run",
+  "set": "S1",
+  "arm": "cpfa",
+  "distributions": ["random", "powerlaw", "clustered"],
+  "seeds": {"first": 1001, "last": 1030},
+  "n_runs": 90,
+  "nest_radius_xml": 0.25,
+  "input": "results/real/runs.csv, rows with set = S1 only",
+
+  "role": "S1 is a measurement, not a comparison. It routes the S2 tuning list (Table 8) and measures the noise line for S3. It makes no effect claim",
+
+  "table_8_verbatim": [
+    {"reading": "`share_random` ≥ 20 % of departures", "meaning": "the map replaces a frequent choice", "action": "keep the round-2 list (§6.3)"},
+    {"reading": "`share_random` < 20 %", "meaning": "the map rarely fires with `q_map` = 0", "action": "round 2 stays as listed (it tests `q_map` first). Report the share"},
+    {"reading": "`search_s / travel_s` ≥ 2", "meaning": "time goes to searching. Better search places pay", "action": "keep T1"},
+    {"reading": "`search_s / travel_s` < 1", "meaning": "time goes to travel. Far targets may cost score", "action": "add the 3 m distance cap to round 3 in place of `spiral`"}
+  ],
+
+  "primary_metric": {
+    "name": "search_travel_ratio",
+    "formula": "sum(search_s) / sum(travel_s) over the 30 runs of one distribution",
+    "kind": "ratio of sums",
+    "why_primary": "It is the only Table 8 reading whose action can change the S2 list. Both share_random rows keep round 2 as listed"
+  },
+
+  "routing_reading": {
+    "name": "share_random_pooled",
+    "formula": "sum(share_random * n_departures) / sum(n_departures) over the 30 runs of one distribution",
+    "kind": "departure-weighted pooled share",
+    "note": "share_random includes fallback_random (D-016). In cpfa the map never fires, so fallback_random is 0"
+  },
+
+  "thresholds": {
+    "share_random": 0.20,
+    "search_travel_low": 1.0,
+    "search_travel_high": 2.0,
+    "comparison": "point value of the pooled statistic, as Table 8 is written"
+  },
+
+  "primary_contrast": "Each distribution's reading against the fixed Table 8 lines. No arm-vs-arm contrast exists in S1",
+
+  "action_rule": {
+    "share_random": "Reported per distribution. Either row keeps round 2 as listed, so the 3 distributions need no combination",
+    "search_travel_ratio": {
+      "fires_distance_cap": "any distribution with search_travel_ratio < 1.0",
+      "keep_T1": "all 3 distributions with search_travel_ratio >= 2.0",
+      "no_listed_action": "otherwise (some value in 1.0 to < 2.0 and none < 1.0). Table 8 has no row for this band. None is added",
+      "why_any": "Round 3 is one list shared by all distributions. The S2 metric sums mean collected over the 3 distributions (DESIGN.md 6.3 item 6). So a travel-bound distribution enters the sum"
+    }
+  },
+
+  "noise_basis": "Table 8 lines are routing lines fixed in DESIGN.md, not effect sizes. The 30-seed bootstrap interval of each reading is printed beside it. A reading whose interval crosses its line is flagged near_threshold. The action still follows the point value. The flag is reported, not decisive",
+  "interval_settings": {
+    "interval": "percentile_bootstrap",
+    "interval_level": 0.95,
+    "n_resamples": 10000,
+    "resample_unit": "seed_index",
+    "bootstrap_seed": 20261112,
+    "rng": "numpy.random.default_rng",
+    "note": "Settings follow DESIGN.md 6.2 item 4. The bootstrap seed value is set here. numpy only (D-011)"
+  },
+
+  "noise_line_for_S3": {
+    "column": "collected",
+    "per": "distribution",
+    "statistic": "sample standard deviation, ddof = 1, over 30 seeds",
+    "written_to": "results/real/S1/headroom.json",
+    "used_by": "prereg/S3_eval.json noise_line (DESIGN.md 6.2 item 8)"
+  },
+
+  "failure_condition": {
+    "incomplete": "any distribution with fewer than 30 runs that pass check_runs.py and have complete = 1. Then no sigma and no Table 8 reading for that distribution. Root-cause memo",
+    "zero_spread": "sigma of collected = 0 in a distribution. The seed may not reach the simulation. Root-cause memo before S2",
+    "no_headroom": "R3 (the map branch rarely fires) has no kill condition. A low share_random is reported, and the plan continues"
+  },
+
+  "round_1_rules_verbatim": {
+    "evaluated_on": "S2 round 1 (qmap at start values), not on S1. In cpfa, targets_reached_share is empty and fallback_random never fires",
+    "R4": {
+      "risk": "Far map targets lower a fixed-time count",
+      "response": "nearest-first answers, `dist_m` logged",
+      "kill_or_switch": "`targets_reached_share` < 50 % in round 1 → 3 m distance cap in round 3"
+    },
+    "R13": {
+      "risk": "Reservations lock too much space",
+      "response": "`t_res` expiry, `fallback_random` share logged",
+      "kill_or_switch": "fallback share > 20 % in round 1 → `r_res` 0.5 m forced into round 2"
+    },
+    "open_for_S2_tuning_json": [
+      "R13 fallback share has no denominator in DESIGN.md. Candidates: all departures, or map queries (branch map plus fallback_random). prereg/S2_tuning.json fixes it",
+      "R4 statistic over 30 round-1 runs (pooled or mean of runs) is not written in DESIGN.md. prereg/S2_tuning.json fixes it"
+    ]
+  },
+
+  "reported_diagnostics": {
+    "status": "reported quantities only. No threshold, no verdict, no action",
+    "why": "The Grid-Based Complete Foraging Algorithm (GCFA) loses on Clustered. Adaptive Repulsive Pheromone Clustering (ARPC) loses on Powerlaw. The GCFA gain is in the collection tail. The ARPC gain timing is [CONFLICT] in its own paper. These readings show whether our 12 min runs contain those conditions",
+    "pickup_clustering_share": {
+      "question": "How often does a pickup happen near an earlier pickup?",
+      "input": "points.csv rows with kind = pickup (schema v2, D-026), read through runs.csv columns (see needs_fields)",
+      "definition": "share of pickups in a run with an earlier pickup in the same run, by any robot, at Euclidean distance <= 1.0 m",
+      "earlier": "strictly smaller t_s. Equal t_s does not count as earlier",
+      "first_pickup": "the first pickup of a run has no earlier pickup and counts as not near. It stays in the denominator",
+      "denominator": "all pickups in the run",
+      "per": "run, then mean, min and max over 30 seeds per distribution",
+      "reference": "the random distribution value is the chance level for this arena and density",
+      "saturation_note": "With k earlier pickups over about 97 m2, the chance share is about 1 - (1 - 3.14 / 97)^k. That is about 0.8 at k = 50. So late pickups are near on every layout, and the whole-run share may not separate the distributions",
+      "companion": {
+        "name": "pickup_near_prev_same_robot_share",
+        "definition": "share of pickups within 1.0 m of the same robot's previous pickup. A robot's first pickup counts as not near",
+        "why": "one earlier point per robot, so the chance level stays near 3 % and cannot saturate. Same pickup rows, one more runs.csv column"
+      },
+      "not_used": "near_pickup_target_share (D-026) measures map targets near pickups. It is empty in cpfa, so S1 does not report it",
+      "computable_now": false,
+      "needs_fields": ["runs.csv pickup_near_share_1m", "runs.csv pickup_near_prev_same_robot_share_1m", "points.csv pickup rows in the cpfa arm"]
+    },
+    "late_phase_reading": {
+      "question": "Does the collection rate fall late in a 12 min run, more on Clustered than on Random?",
+      "input": "runs.csv collected_4min, collected_8min, collected (schema v2, D-026, D-027)",
+      "per_seed": [
+        "mid = collected_8min - collected_4min",
+        "late = collected - collected_8min"
+      ],
+      "per_distribution": "drop = mean over 30 seeds of (mid - late)",
+      "contrast": "drop(clustered) - drop(random), and drop(powerlaw) - drop(random), each with the interval_settings bootstrap over the seed index",
+      "why_minutes_0_to_4_skipped": "minute 1 is a ramp-up from the nest, and pheromone use builds over time (research/applied_vs_not.md 4 P5)",
+      "pairing_note": "distributions share seed numbers but not layouts. The bootstrap resamples the seed index of each distribution independently",
+      "reading_words": "printed only. Interval above 0 reads as a late slowdown specific to that layout. Interval covering 0 reads as none. No action and no verdict follow (D-027)",
+      "turnover": {
+        "definition": "collected / 256 per run, mean, min and max per distribution",
+        "denominator_source": "256 resources always standing with respawn (DESIGN.md 2 F2-a, D-007, research/baseline_code_map.md FoodItemCount)",
+        "note": "With respawn, the value can exceed 1. The standing count never falls, so this is turnover, not depletion",
+        "reference_marks": [0.6, 0.8, 0.9],
+        "reference_marks_source": "GCFA gain in the last 20 % and last 10 % [S-LP-1]. ARPC gain from 60 % or 80 % (p. 9) [S-LP-2], contradicted by its conclusion (p. 12) [CONFLICT]. research/lu_papers_p2.md Figure 1"
+      },
+      "computable_now": true,
+      "needs_fields": []
+    },
+    "source_rows": {
+      "GCFA": "research/lu_papers_p2.md 1.1: Clustered last 10 % is -14.69 %, and the stated cluster limit (PDF p. 7) [S-LP-1]",
+      "ARPC": "research/lu_papers_p2.md 1.3: Powerlaw last 10 % is -31.79 %, Cluster +12.78 % [S-IS-4]. Powerlaw limit (Section 6.2) [S-LP-2]"
+    }
+  },
+
+  "needs_fields": [
+    {
+      "file": "runs.csv",
+      "columns": ["pickup_near_share_1m", "pickup_near_prev_same_robot_share_1m"],
+      "meaning": "the two pickup clustering shares above, per run",
+      "filled_by": "collect_runs.py from points.csv kind = pickup",
+      "why_not_existing": "D-026 adds near_pickup_target_share, which is about map targets, not pickups. Every report number comes from runs.csv (DESIGN.md 6.5, D-013)"
+    },
+    {
+      "file": "points.csv",
+      "rows": "kind = pickup rows in the cpfa arm (t_s, robot, x, y of the picked resource)",
+      "why_not_existing": "D-015 makes points.csv header-only for cpfa. D-026 adds the kind column but does not say cpfa logs pickups. research/applied_vs_not.md 4 P4 still lists points.csv as header-only in cpfa"
+    }
+  ],
+
+  "output": {
+    "file": "results/real/S1/headroom.json",
+    "per_distribution": ["share_random_pooled", "share_random_interval", "search_travel_ratio", "search_travel_interval", "near_threshold flags", "sigma_collected", "late_phase_reading drop and contrasts", "turnover mean, min, max", "pickup clustering shares (when the fields exist)"],
+    "swarm_level": ["action that fires per Table 8 row, by action_rule"],
+    "records": "this file path and its sha256 (rules/measurement.md 4.1)"
+  },
+
+  "seed_rules": "Seeds 1001 to 1030 never touch the evaluation seeds 2001 to 2050 (DESIGN.md 6.1, D-022)",
+  "change_rule": "Nothing here changes after the first S1 run. A needed change makes a new file and a new run set"
+}

@@ -1,0 +1,4 @@
+random: improves, improvement +7.53 % [+6.66, +8.40], pairs 50
+powerlaw: not resolved, improvement +0.08 % [-0.88, +1.03], pairs 50
+clustered: worse, improvement -6.34 % [-6.92, -5.77], pairs 50
+SUMMARY set=S3 distributions=3 missing=0 out=results/mock/S3

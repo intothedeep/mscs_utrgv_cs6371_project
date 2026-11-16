@@ -1,0 +1,106 @@
+{
+  "title": "G1 benchmark criteria (map query cost and memory, judged at 80 m)",
+  "schema_version": 1,
+  "mock": false,
+  "task": "TASKS.md M3-04",
+  "serves": "M3 -> S1 -> G1, RQ2",
+  "source": "DESIGN.md 5.2, Table 9 (R6); DECISIONS.md D-010, D-012, D-028; PLAN.md G1 line",
+  "written": "2026-11-16, before the first benchmark run",
+  "input_file": "results/real/bench/bench.csv",
+
+  "design_text_verbatim": [
+    "Query: at 80 m (D-012), B median operations per query ≤ 1 % of the flat-list tests (≤ 4,000).",
+    "Query: at 80 m (D-012), B median operations per query < the equal-resolution student grid.",
+    "Memory: at the largest arena where cells touched < 37 %, B (merge on) memory < A memory.",
+    "A fail of any line gets a root-cause memo. The line does not move."
+  ],
+
+  "judged_scope": {
+    "arena_side_m_judged": [80],
+    "arenas_reported_not_judged": [10, 20, 40, 160, 320],
+    "line_3_candidate_arenas_m": [10, 20, 40, 80],
+    "input": "synthetic only (200 robots, 20 trips, 100 points per trip, 400,000 points, fixed generator seed)",
+    "input_note": "Replay inputs come from 10 m runs, so no replay exists at 80 m. Replay rows are reported, not judged",
+    "structure_names": {
+      "flat": "1. flat list",
+      "grid12": "2. student grid, n = 12",
+      "grid_eq": "3. student grid at equal resolution, n = L / s_min",
+      "A": "4. fine grid",
+      "B": "5. quadtree, merge on",
+      "B_nomerge": "6. quadtree, merge off"
+    }
+  },
+
+  "primary_metric": {
+    "column": "operations per query, median",
+    "structure": "B",
+    "arena_side_m": 80,
+    "input": "synthetic",
+    "kind": "deterministic operation count (nodes visited)"
+  },
+
+  "lines": {
+    "line_1": {
+      "metric": "B median operations per query, 80 m, synthetic",
+      "threshold": 4000,
+      "test": "value <= 4000",
+      "threshold_basis": "1 % of 400,000 synthetic points, the cost of one flat-list scan over all points. DESIGN.md 5.2 line 1 and the PLAN.md G1 line give the same number",
+      "contrast": "B vs one full flat-list scan",
+      "reported_not_decisive": "B median divided by the measured flat-list median at 80 m"
+    },
+    "line_2": {
+      "metric": "B median operations per query, 80 m, synthetic",
+      "test": "B value < grid_eq value, strict",
+      "contrast": "B vs the student grid at equal resolution, same input, same arena"
+    },
+    "line_3": {
+      "metric": "memory bytes",
+      "selector": "the largest arena in line_3_candidate_arenas_m where cells touched < 37 %",
+      "cells_touched_source": "the cells touched (%) column of structure A on the synthetic input",
+      "test": "B (merge on) memory bytes < A memory bytes, strict, at the selected arena",
+      "contrast": "B vs A, same input, same arena",
+      "no_arena_selected": "no candidate arena has cells touched < 37 %. Then line 3 is not resolved. Root-cause memo. The 37 % and the candidate list do not move",
+      "why_capped_at_80_m": "D-012 judges G1 at 80 m only. Larger arenas are reported, not judged. DESIGN.md line 3 names no arena cap, so this file applies the D-012 cap. Needs the M3-10 D-row to confirm"
+    }
+  },
+
+  "verdict": {
+    "per_line": "pass or fail for each of the 3 lines. line_3 may also be not resolved",
+    "G1": "pass only if all 3 lines pass. fail if any line fails. not resolved if no line fails and line 3 is not resolved",
+    "multiplicity": "3 separate line verdicts. The report shows each line and does not average them"
+  },
+
+  "precondition": {
+    "equivalence": "A and B return the same cell on every query (DESIGN.md 5.2). Any difference stops B, and no G1 line is judged on B",
+    "R6": "A and B equivalence fails on 2026-11-21 → ship A, D-row (DESIGN.md Table 9, verbatim)"
+  },
+
+  "noise_basis": "Operation counts and memory bytes are deterministic for a fixed generator seed. One run gives the exact value. So the lines are exact comparisons with no margin",
+
+  "failure_condition": "Any line that fails gets a root-cause memo. The line does not move. G1 is then reported as fail",
+
+  "reported_not_decisive": {
+    "us_per_query_median": "machine noise. Reported only",
+    "percentiles": "95th percentile and maximum operations per query",
+    "other_arenas": "every column for 10, 20, 40, 160, 320 m",
+    "B_nomerge": "every column",
+    "grid12": "every column",
+    "figure": "fig_cost_vs_arena.png, log scale",
+    "rec_period_axis": {
+      "values_s": [2, 8, 25],
+      "input": "replay (D-028)",
+      "reported": "every output column per rec_period value",
+      "judged": false,
+      "why": "answers the GCFA logging-interval future work on the cost side (research/applied_vs_not.md 4 P6). The G1 verdict stays at 80 m on the synthetic input (D-012)",
+      "fallback": "benchmark wall time over 300 s with the axis → axis dropped, D-row (research/applied_vs_not.md 4 P6)"
+    }
+  },
+
+  "output": {
+    "file": "results/real/bench/G1_verdict.json",
+    "fields": ["per-line value, threshold, verdict", "selected arena for line 3", "G1 verdict"],
+    "records": "this file path and its sha256, analyze.py sha256 (rules/measurement.md 4.1)"
+  },
+
+  "change_rule": "Nothing here changes after the first benchmark run. A needed change makes a new file and a new run"
+}

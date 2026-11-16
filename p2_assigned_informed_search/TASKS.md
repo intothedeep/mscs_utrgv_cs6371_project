@@ -86,7 +86,7 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
   - Static: `index.html` links every stage report and uses `skills/html-theme/theme.css`.
   - Gate: M1 exit 7. Main session renders `index.html` with the `rules/answering.md` §3 Chrome command.
   - Depends on: M1-07.
-- [ ] M1-09 → M1: M1 gate run (main session)
+- [x] M1-09 → M1: M1 gate run (main session)
   - Gate: M1 exit 1 to 7 run in order. Command lines and exit codes go into `results/mock/mvp1/gate_log.txt`.
   - Depends on: M1-01 to M1-08, M1-10.
 - [x] M1-10 → M1: mock criteria file `prereg/S3_eval_MOCK.json` (data-analyst)
@@ -161,11 +161,11 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
   - Static: exits nonzero on any mismatch and names the pair and the first differing minute.
   - Gate: M2 exit 2 and 3. Breakage: a scratchpad copy with one edited per-minute row fails.
   - Depends on: M2-05.
-- [ ] M2-07 → M2: pre-registrations `prereg/S0_invariance.json`, `prereg/S1_headroom.json` (data-analyst)
+- [x] M2-07 → M2: pre-registrations `prereg/S0_invariance.json`, `prereg/S1_headroom.json` (data-analyst)
   - Static: each file has the 4 lines of `rules/measurement.md` §1 (metric, threshold, contrast, failure condition) and names its goal or RQ.
   - Static: `S1_headroom.json` copies DESIGN Table 8 readings and actions, plus the R4 and R13 round-1 rules, word for word.
   - Depends on: none.
-- [ ] M2-08 → M2: D-row for the S0 and S1 pre-registrations (product-manager)
+- [x] M2-08 → M2: D-row for the S0 and S1 pre-registrations (product-manager)
   - Static: one `DECISIONS.md` row cites both file paths before any S0 or S1 run.
   - Depends on: M2-07.
 - [ ] M2-09 → M2: `analyze.py --headroom` (developer)
@@ -214,7 +214,7 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
   - Static: writes the §5.2 output columns. Exits nonzero if A and B return a different cell for any query.
   - Static: CMake target in `src/`, built into `build_ours/`.
   - Depends on: M3-02.
-- [ ] M3-04 → M3 → G1, RQ2: `prereg/G1_bench.json` (data-analyst)
+- [x] M3-04 → M3 → G1, RQ2: `prereg/G1_bench.json` (data-analyst)
   - Static: G1 lines 1 to 3 of DESIGN §5.2. Which arenas decide G1 ("80 m" or "80 m and larger") follows the D-row of the main session pick (PLAN open item).
   - Static: the 4 lines of `rules/measurement.md` §1. A fail gets a root-cause memo, the line does not move.
   - Depends on: the G1-reading D-row.
@@ -238,7 +238,7 @@ Roles: developer (code, static AC only), data-analyst (pre-registrations, memos)
 - [ ] M3-09 → M3 → G1: G1 root-cause memo, only if a G1 line fails (data-analyst)
   - Static: `results/real/bench/root_cause.md` names the failed line, the cause and the evidence paths.
   - Depends on: M3-08.
-- [ ] M3-10 → M3: D-row for `prereg/G1_bench.json` (product-manager)
+- [x] M3-10 → M3: D-row for `prereg/G1_bench.json` (product-manager)
   - Static: one `DECISIONS.md` row cites the file path and sha before the first benchmark run.
   - Depends on: M3-04.
 

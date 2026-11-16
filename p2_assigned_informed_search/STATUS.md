@@ -25,3 +25,10 @@
 2026-11-12 decisions: D-021 site folder for P2 pages (DECISIONS.md)
 2026-11-16 research: lu_papers_p2.md, 12 papers (4 verified); 3 papers to obtain (research/lu_papers_p2.md, check/access-needed.md)
 2026-11-16 decisions: D-022 idea exploration protocol, one batch run (DECISIONS.md)
+2026-11-16 M1-09: gate exits 1 to 7 PASS in repo (390 mock runs, check 0 failed, 3 breakages named, report rendered); exit 8 review pending (results/mock/mvp1/gate_log.txt)
+2026-11-16 decisions: D-023 to D-029 from applied_vs_not.md, S2 one factorial batch (DECISIONS.md, research/applied_vs_not.md)
+2026-11-16 prereg: S0_invariance.json, S1_headroom.json written (M2-07), G1_bench.json written (M3-04), JSON parse ok (data-analyst, main session)
+2026-11-16 decisions: D-030 pickup rows and 2 clustering columns, D-031 prereg accepted, M2-08 and M3-10 closed (DECISIONS.md)
+2026-11-16 decisions: D-032 generated site progress page (DECISIONS.md)
+2026-11-16 DESIGN: D-023 to D-030 applied (search_mode, halo T5, block tour T6, schema v2 columns, S2 factorial 750 or 780 runs, no-harm pick rule, R14) (architect, DESIGN.md §3, §5, §6, §7)
+2026-11-16 paused (owner): 4 agents stopped mid-task. Partial, unverified: src/ copy and hooks (M2-01..03, M3-05), tools/make_runs.py, run_argos.py, invariance.py, bench (M3-03, M2-04..06). Not started or no file: M1 gate review, site progress.html and papers.html (D-032), schema v2 Python side (D-026, D-030). Resume list: PLAN.md stub

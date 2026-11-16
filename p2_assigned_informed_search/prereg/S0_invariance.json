@@ -1,0 +1,71 @@
+{
+  "title": "S0 invariance and determinism criteria (switch off equals vendor)",
+  "schema_version": 1,
+  "mock": false,
+  "task": "TASKS.md M2-07",
+  "serves": "M2 -> S1 -> RQ1. Valid pairing for G2 and G3. Kill conditions R1 and R2",
+  "source": "DESIGN.md 4.3, 6.1, 8 (R1, R2), 10; DECISIONS.md D-006, D-011; TASKS.md M2 exit 2, 3 and M3 exit 6",
+  "written": "2026-11-16, before any S0det, S0 or S0v2 run",
+  "applies_to_sets": ["S0det", "S0", "S0v2"],
+  "nest_radius_xml": 0.25,
+  "nest_radius_note": "F1-a, the primary set (D-006)",
+
+  "design_text_verbatim": [
+    "Precondition: vendor build, same experiment file, same seed, twice. Collected counts and per-minute rows must be equal. Otherwise determinism fails: stop and write a root-cause memo.",
+    "Vendor build vs our build with `InformedSearch=\"0\"`: 5 seeds × 3 distributions, F1-a.",
+    "Pass: collected count and every per-minute count are equal in all 15 pairs.",
+    "Any mismatch: no evaluation run starts. Root-cause memo first."
+  ],
+
+  "step_1_determinism": {
+    "set": "S0det",
+    "arm": "vendor",
+    "distribution": "random",
+    "seed": 3001,
+    "repeats": 2,
+    "primary_metric": {
+      "compared": ["collected (runs.csv)", "every row of forage_per_minute.csv (minute, collected)"],
+      "statistic": "exact equality between the 2 runs"
+    },
+    "threshold": "difference 0 in collected and in every per-minute row",
+    "contrast": "run 1 vs run 2, same build, same experiment file, same seed",
+    "failure_condition": "any difference. Kill R1: stop, root-cause memo, no paired design until fixed. S0 does not start"
+  },
+
+  "step_2_invariance": {
+    "set": "S0 (M2), repeated as S0v2 on the M3 build",
+    "primary_metric": {
+      "compared": ["collected (runs.csv)", "every row of forage_per_minute.csv (minute, collected)"],
+      "statistic": "exact equality within each pair"
+    },
+    "primary_contrast": {
+      "treatment_arm": "cpfa (our build, InformedSearch=\"0\")",
+      "control_arm": "vendor (build_baseline/)",
+      "pairing": "same distribution, same seed, same experiment file except our attributes",
+      "distributions": ["random", "powerlaw", "clustered"],
+      "seeds": {"first": 3001, "last": 3005},
+      "n_pairs": 15
+    },
+    "threshold": "15 of 15 pairs equal in collected and in every per-minute row",
+    "failure_condition": "any pair with any difference. Kill R2: no S3 run until fixed. Root-cause memo first. The memo names the pair and the first differing minute",
+    "incomplete_run": "a run with complete = 0 counts as a mismatch for its pair"
+  },
+
+  "noise_basis": "The simulator is expected to be deterministic for a fixed seed. Step 1 measures that noise directly. Zero difference is the only threshold that step 1 supports. So no tolerance band exists",
+
+  "reported_not_decisive": {
+    "layout_sha_equal": "per pair, vendor vs cpfa. Reported beside the verdict",
+    "vendor_attribute_handling": "whether the vendor build accepted our attributes, or ran on a copy of the experiment file without them (DESIGN.md 10)",
+    "wall_s": "per run"
+  },
+
+  "output": {
+    "file": "results/real/S0/invariance.json (S0v2: results/real/S0v2/invariance.json)",
+    "per_pair_fields": ["distribution", "seed", "collected_vendor", "collected_cpfa", "first_differing_minute", "equal"],
+    "verdict_words": {"pass": "15 of 15 equal", "fail": "otherwise"},
+    "records": "this file path and its sha256 (rules/measurement.md 4.1)"
+  },
+
+  "seed_rules": "Seeds 3001 to 3005 never overlap S1, S2 (1001 to 1030) or S3 to S5 (2001 to 2050). Seeds 0 and 1 are never used (DESIGN.md 6.1)",
+  "change_rule": "Nothing here changes after the first S0det run. A needed change makes a new file and a new run set"
+}

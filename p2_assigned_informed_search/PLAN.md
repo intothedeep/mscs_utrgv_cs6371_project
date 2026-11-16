@@ -71,7 +71,7 @@ Design: [DESIGN.md](./DESIGN.md). Decisions: [DECISIONS.md](./DECISIONS.md). Que
 
 ### Task list: split out (2026-11-12)
 
-> Current state (2026-11-12): 0 of 5 milestones closed. 38 open (M1 1, M2 11, M3 8, M4 9, M5 9), 11 done (M1-01..08, M1-10, M3-01, M3-02), 0 in progress. <!-- see TASKS.md -->
+> Current state (2026-11-16): 0 of 5 milestones closed (M1 gate review pending; schema v2 D-026 re-opens M1 tools). 33 open (M1 0, M2 9, M3 6, M4 9, M5 9), 16 done (M1-01..10, M2-07, M2-08, M3-01, M3-02, M3-04, M3-10), PAUSED 2026-11-16. Resume in this order: (1) syntax-check and finish M2-01..03 and M3-05 (partial in src/), (2) finish M3-03, M2-04..06 (partial in tools/), (3) schema v2 Python side (D-026, D-030), then re-run the M1 gate and dispatch the M1 review, (4) site progress.html generator and papers.html (D-032), (5) idea agents for halo, search_mode, block tour (D-022), (6) M2 gate build and runs. <!-- see TASKS.md -->
 > Gating fact: M1 opens first. M3-01 to M3-03 (pure code) may start during M1 and M2 (DESIGN §7).
 > Detail: [TASKS.md](./TASKS.md)
 

@@ -136,8 +136,8 @@ Our method adds new parameters (Table 6). The baseline has no such knobs.
 | F4-c | Equal budget: same tuner, same candidate count, same tuning seeds, applied to the baseline's 7 parameters | Required whenever F4-b is used |
 
 - **Recommendation: F4-a.**
-- Tuning budget, pre-registered: 3 rounds, 9 candidate settings, 10 tuning seeds, 3 distributions. 270 runs, about 27 min (§6.3).
-- One parameter set for all 3 distributions. The metric is the sum of mean collected over the 3 distributions.
+- Tuning budget, pre-registered: one factorial batch, 24 configs plus a `cpfa` control (T6 adds 1), 10 tuning seeds, 3 distributions. 750 to 780 runs, about 75 to 78 min (§6.3, D-029).
+- One parameter set for all 3 distributions. The metric is the sum of mean collected over the 3 distributions, under a per-distribution no-harm guard (D-023).
 - Why one set: the baseline uses one set for all 3 (F3-a). Per-distribution tuning would give our arm knowledge the baseline lacks.
 - If F4-b is ever opened, the headline stays "vs the shipped baseline" [TASK: "original CPFA"]. The equal-budget comparison is reported beside it. This is fixed now, before any run.
 
@@ -150,10 +150,13 @@ These parts are the same in A, B and C. Only the map structure differs.
 1. Record (robot side, `Searching()`):
    - While `SEARCHING`, log `GetPosition()` every `rec_period` seconds, on a half-second tick (`ctrl.cpp:321`).
    - Skip a point in the same minimum cell as the last logged point. This records fewer points [TASK hint 3].
-   - Also log the pickup position.
+   - Also log the pickup position, tagged `kind = pickup`. Other points are `kind = visit` (D-026).
+   - Food halo T5, when `r_halo` > 0: at a pickup, drop every buffered `visit` point within `r_halo` of the pickup position (D-024).
    - Buffer: first-in first-out, capacity 100 [TASK example].
 2. Upload (robot side, `Returning()` nest branch, `ctrl.cpp:489-517`):
    - Send the buffer with the upload time, then clear it. Same place the pheromone is pushed (`ctrl.cpp:513`).
+   - The server inserts every `visit` point. It inserts the `pickup` point only when `r_halo` = 0 (D-024).
+   - `points.csv` logs every uploaded row with its `kind` (D-026).
 3. Store (server side): each minimum cell or leaf keeps two times.
    - `t_last`: last recorded visit. Never visited = −∞.
    - `t_res_until`: end of the current reservation. None = −∞.
@@ -167,7 +170,7 @@ These parts are the same in A, B and C. Only the map structure differs.
    - Query the nearest available minimum cell from the robot position (rule below).
    - Reserve the minimum cells within `r_res` of the answer: `t_res_until = now + t_res`.
 5. Travel (robot side, `Departing()`, `ctrl.cpp:270-292`):
-   - A robot with a map target skips the 5 s switch-to-search test. It drives to the target, then starts the uninformed walk.
+   - A robot with a map target skips the 5 s switch-to-search test. It drives to the target, then searches by `search_mode` (§3.6, D-025).
    - A new flag `isMapTarget` carries this. `isInformed` stays false, so the uninformed walk runs at the target (`ctrl.cpp:362`).
    - Why a new flag: `isInformed` is read in 5 places (`ctrl.cpp:71, 81, 271, 297, 362`) and set in 3 (`ctrl.cpp:530, 535, 542`). Overloading it would also turn on the informed walk.
 6. Decision order (parameter `q_map`):
@@ -295,16 +298,47 @@ Table 4. Options at the professor's example scale (200 robots, 400,000 points, 8
 
 ### 3.6 Behaviour tactics on top of the map
 
-Each tactic is one switch. Each enters only through tuning on tuning seeds (§6.3).
+Each tactic is one parameter. Each enters only through the S2 factorial batch on tuning seeds (§6.3, D-029).
 
 | ID | Tactic | Default | Why |
 | --- | --- | --- | --- |
 | T1 | Map-target travel without the early switch (§3.1 step 5) | on (part of the method) | Without it the target is not reached (BCM §1.4) |
 | T2 | `q_map` > 0: map before pheromone for robots without fidelity | 0 | Fires the map when pheromones are active |
 | T3 | Reservation radius `r_res` and time `t_res` | 1.0 m, 60 s | Spreads 24 robots. The student grid has no reservation [S-IS-2] |
-| T4 | Spiral search at the map target | off | Covers the target region without overlap [S-IS-9] |
+| T4 | `search_mode` at the map target: `walk`, `spiral`, `hybrid` (form below) | `walk` | Spiral covers the target region without overlap [S-IS-9]. Hybrid leaves the spiral when crowded (D-018, D-025) |
+| T5 | Food halo `r_halo` (§3.1 steps 1 and 2) | 0 (off). Candidate 0.6 m | GCFA and ARPC lost on clustered layouts because visited ground covered the food areas (`research/lu_papers_p2.md` §2 T-A). Ground near a find is not searched out (D-024) |
+| T6 | Block tour: 2 × 2 minimum cells per trip, fixed order | off | Enters the S2 batch only if its code is ready at the batch cut-off (D-029). Needs a block query in `visit_map` |
 
 - `t_res` start value: a 3 m trip at 0.16 m/s takes about 19 s, plus search time. 60 s covers travel and the first search (inference).
+- `r_halo` = 0.6 m: half the side of a vendor Clustered cluster. 8 items per side × 0.15 m spacing = 1.2 m (`xml10:44-47`, `lf.cpp:370`) (D-024).
+
+#### T4 form: `search_mode` (D-025)
+
+```
+Figure 4b. One map-target trip under search_mode = hybrid
+
+ nest ──T1 travel──> map target ──> square spiral, outward, gap 0.18 m ──> spiral end ──> vendor walk
+                                       │          └─ 2nd collision event ──> vendor walk
+                                       ├─ food found ──> vendor RETURNING (spiral cleared)
+                                       └─ vendor give-up test (unchanged) ──> RETURNING
+```
+
+- Caption: Figure 4b shows when a hybrid robot leaves the spiral. Why: a collision pushes the robot off the spiral path, so the no-overlap property is already lost.
+
+| Item | Rule (D-025) | Why |
+| --- | --- | --- |
+| Values | `walk` (vendor walk), `spiral`, `hybrid` | One parameter, one factor in S2 |
+| Scope | Only trips with `isMapTarget` at arrival. Fidelity, pheromone and random trips run the vendor walk | Keeps the CPFA strengths |
+| Shape | Square spiral, outward from the target point. Leg lengths g, g, 2g, 2g, 3g, ... with g = 0.18 m | MDBSA (`research/lu_papers_p2.md` §1.5, pp. 227 to 228). Detection radius 0.13 m gives a 0.26 m strip |
+| Extent | Stop when the half-side reaches `r_res` | Stays inside the reserved disk in space. Not in time: a full spiral takes about 139 s, `t_res` is 60 s (inference) |
+| Step targets | Each step target lies `SearchStepSize` (0.08 m) further along the spiral. It replaces the walk step at `ctrl.cpp:358-388`. A step outside the forage range or inside the nest exclusion disk jumps to the next leg | Same step length as the walk |
+| Give-up | Vendor test unchanged (`ctrl.cpp:332-334`) | The test needs the robot within the 0.224 m tolerance (BCM §1.5). With 0.08 m steps that holds on every tick, as in the walk. So the give-up rate stays as frozen by D-009 (inference) |
+| On pickup | Vendor `RETURNING`. Spiral state cleared | Site fidelity already resumes at the find |
+| Spiral end | Vendor walk for the rest of the trip | GCFA order: spiral, then walk |
+| Crowd event (`hybrid` only) | A control step with `collisionFlag` true, and no event counted in the previous 1.0 s | `collision_counter` counts ticks, not contacts (`BaseController.cpp:304-315`). 1.0 s = the longest vendor `collisionDelay` (`BaseController.cpp:328-329`) |
+| Switch | At the 2nd event since the spiral began → vendor walk. `c_crowd` = 2, fixed, not tuned | One event can be one robot passing (inference) |
+| Determinism | No new random draw. Nothing runs when the switch is off | §4.1 |
+| Log | `n_crowd_switch` per run in the metrics line (§6.5, D-026) | Cause of a hybrid effect |
 
 ## 4. Integration into the baseline code
 
@@ -382,6 +416,15 @@ Figure 5. Code layout, under p2_assigned_informed_search/
 - Primary cost measure: `nodes_visited` (deterministic). `query_us` is secondary (machine noise).
 - In the baseline arm, the cost columns stay empty. The branch rows give the headroom counts.
 
+Mechanism readings added by schema v2 (D-026). Each lands in `runs.csv` (§6.5). No tool reads run folders for a report number (D-013).
+
+| `runs.csv` column | Source | Written by |
+| --- | --- | --- |
+| `collision_s` | vendor `iAntTagData.txt` column `collisions_in_seconds` (`lf.cpp:286-295`), all arms | `run_argos.py` |
+| `collected_4min`, `collected_8min` | `forage_per_minute.csv` rows 4 and 8 | `collect_runs.py` |
+| `near_pickup_target_share` | `queries.csv` map targets within 0.6 m of an earlier `pickup` row of `points.csv` | `collect_runs.py` |
+| `n_crowd_switch` | metrics line of our build (`METRICS_TAG`), summed over robots | `run_argos.py` |
+
 ### 5.2 Micro-benchmark at the professor's scale
 
 `bench_visit_map` links only `visit_map`. No simulator, no model, one core.
@@ -389,13 +432,15 @@ Figure 5. Code layout, under p2_assigned_informed_search/
 - Inputs, two kinds:
   1. Synthetic: 200 robots, correlated random walk traces from a central nest, 100 points per trip, 20 trips = 400,000 points. Generator seed fixed.
   2. Replay: `points.csv` uploads saved from real runs, replayed in time order.
+  3. `rec_period` axis on the replay: 2, 8, 25 s. Per robot, keep a `visit` point only if it is at least `rec_period` after the last kept one. No new simulation run (D-028).
+- Why the axis: GCFA leaves the logging interval to future work (`research/lu_papers_p2.md` §1.1). The benchmark is reported as the answer to GCFA's cell-count vs cost future work (D-028).
 - Arena sides: 10, 20, 40, 80, 160, 320 m. Minimum leaf 0.3125 m.
 - Structures, one interface:
   1. Flat list: scan all points per candidate.
   2. Student grid, n = 12: minimum 3 × 3 block (Algorithm 1 of [S-IS-2]).
   3. Student grid at equal resolution: n = L / `s_min`, same block rule.
   4. A: fine grid. 5. B: quadtree, merge on. 6. B without the merge.
-- Output columns per structure × arena × input: region side (m), total insert operations, operations per query (median, 95th percentile, maximum), memory bytes, microseconds per query (median), cells touched (%).
+- Output columns per structure × arena × input × `rec_period_s` (D-028): region side (m), total insert operations, operations per query (median, 95th percentile, maximum), memory bytes, microseconds per query (median), cells touched (%).
 - Queries: one per robot return (4,000), from the nest.
 - Equivalence check: A and B return the same cell on the same input (§3.1 query rule). Any difference stops B.
 - Expected wall time: under 10 s per arena size (inference). The main session runs it with `timeout 300`, one core.
@@ -416,7 +461,7 @@ G1 lines (draft, pre-registered in `prereg/G1_bench.json` before the first bench
 | --- | --- | --- | --- | --- | --- |
 | S0 invariance | vendor, `cpfa` (switch off) | 3 | 3001 to 3005 | 30, plus 2 determinism | §4.3 |
 | S1 headroom and noise | `cpfa` | 3 | 1001 to 1030 | 90 | branch shares, travel and search split, baseline noise |
-| S2 tuning | `qmap` candidates | 3 | 1001 to 1010 | 270 | §6.3 |
+| S2 tuning, one factorial batch (D-029) | `cpfa` control, 24 `qmap` configs, T6 if ready | 3 | 1001 to 1010 | 750, or 780 with T6 | §6.3 |
 | S3 evaluation, F1-a (primary) | `cpfa`, `qmap` frozen | 3 | 2001 to 2050 | 300 | G2, G3 |
 | S4 sensitivity, F1-b | `cpfa`, `qmap` frozen | 3 | 2001 to 2050 | 300 | nest radius reading |
 | S5 ablation (RQ3) | `qmap` minus one tactic | 3 | 2001 to 2050 | ≤ 300 | which part gives the effect |
@@ -424,7 +469,7 @@ G1 lines (draft, pre-registered in `prereg/G1_bench.json` before the first bench
 - `cpfa` = our build with the switch off. After S0 passes, it stands for the vendor baseline.
 - Seed 0 (clock seed, BCM §5.2) and seed 1 (smoke) are never used.
 - Tuning seeds and evaluation seeds never overlap. The same 50 evaluation seeds serve both arms, paired by seed.
-- Total runs ≈ 1,300. At about 6 s each: about 2.2 h, one core, sequential (inference from the smoke).
+- Total runs ≈ 1,800. At about 6 s each: about 3 h, one core, sequential (inference from the smoke, D-029).
 
 ### 6.2 Pre-registration
 
@@ -448,28 +493,47 @@ G1 lines (draft, pre-registered in `prereg/G1_bench.json` before the first bench
 - Nothing in this file changes after the first S3 run. A needed change makes a new file and a new run set.
 - G3 needs a root-cause memo for each distribution that is `worse` or `not resolved`.
 
-### 6.3 Tuning rule (S2, pre-registered in `prereg/S2_tuning.json`)
+### 6.3 Tuning rule (S2, one factorial batch, pre-registered in `prereg/S2_tuning.json`, D-029)
 
 Table 6. Method parameters (start value first, all inference)
 
-| Parameter | Start | Tuned candidates | Why |
+| Parameter | Start | S2 levels | Why |
 | --- | --- | --- | --- |
 | `s_min` (minimum cell) | 0.3125 m | fixed | about 2 × pickup radius 0.13 m |
-| `rec_period` | 2 s | fixed | 0.32 m at full speed, about one cell |
-| `T_stale` | ∞ | 300 s | respawn refill estimate (§3.1) |
-| `r_res` | 1.0 m | 0.5 m, 2.0 m | spread 24 robots |
-| `t_res` | 60 s | 30 s, 120 s | travel plus first search (§3.6) |
-| `q_map` | 0 | 0.5, 1.0 | headroom (M2 gate) |
-| `spiral` (T4) | off | on | [S-IS-9] |
+| `rec_period` | 2 s | fixed in S2. Cost axis 2, 8, 25 s in the benchmark (D-028) | 0.32 m at full speed, about one cell |
+| `T_stale` | ∞ | fixed | refill estimate: a cell refills about once per 2,900 s, longer than a run (§3.1) (D-029) |
+| `r_res` | 1.0 m | fixed. 0.5 m if R13 fires on SMK (D-029) | spread 24 robots |
+| `t_res` | 60 s | 60, 120 s (D-029) | travel plus first search (§3.6). A full spiral outlasts 60 s |
+| `q_map` | 0 | 0, 0.5 (D-029) | headroom (M2 gate). 1.0 dropped: it removes the pheromone branch for every robot without fidelity |
+| `search_mode` (T4) | `walk` | `walk`, `spiral`, `hybrid` (D-025, D-029) | [S-IS-9], D-018 |
+| `r_halo` (T5) | 0 | 0, 0.6 m (D-024, D-029) | clustered-layout risk |
+| `block_tour` (T6) | off | on, one extra config, only if ready (D-029) | GCFA Algorithm 1 |
+| `dist_cap` | none | fixed. 3 m if R4 or Table 8 fires (D-029) | far targets cost a fixed-time count |
 
-1. A round holds up to 4 candidates. Each candidate changes one parameter from the current best.
-2. Round 1: the start values (1 candidate).
-3. Round 2: `q_map` 0.5, `q_map` 1.0, `r_res` 0.5, `r_res` 2.0.
-4. Round 3: `t_res` 30, `t_res` 120, `T_stale` 300, `spiral` on.
-5. Each candidate: 10 seeds × 3 distributions = 30 runs. Total 9 × 30 = 270 runs.
-6. Metric: sum over 3 distributions of mean `collected` on seeds 1001 to 1010. The best of a round becomes the current best only if it beats it. A tie keeps the earlier one.
-7. If the M2 headroom gate shows `targets_reached_share` < 50 % in round 1, a 3 m distance cap replaces `spiral` in round 3.
-8. Freeze in a D-row before S3. Never re-tune on evaluation seeds.
+Table 6b. S2 batch (D-029)
+
+| Part | Factors and levels | Configs | Runs (× 10 seeds × 3 distributions) |
+| --- | --- | --- | --- |
+| Full factorial | `search_mode` 3 × `r_halo` 2 × `q_map` 2 × `t_res` 2 | 24 | 720 |
+| Shared control (D-022) | `cpfa` (switch off) | 1 | 30 |
+| T6, only if code is ready at the cut-off | start config + `block_tour` on | 0 or 1 | 0 or 30 |
+| Total | | 25 or 26 | 750 or 780, about 75 to 78 min at about 6 s per run (inference) |
+
+1. Batch cut-off: the commit of `prereg/S2_tuning.json`. Configs not ready then do not enter (D-029).
+2. Fixed values set before the batch, from saved readings only:
+   - R4: `targets_reached_share` < 50 % in SMK (start config) → `dist_cap` 3 m in every `qmap` config.
+   - Table 8: `search_s / travel_s` < 1 in S1 → `dist_cap` 3 m in every `qmap` config.
+   - R13: `fallback_random` share > 20 % in SMK → `r_res` 0.5 m in every `qmap` config.
+3. Seeds 1001 to 1010, paired across configs. All configs run in one batch on one build (D-022).
+4. No-harm guard (D-023). For each distribution d:
+   - Δ_d = mean `collected`(config) − mean `collected`(`cpfa` control), on the 10 tuning seeds.
+   - δ_d = 2 · σ_d · √(2/10). σ_d = S1 standard deviation of `collected` for d (`results/real/S1/headroom.json`).
+   - A config is eligible only if Δ_d ≥ −δ_d for all 3 distributions.
+5. Pick: among eligible configs, the largest sum over 3 distributions of mean `collected`.
+6. Tie: the config with fewer changes from the start values, then Table 6b row order.
+7. No eligible `qmap` config: freeze the start values, D-row, root-cause memo.
+8. Main effects and two-factor interactions are reported, descriptive only. No improvement is claimed from tuning seeds (D-022).
+9. Freeze in a D-row before S3. Never re-tune on evaluation seeds.
 
 ### 6.4 Run layout
 
@@ -482,7 +546,7 @@ p2_assigned_informed_search/
     manifest.json                rules/measurement.md §2.1 fields plus metrics
     forage_per_minute.csv        minute, collected
     queries.csv                  §5.1
-    points.csv                   uploads (t_s, robot, x, y), for replay
+    points.csv                   uploads (t_s, robot, x, y, kind), kind = visit | pickup, for replay (D-026)
   mock/runs/<set>/<runid>/       same layout, runid starts MOCK_
 ```
 
@@ -493,15 +557,15 @@ p2_assigned_informed_search/
 
 ### 6.5 Per-run summary schema (the single contract)
 
-`results/<real|mock>/runs.csv`, one row per run. `schema_version = 1`. Mock and real write exactly these columns.
+`results/<real|mock>/runs.csv`, one row per run. `schema_version = 2` (D-026). Mock and real write exactly these columns.
 
 | Column | Type | Meaning |
 | --- | --- | --- |
-| `schema_version` | int | 1 |
+| `schema_version` | int | 2 (D-026) |
 | `mock` | int | 1 mock, 0 real |
 | `run_id` | str | as §6.4 |
 | `set` | str | S0 to S5 |
-| `arm` | str | `vendor`, `cpfa`, `qmap`, `qmap-<ablation>` |
+| `arm` | str | `vendor`, `cpfa`, `qmap`, `qmap-<ablation>`, `qmap-s2c<NN>` (S2 config NN of Table 6b, values in manifest `params`, D-029) |
 | `distribution` | str | `random`, `powerlaw`, `clustered` |
 | `seed` | int | |
 | `collected` | int | score at 720 s |
@@ -522,9 +586,14 @@ p2_assigned_informed_search/
 | `ops_per_query_max` | int | `nodes_visited` |
 | `us_per_query_median` | float | |
 | `targets_reached_share` | float | |
+| `collision_s` | float | vendor `collisions_in_seconds`, all arms (D-026) |
+| `collected_4min`, `collected_8min` | int | collected at minutes 4 and 8 (D-026, D-027) |
+| `near_pickup_target_share` | float | share of map targets within 0.6 m of an earlier pickup. Empty with no map query (D-026) |
+| `n_crowd_switch` | int | hybrid spiral exits. Empty unless `search_mode` = `hybrid` (D-026) |
 | `wall_s` | float | |
 
 - Columns that do not apply (cost columns in the baseline arm) are empty, not 0.
+- v2 sends the slice back to MVP1: `schema.py`, `collect_runs.py`, `make_mock_runs.py` change, the mock is regenerated, and the M1 gate re-runs (D-026).
 - `runs.csv` is the source of every number in the report (`rules/answering.md` §3).
 
 ### 6.6 Checks (`tools/check_runs.py`)
@@ -564,7 +633,7 @@ Figure 6. Milestones (draft dates, presentation window opens 2026-11-30)
 
  M1 MVP1 shape ──> M2 MVP2 baseline slice ──> M3 map + bench ──> M4 tune + freeze ──> M5 eval + report
  by 11-14          by 11-18                   by 11-21           by 11-23            by 11-27
- mock end-to-end   invariance, headroom,      G1 benchmark,      S2 (270 runs),      S3, S4 (600 runs),
+ mock end-to-end   invariance, headroom,      G1 benchmark,      S2 batch (750-780), S3, S4 (600 runs),
                    S1 noise (90 runs)         qmap smoke runs    prereg commit       verdict, report
 ```
 
@@ -577,21 +646,26 @@ Table 7. Milestones and exit criteria
 | M1 | MVP1 | `make_mock_runs.py` writes S1 and S3 mock (300 S3 runs) → `check_runs.py` → `analyze.py` → box plot, `improvement.csv`, `verdict.json`, `report.html` | 300 mock runs pass. All MOCK outputs exist. The 3 deliberate breakages (§6.6 item 7) fail the check |
 | M2 | MVP2 | `src/` copy builds → `make_runs.py` writes S0 and S1 → `run_argos.py` (one core, timeout) → check → analyze on real `cpfa` only | Determinism holds. S0: 15 of 15 pairs equal. S1: 90 runs pass the check unchanged. Headroom stage report: branch shares, travel and search split, σ per distribution. `analyze.py` lists the missing `qmap` arm and does not crash |
 | M3 | MVP3 (core) | `visit_map` and hooks → benchmark (§5.2) → one `qmap` smoke run per distribution → check | `bench.csv` and `fig_cost_vs_arena.png` exist. A and B equivalence holds. G1 lines judged. 3 `qmap` smoke runs pass the same check. Switch off still passes S0 on the new build |
-| M4 | MVP3 | S2 tuning rounds → freeze D-row → `prereg/S3_eval.json` committed | Tuning table with every round. Frozen values in `DECISIONS.md`. Pre-registration committed before any S3 run |
+| M4 | MVP3 | `prereg/S2_tuning.json` committed → one S2 factorial batch → pick → freeze D-row → `prereg/S3_eval.json` committed (D-029) | Tuning table with every config, Δ_d, eligibility and the pick (D-023). Frozen values in `DECISIONS.md`. Pre-registration committed before any S3 run |
 | M5 | MVP3 | S3, then S4, then S5 if time → check → analyze → report | 300 S3 runs complete (G2). `verdict.json` committed. Root-cause memo per non-improving distribution (G3). S4 reported as sensitivity |
 
 - MVP2 makes 2 tasks real: (1) the baseline run harness on real runs, (2) the invariance check. The `qmap` arm stays mock in MVP2.
 - `visit_map` and the benchmark (U8, U9) are pure code with no simulator. They may start during M1 and M2.
 - A schema change needed by real code sends that slice back to MVP1: bump `schema_version`, regenerate the mock.
+- Schema v2 (D-026) is such a return. M1 reopens: the M1 tools take the v2 columns, the mock is regenerated, and the M1 gate re-runs before M2 opens.
+- M2: `prereg/S1_headroom.json` carries the D-027 late-phase reading and the σ values the D-023 guard needs.
+- M3: the benchmark carries the `rec_period` axis (D-028). SMK feeds the R4 and R13 fixed values of §6.3 item 2. T6 code, if built, must be ready at the S2 cut-off (D-029).
+- M4: S2 is one batch, not rounds (D-029). R10 still applies: M3 not done by 2026-11-22 → S2 skipped, start values frozen.
 
 Table 8. Headroom readings, pre-registered now (S1, baseline arm)
 
 | Reading | Meaning | Action |
 | --- | --- | --- |
-| `share_random` ≥ 20 % of departures | the map replaces a frequent choice | keep the round-2 list (§6.3) |
-| `share_random` < 20 % | the map rarely fires with `q_map` = 0 | round 2 stays as listed (it tests `q_map` first). Report the share |
+| `share_random` ≥ 20 % of departures | the map replaces a frequent choice | keep the S2 `q_map` levels (§6.3, D-029) |
+| `share_random` < 20 % | the map rarely fires with `q_map` = 0 | S2 keeps the `q_map` factor (D-029). Report the share |
 | `search_s / travel_s` ≥ 2 | time goes to searching. Better search places pay | keep T1 |
-| `search_s / travel_s` < 1 | time goes to travel. Far targets may cost score | add the 3 m distance cap to round 3 in place of `spiral` |
+| `search_s / travel_s` < 1 | time goes to travel. Far targets may cost score | `dist_cap` 3 m in every S2 `qmap` config (§6.3 item 2, D-029) |
+| Late phase, report-only (D-027): per seed, late = `collected` − `collected_8min`, mid = `collected_8min` − `collected_4min`. Contrast = mean(mid − late) on Clustered minus the same on Random, 95 % bootstrap interval over 30 seeds | interval above 0: Clustered slows late more than Random, so a depletion phase exists inside 12 min. Covers 0: no Clustered-specific late phase | none. Cited by the root-cause memos (R5). Minutes 0 to 4 skipped: ramp-up from the nest |
 
 ## 8. Risks and kill conditions
 
@@ -602,7 +676,7 @@ Table 9. Risks
 | R1 | Simulation not deterministic for a fixed seed | M2 precondition check | Fails → stop, root-cause memo, no paired design until fixed |
 | R2 | Switch off differs from vendor | §4.3 | Any mismatch → no S3 run until fixed |
 | R3 | The map branch rarely fires (pheromone list rarely empty) | headroom gate, `q_map` | none |
-| R4 | Far map targets lower a fixed-time count | nearest-first answers, `dist_m` logged | `targets_reached_share` < 50 % in round 1 → 3 m distance cap in round 3 |
+| R4 | Far map targets lower a fixed-time count | nearest-first answers, `dist_m` logged | `targets_reached_share` < 50 % in SMK → `dist_cap` 3 m in every S2 `qmap` config (D-029) |
 | R5 | No score gain. 12 min may stay in the early regime where the papers show no gain [S-IS-2, S-IS-4] | outcome does not matter (repo `CLAUDE.md`). G1 stands alone | `not resolved` or `worse` → root-cause memo, never a widened criterion |
 | R6 | Quadtree bug | A fallback, same interface | A and B equivalence fails on 2026-11-21 → ship A, D-row |
 | R7 | F1-b drop-off loop slows runs | wall time logged | S4 median run > 60 s → S4 reduced to 20 seeds, D-row |
@@ -611,7 +685,8 @@ Table 9. Risks
 | R10 | Deadline: the window opens 2026-11-30 | M5 by 11-27 | M3 not done by 11-22 → S2 skipped, start values frozen, D-row |
 | R11 | Vendor appends result files without an arm label | one working directory per run | none |
 | R12 | SciPy not approved | numpy Wilcoxon | none |
-| R13 | Reservations lock too much space | `t_res` expiry, `fallback_random` share logged | fallback share > 20 % in round 1 → `r_res` 0.5 m forced into round 2 |
+| R13 | Reservations lock too much space | `t_res` expiry, `fallback_random` share logged | fallback share > 20 % in SMK → `r_res` 0.5 m in every S2 `qmap` config (D-029) |
+| R14 | Map targets avoid food areas on Clustered, as in GCFA and ARPC | T5 halo factor, D-023 guard, `near_pickup_target_share` | Clustered `worse` in S3 → root-cause memo cites `near_pickup_target_share` and the D-027 reading (D-024, D-026) |
 
 ## 9. Design units for `product-manager`
 
