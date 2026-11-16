@@ -23,3 +23,5 @@
 2026-11-12 M1-06..08: tools/analyze.py, analyze_figures.py, plot_style.py, report.py, report_html.py; verified on scratchpad mirror, repo gate pending (developer)
 2026-11-12 decisions: D-017 folder rename, D-018 hybrid tuning candidate, D-019 irrigation analogy, D-020 index.html name (DECISIONS.md)
 2026-11-12 decisions: D-021 site folder for P2 pages (DECISIONS.md)
+2026-11-16 research: lu_papers_p2.md, 12 papers (4 verified); 3 papers to obtain (research/lu_papers_p2.md, check/access-needed.md)
+2026-11-16 decisions: D-022 idea exploration protocol, one batch run (DECISIONS.md)
